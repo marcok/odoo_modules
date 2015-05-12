@@ -24,11 +24,11 @@ You can export your employees data from odoo as excel and create 2d barcode stic
 The check-in process automatically detects if the user is currently signed in or out and executes the following step. The employee gets a quick overview of his over- and under-time total and leave rest entitlement.
 
 Lunch order
-#####
+*****
 If Lunch order is installed and lunch items are defined, they are shown after each sign in process and the user can choose his favorite lunch.
 
 Company info message
-#####
+*****
 The company can define company wide information messages as a calender entry, tagged with "Station" and the information is shown on the time clock app for the desired periode.
 
 
