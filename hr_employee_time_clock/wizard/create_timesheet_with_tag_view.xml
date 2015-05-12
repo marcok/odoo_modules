@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_hr_timesheet_current_open_inherit" model="ir.ui.view">
+            <field name="name">hr_timesheet_current_open.form.inherit</field>
+            <field name="model">hr.timesheet.current.open</field>
+            <field name="inherit_id" ref="hr_timesheet_sheet.view_hr_timesheet_current_open"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/group/separator" position="attributes">
+                    <attribute name="string">It creates and open timesheets for employees having the below tag.</attribute>
+                </xpath>
+                <xpath expr="//form/group" position="after">
+                    <group>
+                        <field name="category_id"/>
+                        <group colspan="2">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <menuitem name="Create/Open Current Timesheets" id="menu_act_hr_timesheet_sheet_form_open_current" 
+                parent="hr_attendance.menu_hr_time_tracking" action="hr_timesheet_sheet.action_hr_timesheet_current_open" 
+                groups="base.group_hr_manager" sequence="10"/>
+
+    </data>
+</openerp>
