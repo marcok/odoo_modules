@@ -11,8 +11,8 @@ Timesheet generation
 #####
 For convenience, the module gives a manger the possibility to generate multiple timesheets for all employees with a certain tag.
 
-This module is well integrated with our iPhone and iPad apps, but in any case, it works without the mobile apps as well.
 
+This module is well integrated with our iPhone and iPad apps, but in any case, it works without the mobile apps as well.
 
 Employee time clock (iPad)
 #####
