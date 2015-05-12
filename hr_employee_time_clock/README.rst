@@ -15,11 +15,11 @@ This module is well integrated with our iPhone and iPad apps, but in any case, i
 
 
 Employee time clock (iPad)
-*****
+#####
 Employee time clock gives the employees the possibility to sign-In/sign-out on the entrance of your company where the time clock station app is mounted with a 2D barcode card.
 
 Sign in/out with 2d barcode
-#####
+*****
 You can export your employees data from odoo as excel and create 2d barcode stickers by yourself with your printer, without additional costs. For a tutorial how you can do it with the Herma online tool for all herma sticker formats, watch your video, or try it by self `<http://www.herma.de/de/service/gratis-software/etikettenassistent-online.html>`_. The tool allows you to create your desired design inclusive logo and generate a pdf for printing.
 The check-in process automatically detects if the user is currently signed in or out and executes the following step. The employee gets a quick overview of his over- and under-time total and leave rest entitlement.
 
