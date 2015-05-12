@@ -2,13 +2,13 @@ Employee Time Clock
 ==============================
 
 Over- and under-time
-#####
+*****
 Employee Time Clock calculates over and undertime based on attendances and contracts/time schedules.
 Over- undetime is displayed and stored in employees timesheets. The manager see the current account balance of the timesheet and the overall account balance from beginning as well.
 Employees leaves are considered as well and subtracted from the duty hours.
 
 Timesheet generation
-#####
+*****
 For convenience, the module gives a manger the possibility to generate multiple timesheets for all employees with a certain tag.
 
 
@@ -34,7 +34,7 @@ The company can define company wide information messages as a calender entry, ta
 
 
 Employee attendance (iPhone)
-*****
+#####
 Employee time clock gives the employees the possibility to sign-in/sign-out online with the app.
 
 Sign in/out
