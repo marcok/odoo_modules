@@ -19,8 +19,15 @@ class hr_timesheet_dh(osv.osv):
             res.setdefault(sheet.id, {
                 'total_duty_hours': 0.0,
             })
-            for duty_hours in sheet.duty_hour_ids:
-                res[sheet.id]['total_duty_hours'] += duty_hours.duty_hours
+            # Done BY Addition IT Solutions: BEGIN 
+            dates = list(rrule.rrule(rrule.DAILY,
+                                     dtstart=parser.parse(sheet.date_from),
+                                     until=parser.parse(sheet.date_to)))
+            for date_line in dates:
+                duty_hours = self.calculate_duty_hours(cr, uid, sheet.employee_id.id, date_line, context)
+                res[sheet.id]['total_duty_hours'] += duty_hours
+            res[sheet.id]['total_duty_hours'] = res[sheet.id]['total_duty_hours'] - sheet.total_attendance
+            # Done BY Addition IT Solutions: END  
         return res
 
     def get_overtime(self, cr, uid, ids, start_date, context=None):
@@ -46,30 +53,10 @@ class hr_timesheet_dh(osv.osv):
 
     _columns = {
         'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
-        'duty_hour_ids': fields.one2many('hr_timesheet.day.dh', 'sheet_id', 'Daily Duty Hours', readonly=True),
         'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
         'calculate_diff_hours': fields.function(_overtime_diff, method=True, string="Diff (worked-duty)", multi="_diff"),
         'prev_timesheet_diff': fields.function(_overtime_diff, method=True, string="Diff from old", multi="_diff"),
     }
-
-
-    def create(self, cr, uid, vals, context=None):
-        res = super(hr_timesheet_dh, self).create(cr, uid, vals, context=context)
-        self.create_days_dh(cr, uid, [res], context)
-        return res
-
-    def create_days_dh(self, cr, uid, ids, context=None):
-        for sheet in self.browse(cr, uid, ids, context=context or {}):
-
-            dates = list(rrule.rrule(rrule.DAILY,
-                                     dtstart=parser.parse(sheet.date_from),
-                                     until=parser.parse(sheet.date_to)))
-            for date_line in dates:
-                duty_hours = self.calculate_duty_hours(cr, uid, sheet.employee_id.id, date_line, context)
-                self.pool.get('hr_timesheet.day.dh').create(cr,
-                                                            uid,
-                                                            {'name': date_line, 'duty_hours': duty_hours, 'sheet_id': sheet.id},
-                                                            context)
 
     def calculate_duty_hours(self, cr, uid, employee_id, date_from, context):
         contract_obj = self.pool.get('hr.contract')
@@ -94,13 +81,13 @@ class hr_timesheet_dh(osv.osv):
         for leave in holiday_obj.browse(cr, uid, holiday_ids, context=context):
             leave_date_from = datetime.strptime(leave.date_from, '%Y-%m-%d %H:%M:%S')
             leave_date_to = datetime.strptime(leave.date_to, '%Y-%m-%d %H:%M:%S')
-            for days in range(0,int(leave.number_of_days_temp)):
-                if leave_date_from.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
+            leave_dates = list(rrule.rrule(rrule.DAILY,
+                                     dtstart=parser.parse(leave.date_from),
+                                     until=parser.parse(leave.date_to)))
+            for date in leave_dates:
+                if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
                     leaves.append((leave_date_from, leave_date_to))
                     break
-                next_leave_date = leave_date_from + relativedelta(days=1)
-                leave_date_from = next_leave_date
-                
         # END
 
         for contract in contract_obj.browse(cr, uid, contract_ids, context=context):
@@ -173,28 +160,14 @@ class hr_timesheet_dh(osv.osv):
         return res
 
     def calculate_diff(self, cr, uid, ids, end_date=None, context=None):
-        attendance_obj = self.pool.get('hr.attendance')
-        q = [('action', '=', 'sign_out')]
-        if end_date:
-            q.append(('name', '<=', end_date))
+#         attendance_obj = self.pool.get('hr.attendance')
+#         q = [('action', '=', 'sign_out')]
+#         if end_date:
+#             q.append(('name', '<=', end_date))
         for sheet in self.browse(cr, uid, ids, context):
-            q.append(('sheet_id', '=', sheet.id))
-            worked_hours = 0.0
-            for attendance in attendance_obj.search_read(cr, uid, q, ['name', 'worked_hours']):
-                worked_hours += attendance['worked_hours']
-            return worked_hours-sheet.total_duty_hours
+#             q.append(('sheet_id', '=', sheet.id))
+#             worked_hours = 0.0
+#             for attendance in attendance_obj.search_read(cr, uid, q, ['name', 'worked_hours']):
+#                 worked_hours += attendance['worked_hours']
+            return sheet.total_attendance - sheet.total_duty_hours
 
-class hr_timesheet_day_dh(osv.osv):
-    """
-        Daily duty hours
-    """
-    _name = 'hr_timesheet.day.dh'
-
-    def _init_duty_hours(self):
-        self.duty_hours = 5.0
-
-    _columns = {
-        'sheet_id': fields.many2one('hr_timesheet_sheet.sheet', 'Sheet'),
-        'name': fields.date('Date'),
-        'duty_hours': fields.float('Duty Hours'),
-    }

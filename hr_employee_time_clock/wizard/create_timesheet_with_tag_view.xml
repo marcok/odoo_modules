@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
+        <!--Done BY Addition IT Solutions: BEGIN -->
+        <!-- Override 'My Current Timesheet' form and menu here -->
         <record id="view_hr_timesheet_current_open_inherit" model="ir.ui.view">
             <field name="name">hr_timesheet_current_open.form.inherit</field>
             <field name="model">hr.timesheet.current.open</field>
@@ -27,3 +30,5 @@
 
     </data>
 </openerp>
+
+<!--Done BY Addition IT Solutions: END -->

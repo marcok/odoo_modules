@@ -35,10 +35,10 @@
             </field>
         </record>
 
-        <record id="action_hr_timesheet_day_dh" model="ir.actions.act_window">
+        <!--record id="action_hr_timesheet_day_dh" model="ir.actions.act_window">
             <field name="name">Duty Hours</field>
             <field name="res_model">hr_timesheet.day.dh</field>
-        </record>
+        </record-->
 
     </data>
 </openerp>

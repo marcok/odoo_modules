@@ -43,7 +43,12 @@ class create_timesheet_with_tag(osv.osv_memory):
                 if ts_id:
                     raise osv.except_osv(_('Data Error!'),_('Timesheet already exists for %s.') %(emp.name))
                 if not ts_id:
-                    ts_id = ts.create(cr, uid, {'employee_id': emp.id})
+                    vals = {'employee_id': emp.id}
+                    if record.date_from and record.date_to:
+                        vals.update({
+                                    'date_from': date_from,
+                                    'date_to': date_to})
+                    ts_id = ts.create(cr, uid, vals)
                 ts_ids.append(ts_id)
         
         #Third: Add it to dictionary to be returned
