@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "hr_employee_time_clock",
+    'name': "Employee time clock",
     'author': "Bytebrand GmbH",
     'website': "http://www.bytebrand.net",
     'category': 'Uncategorized',
