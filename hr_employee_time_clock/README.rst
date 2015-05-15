@@ -16,7 +16,7 @@ This module is well integrated with our iPhone and iPad apps, but in any case, i
 
 Employee time clock (iPad)
 ======================
-Employee time clock gives the employees the possibility to sign-In/sign-out on the entrance of your company where the time clock station app is mounted with a 2D barcode card.
+Employee time clock gives the employees the possibility to sign-In/sign-out on the entrance of your company where the iPad is mounted with a 2D barcode card.
 
 Sign in/out with 2d barcode
 -------------------
@@ -30,6 +30,7 @@ If Lunch order is installed and lunch items are defined, they are shown after ea
 Company info message
 -------------------
 The company can define company wide information messages as a calender entry, tagged with "Station" and the information is shown on the time clock app for the desired periode.
+Your company logo, if available, is displayed too.
 
 
 
