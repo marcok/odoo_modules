@@ -25,10 +25,10 @@
             <field name="arch" type="xml">
                 <xpath expr="/form/sheet/group/group[2]" position="replace">
                     <group>
-                        <field name="prev_timesheet_diff" widget="float_time" string="Diff from old"/>
+                        <field name="prev_timesheet_diff" widget="float_time" string="Total from last months"/>
                         <field name="total_timesheet" widget="float_time"/>
                         <field name="total_attendance" widget="float_time" string="Attendence this month"/>
-                        <field name="total_duty_hours" widget="float_time" string="Duty Hours this month"/>
+                        <field name="total_duty_hours" widget="float_time" string="Remaining duty hours this month"/>
                         <field name="calculate_diff_hours" widget="float_time" string="Total"/>
                     </group>
                 </xpath>
