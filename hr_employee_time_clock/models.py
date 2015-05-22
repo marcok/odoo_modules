@@ -15,6 +15,7 @@ class hr_timesheet_dh(osv.osv):
 
     def _duty_hours(self, cr, uid, ids, name, args, context=None):
         res = {}
+        holiday_obj = self.pool.get('hr.holidays')
         for sheet in self.browse(cr, uid, ids, context=context or {}):
             res.setdefault(sheet.id, {
                 'total_duty_hours': 0.0,
@@ -25,7 +26,30 @@ class hr_timesheet_dh(osv.osv):
                                      until=parser.parse(sheet.date_to)))
             for date_line in dates:
                 duty_hours = self.calculate_duty_hours(cr, uid, sheet.employee_id.id, date_line, context)
-                res[sheet.id]['total_duty_hours'] += duty_hours
+                # Done BY Addition IT Solutions: BEGIN 
+                # First: Find all the leaves of current month
+                start_leave_period = datetime.strftime((date_line + relativedelta(day=1)),'%Y-%m-%d')
+                end_leave_period = datetime.strftime((date_line + relativedelta(day=31)),'%Y-%m-%d')
+                holiday_ids = holiday_obj.search(cr, uid, [('date_from','>=',start_leave_period),
+                                                           ('date_to','<=',end_leave_period),
+                                                           ('employee_id','=',sheet.employee_id.id),
+                                                           ('state','=','validate'),
+                                                           ('type','=','remove')])
+                leaves = []
+                #Second: If date_from and leave date matches add to list leaves
+                for leave in holiday_obj.browse(cr, uid, holiday_ids, context=context):
+                    leave_date_from = datetime.strptime(leave.date_from, '%Y-%m-%d %H:%M:%S')
+                    leave_date_to = datetime.strptime(leave.date_to, '%Y-%m-%d %H:%M:%S')
+                    leave_dates = list(rrule.rrule(rrule.DAILY,
+                                             dtstart=parser.parse(leave.date_from),
+                                             until=parser.parse(leave.date_to)))
+                    for date in leave_dates:
+                        if date.strftime('%Y-%m-%d') == date_line.strftime('%Y-%m-%d'):
+                            leaves.append((leave_date_from, leave_date_to))
+                            break
+                # END
+                if not leaves:
+                    res[sheet.id]['total_duty_hours'] += duty_hours
             res[sheet.id]['total_duty_hours'] = res[sheet.id]['total_duty_hours'] - sheet.total_attendance
             # Done BY Addition IT Solutions: END  
         return res
@@ -33,7 +57,7 @@ class hr_timesheet_dh(osv.osv):
     def get_overtime(self, cr, uid, ids, start_date, context=None):
         for sheet in self.browse(cr, uid, ids, context):
             if sheet.state == 'done':
-                return sheet.total_duty_hours
+                return sheet.total_duty_hours * -1
             return self.calculate_diff(cr, uid, ids, start_date, context)
 
     def _overtime_diff(self, cr, uid, ids, name, args, context=None):
@@ -60,42 +84,16 @@ class hr_timesheet_dh(osv.osv):
 
     def calculate_duty_hours(self, cr, uid, employee_id, date_from, context):
         contract_obj = self.pool.get('hr.contract')
-        holiday_obj = self.pool.get('hr.holidays')
         calendar_obj = self.pool.get('resource.calendar')
         duty_hours = 0.0
         contract_ids = contract_obj.search(cr, uid, [('employee_id','=',employee_id),
                                                      ('date_start','<=', date_from), '|',
                                                      ('date_end', '>=', date_from), ('date_end', '=', None) ], context=context)
-        # Done BY Addition IT Solutions: BEGIN 
-        # First: Find all the leaves of current month
-        start_leave_period = datetime.strftime((date_from + relativedelta(day=1)),'%Y-%m-%d')
-        end_leave_period = datetime.strftime((date_from + relativedelta(day=31)),'%Y-%m-%d')
-        holiday_ids = holiday_obj.search(cr, uid, [('date_from','>=',start_leave_period),
-                                                   ('date_to','<=',end_leave_period),
-                                                   ('employee_id','=',employee_id),
-                                                   ('state','=','validate'),
-                                                   ('type','=','remove')])
-        leaves = []
-        
-        #Second: If date_from and leave date matches add to list leaves
-        for leave in holiday_obj.browse(cr, uid, holiday_ids, context=context):
-            leave_date_from = datetime.strptime(leave.date_from, '%Y-%m-%d %H:%M:%S')
-            leave_date_to = datetime.strptime(leave.date_to, '%Y-%m-%d %H:%M:%S')
-            leave_dates = list(rrule.rrule(rrule.DAILY,
-                                     dtstart=parser.parse(leave.date_from),
-                                     until=parser.parse(leave.date_to)))
-            for date in leave_dates:
-                if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append((leave_date_from, leave_date_to))
-                    break
-        # END
 
         for contract in contract_obj.browse(cr, uid, contract_ids, context=context):
             dh = calendar_obj.get_working_hours_of_date(cr=cr, uid=uid,
                                                          id=contract.working_hours.id,
                                                          start_dt=date_from,
-                                                         leaves=leaves, # Added leaves here
-                                                         compute_leaves=True, # Added this argument to calculate leaves
                                                          resource_id=employee_id, # Find leaves of this employee
                                                          context=context)
             duty_hours += dh
