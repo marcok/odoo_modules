@@ -141,7 +141,7 @@ class hr_timesheet_dh(osv.osv):
                                  'running': self.sign_float_time_convert(current_month_diff)})
             total['worked_hours'] += worked_hours
             total['diff'] += diff
-	total['diff'] -= previous_month_diff
+        total['diff'] -= previous_month_diff
         res['total'] = total
         return res
 
