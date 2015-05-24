@@ -25,20 +25,15 @@
             <field name="arch" type="xml">
                 <xpath expr="/form/sheet/group/group[2]" position="replace">
                     <group>
-                        <field name="prev_timesheet_diff" widget="float_time" string="Total from last months"/>
+                        <field name="prev_timesheet_diff" widget="float_time" string="Last timesheets"/>
                         <field name="total_timesheet" widget="float_time"/>
-                        <field name="total_attendance" widget="float_time" string="Attendence this month"/>
-                        <field name="total_duty_hours" widget="float_time" string="Remaining duty hours this month"/>
-                        <field name="calculate_diff_hours" widget="float_time" string="Total"/>
+                        <field name="total_attendance" widget="float_time" string="Attendance this timesheet"/>
+                        <field name="total_duty_hours" widget="float_time" string="Remaining this timesheet"/>
+                        <field name="calculate_diff_hours" widget="float_time" string="Total balance"/>
                     </group>
                 </xpath>
             </field>
         </record>
-
-        <!--record id="action_hr_timesheet_day_dh" model="ir.actions.act_window">
-            <field name="name">Duty Hours</field>
-            <field name="res_model">hr_timesheet.day.dh</field>
-        </record-->
 
     </data>
 </openerp>
