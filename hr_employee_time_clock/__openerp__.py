@@ -6,6 +6,7 @@
     'category': 'Human Resources',
     'version': '1.0',
     'depends': ['hr_timesheet_sheet', 'hr_attendance', 'hr_contract'],
+	'images': ['images/overundertime.png'],
 	'installable': True,
     'data': [
         'security/ir.model.access.csv',
