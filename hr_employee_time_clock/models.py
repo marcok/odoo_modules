@@ -139,8 +139,8 @@ class hr_timesheet_dh(osv.osv):
                         'date_to': end_date
                         })
         dates = list(rrule.rrule(rrule.DAILY,
-                                 dtstart=parser.parse(start_date),
-                                 until=min(parser.parse(end_date), datetime.utcnow())))
+                                     dtstart=parser.parse(start_date),
+                                     until=parser.parse(end_date)))
         total = {'worked_hours': 0.0, 'diff': current_month_diff}
         for date_line in dates:
 
