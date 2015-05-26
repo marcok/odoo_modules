@@ -32,6 +32,11 @@
                         <field name="calculate_diff_hours" widget="float_time" string="Total balance"/>
                     </group>
                 </xpath>
+                <notebook position="inside">
+                    <page string="Attendance Analysis">
+                        <field name="analysis" widget="html" nolabel="1"/>
+                    </page>
+                </notebook>
             </field>
         </record>
 

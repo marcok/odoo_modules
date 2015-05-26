@@ -85,11 +85,36 @@ class hr_timesheet_dh(osv.osv):
             })
         return res
 
+    def _get_analysis(self, cr, uid, ids, name, args, context=None):
+        # Done BY Addition IT Solutions: BEGIN
+        res = {}
+        for sheet in self.browse(cr, uid, ids, context=context):
+            data = self.attendance_analysis(cr, uid, sheet.id, context)
+            values = []
+            for k,v in data.items():
+                if isinstance(v,list):
+                    for res in v:
+                        output = ['<table cellpadding="4" style="border: 1px solid #000000; border-collapse: collapse;" border="1">']
+                        output.append('<tr>')
+                        for th in res.keys():
+                            output.append('<th>'+th+'</th>')
+                        output.append('</tr>')
+                        values.append(res.values())
+            for tr in values:
+                output.append('<tr>')
+                for td in tr:
+                    output.append('<td>'+td+'</td>')
+                output.append('</tr>')
+            output.append('</table>')
+            res[sheet.id] = '\n'.join(output)
+        return res
+
     _columns = {
         'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
         'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
         'calculate_diff_hours': fields.function(_overtime_diff, method=True, string="Diff (worked-duty)", multi="_diff"),
         'prev_timesheet_diff': fields.function(_overtime_diff, method=True, string="Diff from old", multi="_diff"),
+        'analysis': fields.function(_get_analysis, type="text", string="Attendance Analysis"), # To display o/p of attendance analysis method
     }
 
     def calculate_duty_hours(self, cr, uid, employee_id, date_from, context):
@@ -114,7 +139,7 @@ class hr_timesheet_dh(osv.osv):
     def get_previous_month_diff(self, cr, uid, employee_id, prev_timesheet_date_from, context=None):
         total_diff = 0.0
         timesheet_ids = self.search(cr, uid, [('employee_id','=',employee_id),
-                                              ('date_from', '<', prev_timesheet_date_from),
+                                              ('date_from', '<', prev_timesheet_date_from), # Get only previous timesheets
                                              ])
         for timesheet in self.browse(cr, uid, timesheet_ids):
             total_diff += self.get_overtime(cr, uid, [timesheet.id], start_date=prev_timesheet_date_from, context=context)
@@ -135,23 +160,23 @@ class hr_timesheet_dh(osv.osv):
             'hours': []
         }
 
-        context.update({'date_from': start_date,
-                        'date_to': end_date
-                        })
+        # Done BY Addition IT Solutions: BEGIN
+        # TS dates needed to find leaves during that period
+        ctx = dict(context)
+        ctx.update({'date_from': start_date,
+                    'date_to': end_date
+                    })
         dates = list(rrule.rrule(rrule.DAILY,
                                      dtstart=parser.parse(start_date),
-                                     until=parser.parse(end_date)))
+                                     until=parser.parse(end_date))) # Removed datetime.utcnow to parse till end date
         total = {'worked_hours': 0.0, 'diff': current_month_diff}
         for date_line in dates:
 
-            dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context)
+            dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context=ctx)
             worked_hours = 0.0
-            for attendance in attendance_obj.search_read(cr, uid, [('employee_id','=', employee_id),
-                                                         ('action', '=', 'sign_out'),
-                                                         ('name', '>=', date_line.strftime('%Y-%m-%d 00:00:00')),
-                                                         ('name', '<=', date_line.strftime('%Y-%m-%d 23:59:59')),
-                                                         ], ['name', 'worked_hours']):
-                worked_hours += attendance['worked_hours']
+            for att in timesheet.period_ids:
+                if att.name == date_line.strftime('%Y-%m-%d'):
+                    worked_hours = att.total_attendance
 
             diff = worked_hours-dh
             current_month_diff += diff
