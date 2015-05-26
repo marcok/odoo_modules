@@ -114,7 +114,7 @@ class hr_timesheet_dh(osv.osv):
     def get_previous_month_diff(self, cr, uid, employee_id, prev_timesheet_date_from, context=None):
         total_diff = 0.0
         timesheet_ids = self.search(cr, uid, [('employee_id','=',employee_id),
-                                              ('date_from', '<=', prev_timesheet_date_from),
+                                              ('date_from', '<', prev_timesheet_date_from),
                                              ])
         for timesheet in self.browse(cr, uid, timesheet_ids):
             total_diff += self.get_overtime(cr, uid, [timesheet.id], start_date=prev_timesheet_date_from, context=context)
