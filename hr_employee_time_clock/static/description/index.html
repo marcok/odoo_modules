@@ -1,167 +1,197 @@
-<section class="oe_container">
+<section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h1 class="oe_slogan">Employee Time Clock</h1>
+			<h2 class="oe_slogan">Employee Time Clock</h2>
+            <h3 class="oe_slogan">Over- and undertime</h3>
+            <p class="oe_mt32">
+                Employee Time Clock calculates over- and undertime based on attendances and contracts/time schedules. Over- and undertime is displayed and stored in employees timesheets. The manager see the current account balance of the timesheet and the overall account balance from beginning as well. Employees leaves are considered as a full-day leave, regardless of the time, in the overtime calculation and subtracted from the duty hours.<br/>
+				<br/>
+				<div class="oe_slogan">
+            <span class="fa fa-envelope fa-1x" style="color:#7c7bad;"></span><span><a style="color:#7c7bad;" href="mailto:odoo@bytebrand.net" target="_top">&nbsp;Help Mail&nbsp;</a></span>
+            <span class="fa fa-road fa-1x" style="color:#7c7bad;"></span><span><a style="color:#7c7bad;" target="_blank" href="https://github.com/marcok/odoo_modules/issues">&nbsp;Bugs&nbsp;</a></span>
+            <span class="fa fa-wrench fa-1x" style="color:#7c7bad;"></span><span><a style="color:#7c7bad;" target="_blank" href="https://github.com/marcok/odoo_modules/issues">&nbsp;Request new Features</a></span>
+			</div>
+            </p>
         </div>
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h3>Over- and undertime</h3>
+            <h3 class="oe_slogan">Timesheet generation</h3>
             <p class="oe_mt32">
-                Employee Time Clock calculates over- and undertime based on attendances and contracts/time schedules. Over- undetime is displayed and stored in employees timesheets. The manager see the current account balance of the timesheet and the overall account balance from beginning as well. Employees leaves are considered and subtracted from the duty hours.<br/>
-				Support, bugs and feature requests <a href="https://github.com/marcok/odoo_modules/tree/8.0/hr_employee_time_clock">on Gitbhub</a>
+                For convenience, this screen gives a manger the possibility to generate multiple timesheets for all employees with a certain tag. If you wanna track over- and undertime it is recommended to generate timesheets for the whole year in advanced, usually on a monthly basis. 
             </p>
         </div>
         <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./overundertime.png"></div>
+		        <div class="oe_row_img oe_centered">
+					<img  class="oe_picture oe_screenshot" src="timesheetgeneration.png">
+				</div>
         </div>
+
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h3>Timesheet generation</h3>
+            <h3 class="oe_slogan">Import leaves</h3>
             <p class="oe_mt32">
-                For convenience, this screen gives a manger the possibility to generate multiple timesheets for all employees with a certain tag. This module is well integrated with our iPhone and iPad apps, but in any case, it works without the mobile apps as well.
+                If you track under- and over-time its important to ignore public holidays in the calculation. This screen allows you to upload public holidays (or other leaves) by an excel file (1 column with dates), which are imported as approved leave requests for employees with a certain tag.
             </p>
         </div>
         <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./timesheetgeneration.png"></div>
+		        <div class="oe_row_img oe_centered">
+					<img  class="oe_picture oe_screenshot	" src="timesheetgeneration.png">
+				</div>
         </div>
+
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h2>Odoo time clock (iPad & iPhone)</h2>
+            <h2 class="oe_slogan">Odoo time clock (iPad & iPhone)</h2>
             <p class="oe_mt32">
+				This module is well integrated with our iPhone and iPad apps, but in any case, it works without the mobile apps as well. The same for the apps, they work without the module too, but without the overtime feature.<br/>
                 Odoo time clock gives the employees the possibility to sign-in/sign-out  with a 2D barcode card on the entrance of your company where the iPad is mounted.
             </p>
         </div>
+		<div class="oe_span12">
+            <div class=" oe_centered">
+                <img  class=" oe_screenshot" src="odoo-time-clock-prev.jpg"></div>
+        </div>
+           </div>
+</section>
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+            <h3 class="oe_slogan">Sign in/out with 2d barcode</h3>
+            <p class="oe_mt32">
+                An employee can sign in/out with holding his 2d code card to the front cam. The check-in process automatically detects if the user is currently signed in or out and executes the following step. The employee gets a quick overview of his over- and undertime total. <strong>Employees don't even need to have an odoo user.</strong> <br/><br/>
+			</p>
         </div>
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h3>Sign in/out with 2d barcode</h3>
-            <p class="oe_mt32">
-                An employee can sign in/out with holding his 2d code card to the front cam. The check-in process automatically detects if the user is currently signed in or out and executes the following step. The employee gets a quick overview of his over- and under-time total. <strong>Employees don't even need an odoo user.</strong> <br/><br/>
-			</p>
 			<p class="oe_mt32">
-			<h4>Producing the 2d cards is easy and without additional costs</h4>
-				You can export your employees data from odoo as excel and create 2d barcode stickers by yourself with your printer. Use e.g. the Herma online tool for all herma sticker formats: <a href="http://www.herma.de/de/service/gratis-software/etikettenassistent-online.html">Herma online tool</a>. The tool allows you to create your desired design inclusive logo and generate a pdf for printing.<br/><br/>
+			<h3 class="oe_slogan">Producing the 2d cards is easy and without additional costs</h3>
+				You can export your employees data from odoo as excel (name and employee id which is used for the 2d barcode) and create the stickers by yourself with your printer. Use e.g. the Herma online tool for all herma sticker formats: <a href="http://www.herma.de/de/service/gratis-software/etikettenassistent-online.html"  target="_blank">Herma online tool</a>. The tool allows you to create your desired design inclusive logo and generate a pdf for printing.<br/><br/>
 			</p>	
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="2dBarcodes.png"></div>
+		<div class="oe_span12">
+		        <div class="oe_row_img oe_centered">
+					<img  class="oe_picture oe_screenshot" src="2dBarcodes.png">
+				</div>
         </div>
     </div>
 </section>
+
+
+
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h3>Lunch order</h3>
+            <h3 class="oe_slogan">Lunch order</h3>
             <p class="oe_mt32">
                 If Lunch order is installed and lunch items are defined, they are shown after each sign in process and the user can choose his favorite lunch.
             </p>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+		<div class="oe_span12">
+		        <div class="oe_row_img oe_centered">
+					<img  class="oe_picture oe_screenshot" src="lunch.png">
+				</div>
         </div>
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h3>Company info message</h3>
+            <h3 class="oe_slogan">Company info message</h3>
             <p class="oe_mt32">
                 The company can define company wide information messages as a calender entry, tagged with "Station" and the description of the entry is shown on the time clock app for the desired period. The calender entry has to be created with the same user as used for the app.<br/>
 				Your company logo, if available, is displayed too.
             </p>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+		<div class="oe_span12">
+		        <div class="oe_row_img oe_centered">
+					<img  class="oe_picture oe_screenshot" src="message.png">
+				</div>
         </div>
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
-            <h2>Odoo HR (iPhone)</h2>
+            <h2 class="oe_slogan">Odoo HR (iPhone)</h2>
             <p class="oe_mt32">
-                Employee time clock gives the employees the possibility to sign-in/sign-out online with the app and track his over and under-time total.
+                Odoo HR let your employees execute the most important task mobile, like sign in/out, make leave requests and see a history of attendances. 
             </p>
         </div>
         <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+            <div class=" oe_centered">
+                <img  class=" oe_screenshot" src="odoo-hr-prev.jpg"></div>
         </div>
     </div>
 </section>
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12">
-            <h3>Sign in/out</h3>
+	<h3 class="oe_slogan">Sign in/out</h3>
+        <div class="oe_span6">
             <p class="oe_mt32">
-                The check-in process automatically detects if the user is currently signed in or out and executes the following step.
+				The check-in process automatically detects if the user is currently signed in or out and executes the following step.
             </p>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="signin.png"></div>
         </div>
     </div>
 </section>
+
+
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12">
-            <h3>Attendance history</h3>
-            <p class="oe_mt32">
-                The employee can get a list of each attendance sign in/out for each month.
-            </p>
+	<h3 class="oe_slogan">Attendance history</h3>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="attendancehistory.png"></div>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+		<div class="oe_span6">
+            <p class="oe_mt32">
+				The employee can get a list of each attendance sign in/out for each month.
+            </p>
         </div>
     </div>
 </section>
+
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12">
-            <h3>Attendance analysis</h3>
+	<h3 class="oe_slogan">Attendance analysis</h3>
+        <div class="oe_span6">
             <p class="oe_mt32">
-                The employee can display an under- and overtime analysis for each timesheet. He see his duty hours based on his contract and his attendances hours and the diff (over- and under-time). This feature is only available, if Odoo module "Employee time clock" is installed.
+				The employee can display an under- and overtime analysis for each timesheet. He see his duty hours based on his contract and his attendances hours and the diff (over- and undertime). This feature is only available, if Odoo module "Employee time clock" is installed.
             </p>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="attendanceana.png"></div>
         </div>
     </div>
 </section>
+
 <section class="oe_container oe_dark">
     <div class="oe_row oe_spaced">
-        <div class="oe_span12">
-            <h3>Leave requests</h3>
-            <p class="oe_mt32">
-                The employee can enter leave requests.
-            </p>
+	<h3 class="oe_slogan">Leave requests</h3>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="leave.png"></div>
         </div>
-        <div class="oe_span12">
-            <div class="oe_demo oe_picture oe_screenshot">
-                <img src="./oddo_publish_page_files/inbox.png"></div>
+	<div class="oe_span6">
+            <p class="oe_mt32">
+				The employee can enter leave requests.
+            </p>
         </div>
     </div>
 </section>
