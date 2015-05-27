@@ -91,20 +91,33 @@ class hr_timesheet_dh(osv.osv):
         for sheet in self.browse(cr, uid, ids, context=context):
             data = self.attendance_analysis(cr, uid, sheet.id, context)
             values = []
+            output = ['<style>.attendanceTable td,.attendanceTable th {padding: 3px; border: 1px solid #C0C0C0; border-collapse: collapse;     text-align: right;} </style><table class="attendanceTable" >']
+            for val in data.values():
+                if isinstance(val,(int,float)):
+                    output.append('<tr>')
+                    output.append('<th colspan="2">Previous Month Diff: </th>')
+                    output.append('<td colspan="3">'+str(val)+'</td>')
+                    output.append('</tr>')
             for k,v in data.items():
                 if isinstance(v,list):
+                    output.append('<tr>')
+                    for th in v[0].keys():
+                        output.append('<th>'+th+'</th>')
+                    output.append('</tr>')
                     for res in v:
-                        output = ['<table cellpadding="4" style="border: 1px solid #000000; border-collapse: collapse;" border="1">']
-                        output.append('<tr>')
-                        for th in res.keys():
-                            output.append('<th>'+th+'</th>')
-                        output.append('</tr>')
                         values.append(res.values())
-            for tr in values:
-                output.append('<tr>')
-                for td in tr:
-                    output.append('<td>'+td+'</td>')
-                output.append('</tr>')
+                    for tr in values:
+                        output.append('<tr>')
+                        for td in tr:
+                            output.append('<td>'+td+'</td>')
+                        output.append('</tr>')
+            
+                if isinstance(v,dict):
+                    output.append('<tr>')
+                    output.append('<th>Total: </th>')
+                    for td in v.values():
+                        output.append('<td>'+str(td)+'</td>')
+                    output.append('</tr>')
             output.append('</table>')
             res[sheet.id] = '\n'.join(output)
         return res
@@ -180,11 +193,11 @@ class hr_timesheet_dh(osv.osv):
 
             diff = worked_hours-dh
             current_month_diff += diff
-            res['hours'].append({'name': date_line.strftime('%Y-%m-%d'),
-                                 'worked_hours': attendance_obj.float_time_convert(worked_hours),
-                                 'dh': attendance_obj.float_time_convert(dh),
-                                 'diff': self.sign_float_time_convert(diff),
-                                 'running': self.sign_float_time_convert(current_month_diff)})
+            res['hours'].append({'Name': date_line.strftime('%Y-%m-%d'),
+                                 'Duty_Hours': attendance_obj.float_time_convert(dh),
+                                 'Worked_Hours': attendance_obj.float_time_convert(worked_hours),
+                                 'Difference': self.sign_float_time_convert(diff),
+                                 'Running': self.sign_float_time_convert(current_month_diff)})
             total['worked_hours'] += worked_hours
             total['diff'] += diff
         total['diff'] -= previous_month_diff
