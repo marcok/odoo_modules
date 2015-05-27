@@ -10,7 +10,7 @@
                 <form string="Import Leave Requests">
                     <group>
                         <group>
-                            <separator string="Import leave requests for following employee tags"/>
+                            <separator string="Generate leave requests for employees having the following tag:"/>
                        </group>
                         <group colspan="2">
                             <field name="leave_dates"/>
