@@ -5,7 +5,7 @@
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '1.0',
-    'depends': ['hr_timesheet_sheet', 'hr_attendance', 'hr_contract'],
+    'depends': ['hr_timesheet_sheet', 'hr_attendance', 'hr_contract', 'hr_attendance_analysis'],
 	'images': ['images/overundertime.png'],
 	'installable': True,
     'data': [
