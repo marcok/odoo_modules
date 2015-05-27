@@ -11,6 +11,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views.xml',
-        'wizard/create_timesheet_with_tag_view.xml', # View file for the wizard
+        # View file for the wizard
+        'wizard/create_timesheet_with_tag_view.xml', 
+        'wizard/import_leave_requests_view.xml',
     ]
 }

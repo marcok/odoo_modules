@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Done BY Addition IT Solutions: BEGIN -->
+<openerp>
+    <data>
+
+        <record id="view_import_leave_requests" model="ir.ui.view">
+            <field name="name">import.leave.requests.form</field>
+            <field name="model">import.leave.requests</field>
+            <field name="arch" type="xml">
+                <form string="Import Leave Requests">
+                    <group>
+                        <group>
+                            <separator string="Import leave requests for following employee tags"/>
+                       </group>
+                        <group colspan="2">
+                            <field name="leave_dates"/>
+                            <field name="leave_type_id"/>
+                            <field name="employee_tag_id"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="import_leave_data" string="Import" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                   </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_import_leave_requests" model="ir.actions.act_window">
+            <field name="name">Import Leave Requests</field>
+            <field name="res_model">import.leave.requests</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_import_leave_requests"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem name="Import Leave Requests" id="menu_import_leave_requests" 
+                parent="hr_holidays.menu_open_ask_holidays" action="action_import_leave_requests" 
+                groups="base.group_hr_manager" sequence="15"/>
+
+    </data>
+</openerp>
+
+<!--Done BY Addition IT Solutions: END -->
