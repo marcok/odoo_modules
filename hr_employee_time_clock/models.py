@@ -94,7 +94,7 @@ class hr_timesheet_dh(osv.osv):
             for k,v in data.items():
                 if isinstance(v,list):
                     for res in v:
-                        output = ['<table cellpadding="4" style="border: 1px solid #000000; border-collapse: collapse;" border="1">']
+                        output = ['<style>.attendanceTable td,.attendanceTable th {padding: 3px; border: 1px solid #C0C0C0; border-collapse: collapse; 	text-align: right;} </style><table class="attendanceTable" >']
                         output.append('<tr>')
                         for th in res.keys():
                             output.append('<th>'+th+'</th>')
