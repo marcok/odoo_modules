@@ -1,3 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_timesheet_day_dh,access_hr_timesheet_day_dh,model_hr_timesheet_day_dh,,1,1,1,0
 access_hr_resource_attendance,hr.employee.resource.calendar.attendance.user,resource.model_resource_calendar_attendance,base.group_hr_user,1,0,0,0
