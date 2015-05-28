@@ -9,6 +9,7 @@
 	'images': ['images/overundertime.png'],
 	'installable': True,
     'data': [
+		'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'views.xml',
         # View file for the wizard
