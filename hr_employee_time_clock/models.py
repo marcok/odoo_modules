@@ -85,8 +85,8 @@ class hr_timesheet_dh(osv.osv):
             })
         return res
 
+    # Done BY Addition IT Solutions: BEGIN
     def _get_analysis(self, cr, uid, ids, name, args, context=None):
-        # Done BY Addition IT Solutions: BEGIN
         res = {}
         for sheet in self.browse(cr, uid, ids, context=context):
             data = self.attendance_analysis(cr, uid, sheet.id, context)
@@ -121,9 +121,11 @@ class hr_timesheet_dh(osv.osv):
             output.append('</table>')
             res[sheet.id] = '\n'.join(output)
         return res
+    #END
 
     _columns = {
         'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
+        'total_duty_hours_done': fields.float('Total Duty Hours', readonly=True, default=0.0),
         'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
         'calculate_diff_hours': fields.function(_overtime_diff, method=True, string="Diff (worked-duty)", multi="_diff"),
         'prev_timesheet_diff': fields.function(_overtime_diff, method=True, string="Diff from old", multi="_diff"),
@@ -144,9 +146,11 @@ class hr_timesheet_dh(osv.osv):
                                                          start_dt=date_from,
                                                          resource_id=employee_id, # Find leaves of this employee
                                                          context=context)
+            # Done BY Addition IT Solutions: BEGIN
             leaves = self.count_leaves(cr, uid, date_from, employee_id, context=context)
             if not leaves:
                 duty_hours += dh
+            # END
         return duty_hours
 
     def get_previous_month_diff(self, cr, uid, employee_id, prev_timesheet_date_from, context=None):
@@ -182,14 +186,17 @@ class hr_timesheet_dh(osv.osv):
         dates = list(rrule.rrule(rrule.DAILY,
                                      dtstart=parser.parse(start_date),
                                      until=parser.parse(end_date))) # Removed datetime.utcnow to parse till end date
+        # END
         total = {'worked_hours': 0.0, 'diff': current_month_diff}
         for date_line in dates:
 
             dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context=ctx)
             worked_hours = 0.0
+            # Done BY Addition IT Solutions: BEGIN
             for att in timesheet.period_ids:
                 if att.name == date_line.strftime('%Y-%m-%d'):
                     worked_hours = att.total_attendance
+            # END
 
             diff = worked_hours-dh
             current_month_diff += diff
@@ -212,6 +219,8 @@ class hr_timesheet_dh(osv.osv):
     def write(self, cr, uid, ids, vals, context=None):
         if 'state' in vals and vals['state'] == 'done':
             vals['total_diff_hours'] = self.calculate_diff(cr, uid, ids, None, context)
+            for sheet in self.browse(cr, uid, ids, context=context):
+                vals['total_duty_hours_done'] = sheet.total_duty_hours
         elif 'state' in vals and vals['state'] == 'draft':
             vals['total_diff_hours'] = 0.0
         res = super(hr_timesheet_dh, self).write(cr, uid, ids, vals, context=context)
