@@ -21,17 +21,20 @@ class hr_timesheet_dh(osv.osv):
             res.setdefault(sheet.id, {
                 'total_duty_hours': 0.0,
             })
-            # Done BY Addition IT Solutions: BEGIN 
-            dates = list(rrule.rrule(rrule.DAILY,
-                                     dtstart=parser.parse(sheet.date_from),
-                                     until=parser.parse(sheet.date_to)))
-            ctx = dict(context)
-            ctx.update(date_from=sheet.date_from,
-                        date_to=sheet.date_to)
-            for date_line in dates:
-                duty_hours = self.calculate_duty_hours(cr, uid, sheet.employee_id.id, date_line, context=ctx)
-                res[sheet.id]['total_duty_hours'] += duty_hours
-            res[sheet.id]['total_duty_hours'] = res[sheet.id]['total_duty_hours'] - sheet.total_attendance
+            # Done BY Addition IT Solutions: BEGIN
+            if sheet.state == 'done':
+                 res[sheet.id]['total_duty_hours'] = sheet.total_duty_hours_done
+            else:
+                dates = list(rrule.rrule(rrule.DAILY,
+                                         dtstart=parser.parse(sheet.date_from),
+                                         until=parser.parse(sheet.date_to)))
+                ctx = dict(context)
+                ctx.update(date_from=sheet.date_from,
+                            date_to=sheet.date_to)
+                for date_line in dates:
+                    duty_hours = self.calculate_duty_hours(cr, uid, sheet.employee_id.id, date_line, context=ctx)
+                    res[sheet.id]['total_duty_hours'] += duty_hours
+                res[sheet.id]['total_duty_hours'] = res[sheet.id]['total_duty_hours'] - sheet.total_attendance
             # Done BY Addition IT Solutions: END  
         return res
 
@@ -67,7 +70,7 @@ class hr_timesheet_dh(osv.osv):
     def get_overtime(self, cr, uid, ids, start_date, context=None):
         for sheet in self.browse(cr, uid, ids, context):
             if sheet.state == 'done':
-                return sheet.total_duty_hours * -1
+                return sheet.total_duty_hours_done * -1
             return self.calculate_diff(cr, uid, ids, start_date, context)
 
     def _overtime_diff(self, cr, uid, ids, name, args, context=None):
