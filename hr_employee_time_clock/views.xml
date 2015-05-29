@@ -28,10 +28,7 @@
                         <field name="prev_timesheet_diff" widget="float_time" string="Last timesheets"/>
                         <field name="total_timesheet" widget="float_time"/>
                         <field name="total_attendance" widget="float_time" string="Attendance this timesheet"/>
-                        <field name="total_duty_hours" widget="float_time" string="Remaining this timesheet" 
-                                attrs="{'invisible': [('state','=','done')]}"/>
-                        <field name="total_duty_hours_done" widget="float_time" string="Remaining this timesheet" 
-                                attrs="{'invisible': [('state','!=','done')]}"/>
+                        <field name="total_duty_hours" widget="float_time" string="Remaining this timesheet"/>
                         <field name="calculate_diff_hours" widget="float_time" string="Total balance"/>
                     </group>
                 </xpath>
