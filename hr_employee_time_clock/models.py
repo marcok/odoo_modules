@@ -92,7 +92,9 @@ class hr_timesheet_dh(osv.osv):
     def _get_analysis(self, cr, uid, ids, name, args, context=None):
         res = {}
         for sheet in self.browse(cr, uid, ids, context=context):
-            data = self.attendance_analysis(cr, uid, sheet.id, context)
+            ctx = dict(context)
+            ctx.update({'function_call': True})
+            data = self.attendance_analysis(cr, uid, sheet.id, context=ctx)
             values = []
             output = ['<style>.attendanceTable td,.attendanceTable th {padding: 3px; border: 1px solid #C0C0C0; border-collapse: collapse;     text-align: right;} </style><table class="attendanceTable" >']
             for val in data.values():
@@ -203,11 +205,18 @@ class hr_timesheet_dh(osv.osv):
 
             diff = worked_hours-dh
             current_month_diff += diff
-            res['hours'].append({'Name': date_line.strftime('%Y-%m-%d'),
-                                 'Duty_Hours': attendance_obj.float_time_convert(dh),
-                                 'Worked_Hours': attendance_obj.float_time_convert(worked_hours),
-                                 'Difference': self.sign_float_time_convert(diff),
-                                 'Running': self.sign_float_time_convert(current_month_diff)})
+            if context.get('function_call'):
+                res['hours'].append({'Name': date_line.strftime('%Y-%m-%d'),
+                                     'Duty_Hours': attendance_obj.float_time_convert(dh),
+                                     'Worked_Hours': attendance_obj.float_time_convert(worked_hours),
+                                     'Difference': self.sign_float_time_convert(diff),
+                                     'Running': self.sign_float_time_convert(current_month_diff)})
+            else:
+                res['hours'].append({'name': date_line.strftime('%Y-%m-%d'),
+                                     'dh': attendance_obj.float_time_convert(dh),
+                                     'worked_hours': attendance_obj.float_time_convert(worked_hours),
+                                     'diff': self.sign_float_time_convert(diff),
+                                     'running': self.sign_float_time_convert(current_month_diff)})
             total['worked_hours'] += worked_hours
             total['diff'] += diff
         total['diff'] -= previous_month_diff
