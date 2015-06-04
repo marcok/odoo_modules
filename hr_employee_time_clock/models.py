@@ -205,7 +205,7 @@ class hr_timesheet_dh(osv.osv):
 
             diff = worked_hours-dh
             current_month_diff += diff
-            if context.get('function_call'):
+            if context.get('function_call', False):
                 res['hours'].append({'Name': date_line.strftime('%Y-%m-%d'),
                                      'Duty_Hours': attendance_obj.float_time_convert(dh),
                                      'Worked_Hours': attendance_obj.float_time_convert(worked_hours),
