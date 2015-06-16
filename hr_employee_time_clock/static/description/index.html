@@ -59,7 +59,8 @@
             <p class="oe_mt32">
 				Under Settings -> Human Resources you should activate "Track attendances for all employees".<br />
 				If users dont have a timezone defined, you get errors on sign in/out.<br />
-				Security: The module adds a rule, which allows employees to read there own contracts, this shouldn't be a problem, but you need to keep that in mind.
+				Security: The module adds a rule, which allows employees to read there own contracts, this shouldn't be a problem, but you need to keep that in mind.<br />
+				Security: The module adds a rule, which only allows managers to see the timesheets of there subordinates. If you want to have the old behaviour, that a manger can see all timesheets, you may set this rule inactive.
             </p>
         </div>
     </div>
@@ -113,8 +114,11 @@
         <div class="oe_span12">
             <h3 class="oe_slogan">Lunch order</h3>
             <p class="oe_mt32">
-                If Lunch order is installed and lunch items are defined, they are shown after each sign in process and the user can choose his favorite lunch.</br>
-				After an employee successfully ordered a meal, the screen will not showed again for the same day.
+                If odoo module "Lunch" is installed and items are defined, they are shown after each sign in and the user can choose his favourite lunch.</br>
+				App settings:<br />
+				- you can define which categories have to be shown.<br />
+				- you can define a lunch only mode, then no attendance sign in/out will be recorded. This is useful to use the app e.g. for coffee consummation book keeping.<br />
+				- you can define if the lunch screen only has to be shown for one order per day or of after each sign in.
             </p>
         </div>
 		<div class="oe_span12">
