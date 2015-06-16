@@ -8,49 +8,49 @@ msgstr ""
 #: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
 #: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
 msgid "Total balance"
-msgstr ""
+msgstr "Total Saldo"
 
 #. module: hr_employee_time_clock
 #: field:hr_timesheet_sheet.sheet,total_duty_hours:0
 #: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
 #: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
 msgid "Remaining this timesheet"
-msgstr ""
+msgstr "Verbleibend diese Zeiterfassung"
 
 #. module: hr_employee_time_clock
 #: field:hr_timesheet_sheet.sheet,prev_timesheet_diff:0
 #: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
 #: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
 msgid "Last timesheets"
-msgstr ""
+msgstr "Letzte Zeiterfassung"
 
 #. module: hr_employee_time_clock
 #: field:hr_timesheet_sheet.sheet,total_attendance:0
 #: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
 #: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
 msgid "Attendance this timesheet"
-msgstr ""
+msgstr "Anwesenheit diese Zeiterfassung"
 
 #. module: hr_employee_time_clock
 #: field:hr_timesheet_sheet.sheet,analysis:0
 msgid "Attendance Analysis"
-msgstr ""
+msgstr "Anwesenheit Analyse"
 
 #. module: hr_employee_time_clock
 #: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
 msgid "Overtime Analysis"
-msgstr ""
+msgstr "Überzeit Analyse"
 
 #. module: hr_employee_time_clock
 #: view:hr.timesheet.current.open:hr_employee_time_clock.view_hr_timesheet_current_open_inherit
 msgid "Generate timesheets for employees having the following tag:"
-msgstr ""
+msgstr "Generiere Zeiterfassungen für Mitarbeiter mit folgendem Tag:"
 
 #. module: hr_employee_time_clock
 #: field:hr.timesheet.current.open,category_id:0
 #: model:ir.model,name:hr.model_hr_employee_category
 msgid "Employee Tag"
-msgstr "Mitarbeiterkategorie"
+msgstr "Mitarbeiter Tag"
 
 #. module: hr_employee_time_clock
 #: field:hr.timesheet.current.open,date_from:0
@@ -66,17 +66,17 @@ msgstr "Enddatum"
 #: code:addons/hr_employee_time_clock/wizard/create_timesheet_with_tag.py:44
 #, python-format
 msgid "Timesheet already exists for %s."
-msgstr ""
+msgstr "Zeiterfassung existiert bereits für %s."
 
 #. module: hr_employee_time_clock
 #: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
 msgid "Generate timesheets for employees having the following tag:"
-msgstr ""
+msgstr "Generiere Zeiterfassungen für Mitarbeiter mit folgendem Tag:"
 
 #. module: hr_employee_time_clock
 #: field:import.leave.requests,leave_dates:0
 msgid "Select *.csv"
-msgstr ""
+msgstr "Wähle *.csv"
 
 #. module: hr_employee_time_clock
 #: field:import.leave.requests,leave_type_id:0
@@ -90,53 +90,53 @@ msgstr "Abwesenheitstyp"
 #: model:ir.model,name:hr.model_hr_employee_category
 #: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
 msgid "Employee Tag"
-msgstr "Mitarbeiterkategorie"
+msgstr "Mitarbeiter Tag"
 
 #. module: hr_employee_time_clock
 #: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
 #: model:ir.actions.act_window,name:hr_employee_time_clock.action_import_leave_requests
 #: model:ir.ui.menu,name:hr_employee_time_clock.menu_import_leave_requests
 msgid "Import Leave Requests"
-msgstr ""
+msgstr "Importiere Abwesenheiten"
 
 #. module: hr_employee_time_clock
 #: view:hr.timesheet.current.open:hr_employee_time_clock.view_hr_timesheet_current_open_inherit
 #: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_form_open_current
 msgid "Generate Timesheets"
-msgstr ""
+msgstr "Generiere Zeiterfassungen"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:103
 #, python-format
 msgid "Previous Month Diff:"
-msgstr ""
+msgstr "Differenz vorhergehender Monat:"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:122
 #, python-format
 msgid "Total:"
-msgstr ""
+msgstr "Total:"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:210
 #, python-format
 msgid "Duty_Hours"
-msgstr ""
+msgstr "Pflichtstunden"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:211
 #, python-format
 msgid "Worked_Hours"
-msgstr ""
+msgstr "Arbeitsstunden"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:212
 #, python-format
 msgid "Difference"
-msgstr ""
+msgstr "Differenz"
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models.py:213
 #, python-format
 msgid "Running"
-msgstr ""
+msgstr "Laufend"
