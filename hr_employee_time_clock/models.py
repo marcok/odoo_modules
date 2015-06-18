@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from openerp.osv import fields, osv
 from dateutil import rrule, parser
 import pytz
+from openerp.tools.translate import _
 
 
 class hr_timesheet_dh(osv.osv):
@@ -100,8 +101,9 @@ class hr_timesheet_dh(osv.osv):
             for val in data.values():
                 if isinstance(val,(int,float)):
                     output.append('<tr>')
-                    output.append('<th colspan="2">Previous Month Diff: </th>')
-                    output.append('<td colspan="3">'+str(val)+'</td>')
+                    prev_ts = _('Previous Timesheet:')
+                    output.append('<th colspan="2">'+ prev_ts +' </th>')
+                    output.append('<td colspan="3">'+ str(val) +'</td>')
                     output.append('</tr>')
             for k,v in data.items():
                 if isinstance(v,list):
@@ -119,7 +121,8 @@ class hr_timesheet_dh(osv.osv):
             
                 if isinstance(v,dict):
                     output.append('<tr>')
-                    output.append('<th>Total: </th>')
+                    total_ts = _('Total:')
+                    output.append('<th>'+ total_ts +' </th>')
                     for td in v.values():
                         output.append('<td>'+str(td)+'</td>')
                     output.append('</tr>')
@@ -167,8 +170,25 @@ class hr_timesheet_dh(osv.osv):
             total_diff += self.get_overtime(cr, uid, [timesheet.id], start_date=prev_timesheet_date_from, context=context)
         return total_diff
 
+    # Done BY Addition IT Solutions: BEGIN
+    def _get_user_datetime_format(self, cr, uid, context=None):
+        """ Get user's language & fetch date/time formats of 
+        that language """
+        users_obj = self.pool.get('res.users')
+        lang_obj = self.pool.get('res.lang')
+        language = users_obj.browse(cr, uid, uid, context=context).lang
+        lang_ids = lang_obj.search(cr, uid, [('code','=',language)], context=context)
+        date_format = _('%Y-%m-%d')
+        time_format = _('%H:%M:%S')
+        for lang in lang_obj.browse(cr, uid, lang_ids, context=context):
+            date_format = lang.date_format
+            time_format = lang.time_format
+        return date_format, time_format
+    # END
+
     def attendance_analysis(self, cr, uid, timesheet_id, context=None):
         attendance_obj = self.pool.get('hr.attendance')
+        date_format, time_format = self._get_user_datetime_format(cr, uid, context)
         timesheet = self.browse(cr, uid, timesheet_id, context=context)
         employee_id = timesheet.employee_id.id
         start_date = timesheet.date_from
@@ -206,13 +226,13 @@ class hr_timesheet_dh(osv.osv):
             diff = worked_hours-dh
             current_month_diff += diff
             if context.get('function_call', False):
-                res['hours'].append({'Name': date_line.strftime('%Y-%m-%d'),
-                                     'Duty_Hours': attendance_obj.float_time_convert(dh),
-                                     'Worked_Hours': attendance_obj.float_time_convert(worked_hours),
-                                     'Difference': self.sign_float_time_convert(diff),
-                                     'Running': self.sign_float_time_convert(current_month_diff)})
+                res['hours'].append({_('Date'): date_line.strftime(date_format),
+                                     _('Duty Hours'): attendance_obj.float_time_convert(dh),
+                                     _('Worked Hours'): attendance_obj.float_time_convert(worked_hours),
+                                     _('Difference'): self.sign_float_time_convert(diff),
+                                     _('Running'): self.sign_float_time_convert(current_month_diff)})
             else:
-                res['hours'].append({'name': date_line.strftime('%Y-%m-%d'),
+                res['hours'].append({'name': date_line.strftime(date_format),
                                      'dh': attendance_obj.float_time_convert(dh),
                                      'worked_hours': attendance_obj.float_time_convert(worked_hours),
                                      'diff': self.sign_float_time_convert(diff),

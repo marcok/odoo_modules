@@ -106,37 +106,43 @@ msgid "Generate Timesheets"
 msgstr "Generiere Zeiterfassungen"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:103
+#: code:addons/hr_employee_time_clock/models.py:104
 #, python-format
-msgid "Previous Month Diff:"
-msgstr "Differenz vorhergehender Monat:"
+msgid "Previous Timesheet:"
+msgstr "Letzte Zeiterfassung:"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:122
+#: code:addons/hr_employee_time_clock/models.py:124
 #, python-format
 msgid "Total:"
 msgstr "Total:"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:210
+#: code:addons/hr_employee_time_clock/models.py:227
 #, python-format
-msgid "Duty_Hours"
+msgid "Date"
+msgstr "Datum"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models.py:228
+#, python-format
+msgid "Duty Hours"
 msgstr "Pflichtstunden"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:211
+#: code:addons/hr_employee_time_clock/models.py:229
 #, python-format
-msgid "Worked_Hours"
-msgstr "Arbeitsstunden"
+msgid "Worked Hours"
+msgstr "Gearbeitete Stunden"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:212
+#: code:addons/hr_employee_time_clock/models.py:230
 #, python-format
 msgid "Difference"
 msgstr "Differenz"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:213
+#: code:addons/hr_employee_time_clock/models.py:231
 #, python-format
 msgid "Running"
 msgstr "Laufend"
