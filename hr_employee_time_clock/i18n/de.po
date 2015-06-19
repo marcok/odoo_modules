@@ -69,6 +69,18 @@ msgid "Timesheet already exists for %s."
 msgstr "Zeiterfassung existiert bereits für %s."
 
 #. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/wizard/import_leave_requests.py:31
+#, python-format
+msgid "Data Error!"
+msgstr ""
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/wizard/import_leave_requests.py:31
+#, python-format
+msgid "Date format in your .csv file does not match with database date format."
+msgstr ""
+
+#. module: hr_employee_time_clock
 #: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
 msgid "Generate timesheets for employees having the following tag:"
 msgstr "Generiere Zeiterfassungen für Mitarbeiter mit folgendem Tag:"
