@@ -24,7 +24,7 @@ class hr_timesheet_dh(osv.osv):
             })
             # Done BY Addition IT Solutions: BEGIN
             if sheet.state == 'done':
-                 res[sheet.id]['total_duty_hours'] = sheet.total_duty_hours_done
+                res[sheet.id]['total_duty_hours'] = sheet.total_duty_hours_done
             else:
                 dates = list(rrule.rrule(rrule.DAILY,
                                          dtstart=parser.parse(sheet.date_from),
@@ -122,9 +122,10 @@ class hr_timesheet_dh(osv.osv):
                 if isinstance(v,dict):
                     output.append('<tr>')
                     total_ts = _('Total:')
-                    output.append('<th>'+ total_ts +' </th>')
-                    for td in v.values():
-                        output.append('<td>'+str(td)+'</td>')
+                    output.append('<th colspan="3">'+ total_ts +' </th>')
+                    output.append('<td>'+str(v.values()[1])+'</td><td>'+str(v.values()[0])+'</td>')
+#                     for td in v.values():
+#                         output.append('<td>'+str(td)+'</td>')
                     output.append('</tr>')
             output.append('</table>')
             res[sheet.id] = '\n'.join(output)
