@@ -31,6 +31,8 @@ class hr_attendance_analysis_report(osv.osv):
         'department_id': fields.many2one('hr.department', 'Department'),
         'timesheet_id': fields.many2one('hr_timesheet_sheet.sheet', 'Timesheet'),
         'total_duty_hours_running': fields.float('Running Hours'),
+        'worked_hours': fields.float('Worked Hours'),
+        'total_duty_hours_done': fields.float('Duty Hours'),
         'user_id': fields.many2one('res.users','User of Employee'),
         'parent_user_id': fields.many2one('res.users','User of Manager'),
     }
@@ -48,18 +50,22 @@ class hr_attendance_analysis_report(osv.osv):
                      (select r.user_id
                      from resource_resource r, hr_employee e
                      where r.id = e.resource_id and e.id=emp.parent_id) as parent_user_id,
-                     sheet.total_diff_hours as total_duty_hours_running
+                     sheet.total_diff_hours as total_duty_hours_running,
+                     attd.worked_hours as worked_hours,
+                     sheet.total_duty_hours_done as total_duty_hours_done
                 from 
                     hr_timesheet_sheet_sheet sheet, 
                     hr_employee emp, 
                     resource_resource res,
-                    hr_department dp
+                    hr_department dp,
+                    hr_attendance attd
                 where 
                     sheet.employee_id=emp.id AND
                     emp.resource_id=res.id AND
-                    emp.department_id=dp.id
+                    emp.department_id=dp.id AND
+                    sheet.employee_id = attd.employee_id
                 group by 
-                    sheet.id, emp.department_id, res.user_id, emp.parent_id
+                    sheet.id, emp.department_id, res.user_id, emp.parent_id,attd.worked_hours
             )
         """)
 

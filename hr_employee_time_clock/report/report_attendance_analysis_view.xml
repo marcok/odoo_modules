@@ -22,6 +22,8 @@
                 <field name="department_id" type="row"/>
                 <field name="name" type="row"/>
                 <field name="total_duty_hours_running" type="measure"/>
+                <field name="worked_hours" type="measure"/>
+                <field name="total_duty_hours_done" type="measure"/>
                 <field name="timesheet_id" type="col"/>
             </graph>
         </field>
