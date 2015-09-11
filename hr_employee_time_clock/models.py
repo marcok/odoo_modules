@@ -6,7 +6,7 @@ from openerp.osv import fields, osv
 from dateutil import rrule, parser
 import pytz
 from openerp.tools.translate import _
-
+import collections
 
 class hr_timesheet_dh(osv.osv):
     """
