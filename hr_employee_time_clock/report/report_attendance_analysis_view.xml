@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <record id="view_hr_attendance_analysis_report_tree" model="ir.ui.view">
+        <field name="name">hr.attendance.analysis.report.tree</field>
+        <field name="model">hr.attendance.analysis.report</field>
+        <field name="arch" type="xml">
+            <tree string="Analysis by Timesheet">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="timesheet_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_attendance_analysis_report_graph" model="ir.ui.view">
+        <field name="name">hr.attendance.analysis.report.graph</field>
+        <field name="model">hr.attendance.analysis.report</field>
+        <field name="arch" type="xml">
+            <graph string="Analysis by Timesheet" type="pivot" stacked="True">
+                <field name="department_id" type="row"/>
+                <field name="name" type="row"/>
+                <field name="total_duty_hours_running" type="measure"/>
+                <field name="total_duty_hours_done" type="measure"/>
+                <field name="timesheet_id" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_hr_attendance_analysis_report" model="ir.actions.act_window">
+        <field name="name">Analysis by Timesheet</field>
+        <field name="res_model">hr.attendance.analysis.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">graph</field>
+        <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
+    </record>
+
+    <menuitem action="action_hr_attendance_analysis_report"  id="menu_hr_attendance_analysis_report"
+        parent="hr.menu_hr_reporting" groups="base.group_hr_user" sequence="3"/>
+
+    </data>
+</openerp>
