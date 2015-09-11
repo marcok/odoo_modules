@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import math
-
+import collections
 from openerp.osv import fields, osv
 from dateutil import rrule, parser
 import pytz
@@ -181,10 +181,10 @@ class hr_timesheet_dh(osv.osv):
                 if isinstance(v,dict):
                     output.append('<tr>')
                     total_ts = _('Total:')
-                    output.append('<th colspan="3">'+ total_ts +' </th>')
-                    output.append('<td>'+str(v.values()[1])+'</td><td>'+str(v.values()[0])+'</td>')
-#                     for td in v.values():
-#                         output.append('<td>'+str(td)+'</td>')
+                    output.append('<th colspan="2">'+ total_ts +' </th>')
+#                    output.append('<td>'+str(v.values()[1])+'</td><td>'+str(v.values()[0])+'</td>')
+                    for td in v.values():
+                        output.append('<td>'+str(td)+'</td>')
                     output.append('</tr>')
             output.append('</table>')
             res[sheet.id] = '\n'.join(output)
@@ -272,7 +272,10 @@ class hr_timesheet_dh(osv.osv):
                                      dtstart=parser.parse(start_date),
                                      until=parser.parse(end_date))) # Removed datetime.utcnow to parse till end date
         # END
-        total = {'worked_hours': 0.0, 'diff': current_month_diff}
+        total = collections.OrderedDict()
+        total['duty_hours'] = 0.0
+        total['worked_hours'] = 0.0
+        total['diff'] = current_month_diff
         for date_line in dates:
 
             dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context=ctx)
@@ -297,6 +300,7 @@ class hr_timesheet_dh(osv.osv):
                                      'worked_hours': attendance_obj.float_time_convert(worked_hours),
                                      'diff': self.sign_float_time_convert(diff),
                                      'running': self.sign_float_time_convert(current_month_diff)})
+            total['duty_hours'] += dh
             total['worked_hours'] += worked_hours
             total['diff'] += diff
         total['diff'] -= previous_month_diff
