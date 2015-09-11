@@ -275,10 +275,13 @@ class hr_timesheet_dh(osv.osv):
                                      dtstart=parser.parse(start_date),
                                      until=parser.parse(end_date))) # Removed datetime.utcnow to parse till end date
         # END
-        total = collections.OrderedDict()
-        total['duty_hours'] = 0.0
-        total['worked_hours'] = 0.0
-        total['diff'] = current_month_diff
+        
+	total = {'worked_hours': 0.0, 'duty_hours': 0.0, 'diff': current_month_diff}
+		
+	#total = collections.OrderedDict()
+        #total['duty_hours'] = 0.0
+        #total['worked_hours'] = 0.0
+        #total['diff'] = current_month_diff
         for date_line in dates:
 
             dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context=ctx)
@@ -306,9 +309,8 @@ class hr_timesheet_dh(osv.osv):
             total['duty_hours'] += dh
             total['worked_hours'] += worked_hours
             total['diff'] += diff
-            total['duty'] += dh
-        total['diff'] -= previous_month_diff
-        res['total'] = total
+            total['diff'] -= previous_month_diff
+            res['total'] = total
         return res
 
     def sign_float_time_convert(self, float_time):
