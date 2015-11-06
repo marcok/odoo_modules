@@ -4,7 +4,7 @@
 	'summary': 'Track over- and under-time, generate timesheets, upload public holidays',
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
-    'version': '1.0',
+    'version': '1.1',
     'depends': ['hr_timesheet_sheet', 'hr_attendance', 'hr_contract', 'hr_holidays'], #,'hr_attendance_analysis'
 	'images': ['images/overundertime.png'],
 	'installable': True,
