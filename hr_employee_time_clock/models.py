@@ -110,8 +110,10 @@ class hr_timesheet_dh(osv.osv):
         if context.get('date_from') and context.get('date_to'):
             start_leave_period = context.get('date_from')
             end_leave_period = context.get('date_to')
-        holiday_ids = holiday_obj.search(cr, uid, [('date_from','>=',start_leave_period),
-                                                   ('date_to','<=',end_leave_period),
+        holiday_ids = holiday_obj.search(cr, uid, ['|','&',('date_from','>=',start_leave_period),
+                                                           ('date_from','<=',end_leave_period),
+                                                   '&',('date_to','<=',end_leave_period),
+                                                       ('date_to','>=',start_leave_period),
                                                    ('employee_id','=',employee_id),
                                                    ('state','=','validate'),
                                                    ('type','=','remove')])
