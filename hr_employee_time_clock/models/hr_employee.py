@@ -21,8 +21,25 @@
 ##############################################################################
 
 
-import controllers
-import models
-import wizard  # Added wizard to open timesheets
-import hr_attendance_analysis
-import report
+from datetime import date
+from openerp.osv import fields, osv, orm
+from openerp.tools.translate import _
+
+
+class hr_employee(osv.osv):
+    _inherit = "hr.employee"
+    _description = "Employee"
+
+    def attendance_action_change(self, cr, uid, ids, context=None):
+        hr_timesheet_sheet_sheet_pool = self.pool.get(
+            'hr_timesheet_sheet.sheet')
+        hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
+            cr, uid, [('employee_id', '=', ids[0]),
+                      ('date_from', '<=', date.today()),
+                      ('date_to', '>=', date.today())], context=context)
+        if not hr_timesheet_ids:
+            raise orm.except_orm(
+                _("Error"),
+                _("Please contact your manager to create timesheet for you."))
+        return super(hr_employee, self).attendance_action_change(
+            cr, uid, ids, context=context)

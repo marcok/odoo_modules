@@ -16,17 +16,20 @@
                     <group>
                         <field name="category_id"/>
                         <group colspan="2">
-                            <field name="date_from"/>
-                            <field name="date_to"/>
+                            <field name="date_from" on_change="change_date(date_from, date_to)"/>
+                            <field name="date_to"  on_change="change_date(date_from, date_to)"/>
                         </group>
                     </group>
                 </xpath>
             </field>
         </record>
 
-        <menuitem name="Generate Timesheets" id="menu_act_hr_timesheet_sheet_form_open_current" 
-                parent="hr_attendance.menu_hr_time_tracking" action="hr_timesheet_sheet.action_hr_timesheet_current_open" 
-                groups="base.group_hr_manager" sequence="10"/>
+        <menuitem name="Generate Timesheets"
+                  id="menu_act_hr_timesheet_sheet_form_open_current"
+                  parent="hr_attendance.menu_hr_time_tracking"
+                  action="hr_timesheet_sheet.action_hr_timesheet_current_open"
+                  groups="base.group_hr_manager"
+                  sequence="10"/>
 
     </data>
 </openerp>

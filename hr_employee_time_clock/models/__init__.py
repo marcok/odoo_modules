@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 ##############################################################################
 #
 #    Clear Groups for Odoo
@@ -20,9 +19,6 @@
 #
 ##############################################################################
 
-
-import controllers
-import models
-import wizard  # Added wizard to open timesheets
-import hr_attendance_analysis
-import report
+from . import hr_employee
+from . import time_clock_resource_calendar
+from . import hr_timesheet_dh
