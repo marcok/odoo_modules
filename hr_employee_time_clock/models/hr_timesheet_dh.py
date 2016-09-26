@@ -158,9 +158,9 @@ class hr_timesheet_dh(osv.osv):
                 if isinstance(v, dict):
                     output.append('<tr>')
                     total_ts = _('Total:')
-                    output.append('<th colspan="2">' + total_ts + ' </th>')
+                    output.append('<th>' + total_ts + ' </th>')
                     for td in v.values():
-                        output.append('<td>' + str(td) + '</td>')
+                        output.append('<td>' + '%s' % round(td, 4) + '</td>')
                     output.append('</tr>')
             output.append('</table>')
             res[sheet.id] = '\n'.join(output)
@@ -283,9 +283,9 @@ class hr_timesheet_dh(osv.osv):
                                      end_date)))
         # Removed datetime.utcnow to parse till end date
         # END
-
+        work_current_month_diff = 0.0
         total = {'worked_hours': 0.0, 'duty_hours': 0.0,
-                 'diff': current_month_diff}
+                 'diff': current_month_diff, 'work_current_month_diff': ''}
         # total = collections.OrderedDict()
         # total['duty_hours'] = 0.0
         # total['worked_hours'] = 0.0
@@ -303,7 +303,7 @@ class hr_timesheet_dh(osv.osv):
 
             diff = worked_hours - dh
             current_month_diff += diff
-            print 'current_month_diff  >>>>>>>>>>>>>>>>>>>>', current_month_diff
+            work_current_month_diff += diff
             if context.get('function_call', False):
                 res['hours'].append({
                     _('Date'): date_line.strftime(date_format),
@@ -325,7 +325,7 @@ class hr_timesheet_dh(osv.osv):
             total['duty_hours'] += dh
             total['worked_hours'] += worked_hours
             total['diff'] += diff
-            # total['diff'] -= previous_month_diff
+            total['work_current_month_diff'] = work_current_month_diff
             res['total'] = total
         return res
 
