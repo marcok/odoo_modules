@@ -39,6 +39,5 @@ class HrEmployee(models.Model):
              ('date_to', '>=', date.today())])
         if not hr_timesheet_ids:
             raise ValidationError(
-                _("Error"),
-                _("Please contact your manager to create timesheet for you."))
+                _('Please contact your manager to create timesheet for you.'))
         return super(HrEmployee, self).attendance_action_change()

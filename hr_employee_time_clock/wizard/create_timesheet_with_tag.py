@@ -57,8 +57,9 @@ class CreateTimesheetWithTag(models.TransientModel):
         employee_obj = self.env['hr.employee']
         ts = self.env['hr_timesheet_sheet.sheet']
         value = super(CreateTimesheetWithTag, self).open_timesheet()
-
         # First: Search all employees of selected Tag
+        if not self.category_id:
+            return value
         category_id = self.category_id.id
         employee_objects = employee_obj.search([
             ('category_ids', 'in', [category_id])])
