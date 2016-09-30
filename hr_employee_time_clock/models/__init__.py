@@ -20,5 +20,7 @@
 ##############################################################################
 
 from . import hr_employee
+from . import hr_attendance_analysis
 from . import time_clock_resource_calendar
 from . import hr_timesheet_dh
+from . import resource_calendar
