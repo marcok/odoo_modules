@@ -37,7 +37,6 @@ class HrEmployee(models.Model):
             [('employee_id', '=', self.id),
              ('date_from', '<=', date.today()),
              ('date_to', '>=', date.today())])
-        print 'hr_timesheet_ids  >>>>>>>>>>>>>>>>>>>>', hr_timesheet_ids
         if not hr_timesheet_ids:
             raise ValidationError(
                 _("Error"),
