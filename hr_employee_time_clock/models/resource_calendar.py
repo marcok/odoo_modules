@@ -30,10 +30,10 @@ class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
 
     @api.multi
-    def get_working_hours_of_date(self, cr, uid, ids, start_dt=None, end_dt=None,
-                                  leaves=None, compute_leaves=False,
-                                  resource_id=None, default_interval=None,
-                                  context=None):
+    def get_working_hours_of_date(self, cr, uid, ids, start_dt=None,
+                                  end_dt=None, leaves=None,
+                                  compute_leaves=False, resource_id=None,
+                                  default_interval=None, context=None):
         """ Get the working hours of the day based on calendar. This method uses
         get_working_intervals_of_day to have the work intervals of the day. It
         then calculates the number of hours contained in those intervals. """
@@ -99,7 +99,7 @@ class ResourceCalendar(models.Model):
         if leaves is None and compute_leaves:
             leaves = self.get_leave_intervals(cr, uid, ids,
                                               resource_id=resource_id,
-                                              context=None)
+                                              context=context)
 
         # filter according to leaves
         for interval in working_intervals:

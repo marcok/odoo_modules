@@ -20,20 +20,26 @@
 ##############################################################################
 
 from openerp import tools
-from openerp.osv import fields,osv
+from openerp.osv import fields, osv
 
-class hr_attendance_analysis_report(osv.osv):
+
+class HrAttendanceAnalysisReport(osv.osv):
     _name = "hr.attendance.analysis.report"
     _description = "Attendance Analysis based on Timesheet"
     _auto = False
     _columns = {
-        'name': fields.many2one('hr.employee','Employee'),
-        'department_id': fields.many2one('hr.department', 'Department'),
-        'timesheet_id': fields.many2one('hr_timesheet_sheet.sheet', 'Timesheet'),
+        'name': fields.many2one('hr.employee',
+                                'Employee'),
+        'department_id': fields.many2one('hr.department',
+                                         'Department'),
+        'timesheet_id': fields.many2one('hr_timesheet_sheet.sheet',
+                                        'Timesheet'),
         'total_duty_hours_running': fields.float('Running Hours'),
         'total_duty_hours_done': fields.float('Duty Hours'),
-        'user_id': fields.many2one('res.users','User of Employee'),
-        'parent_user_id': fields.many2one('res.users','User of Manager'),
+        'user_id': fields.many2one('res.users',
+                                   'User of Employee'),
+        'parent_user_id': fields.many2one('res.users',
+                                          'User of Manager'),
     }
 
     def init(self, cr):
@@ -66,4 +72,4 @@ class hr_attendance_analysis_report(osv.osv):
         """)
 
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
