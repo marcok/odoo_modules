@@ -71,7 +71,7 @@ class HrTimesheetDh(models.Model):
              ('state', '=', 'validate'),
              ('type', '=', 'remove')])
         leaves = []
-        for leave in holiday_obj.browse(holiday_ids):
+        for leave in holiday_ids:
             leave_date_from = datetime.strptime(leave.date_from,
                                                 '%Y-%m-%d %H:%M:%S')
             leave_date_to = datetime.strptime(leave.date_to,
