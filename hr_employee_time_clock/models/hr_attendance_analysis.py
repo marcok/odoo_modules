@@ -21,7 +21,9 @@
 ##############################################################################
 
 import math
-from openerp import models
+from openerp import models, api, _
+from datetime import datetime
+from openerp.exceptions import ValidationError
 
 
 class HrAttendance(models.Model):
@@ -39,3 +41,12 @@ class HrAttendance(models.Model):
             mins = 0.0
         float_time = '%02d:%02d' % (hours, mins)
         return float_time
+
+    @api.model
+    def create(self, values):
+        times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
+        if datetime.now() < times:
+            raise ValidationError(
+                _('You can not set time of Sing In (resp. Sing Out) which '
+                  'is later than a current time'))
+        return super(HrAttendance, self).create(values)

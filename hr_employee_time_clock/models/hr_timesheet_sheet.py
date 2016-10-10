@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    Clear Groups for Odoo
@@ -19,9 +20,26 @@
 #
 ##############################################################################
 
-from . import hr_employee
-from . import hr_attendance_analysis
-from . import time_clock_resource_calendar
-from . import hr_timesheet_dh
-from . import resource_calendar
-from . import hr_timesheet_sheet
+
+from openerp import api, fields, models, _
+from openerp.exceptions import ValidationError
+
+
+class HrTimesheetSheet(models.Model):
+    _inherit = "hr_timesheet_sheet.sheet"
+
+    @api.onchange('date_from', 'date_to')
+    @api.multi
+    def change_date(self):
+        if self.date_to and self.date_from and self.date_from > self.date_to:
+            raise ValidationError(
+                _('You added wrong date period.'))
+
+    @api.model
+    def create(self, values):
+        if values.get('date_to') and values.get('date_from') \
+                and values.get('date_from') > values.get('date_to'):
+            raise ValidationError(
+                _('You added wrong date period.'))
+        return super(HrTimesheetSheet, self).create(values)
+

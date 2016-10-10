@@ -38,6 +38,7 @@ class CreateTimesheetWithTag(models.TransientModel):
     date_from = fields.Date(string='Start Date')
     date_to = fields.Date(string='End Date')
 
+    @api.onchange('date_from', 'date_to')
     @api.multi
     def change_date(self, date_from, date_to):
         if date_to and date_from and date_from > date_to:
