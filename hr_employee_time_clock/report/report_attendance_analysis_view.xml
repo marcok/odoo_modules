@@ -37,7 +37,7 @@
     </record>
 
     <menuitem action="action_hr_attendance_analysis_report"  id="menu_hr_attendance_analysis_report"
-        parent="hr.menu_hr_reporting" groups="base.group_hr_user" sequence="3"/>
+        parent="hr_attendance.timesheet_menu_root" groups="base.group_hr_user" sequence="3"/>
 
     </data>
 </openerp>

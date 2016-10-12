@@ -20,24 +20,34 @@
 #
 ##############################################################################
 
-
-from datetime import date
-from openerp import api, fields, models, _
+import math
+from openerp import models, api, _
+from datetime import datetime
 from openerp.exceptions import ValidationError
 
 
-class HrEmployee(models.Model):
-    _inherit = "hr.employee"
-    _description = "Employee"
+class HrAttendance(models.Model):
+    _inherit = "hr.attendance"
 
-    @api.multi
-    def attendance_action_change(self):
-        hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
-        hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
-            [('employee_id', '=', self.id),
-             ('date_from', '<=', date.today()),
-             ('date_to', '>=', date.today())])
-        if not hr_timesheet_ids:
-            raise ValidationError(
-                _('Please contact your manager to create timesheet for you.'))
-        return super(HrEmployee, self).attendance_action_change()
+    # ref: https://bugs.launchpad.net/openobject-client/+bug/887612
+    # test: 0.9853 - 0.0085
+
+    def float_time_convert(self, float_val):
+        hours = math.floor(abs(float_val))
+        mins = abs(float_val) - hours
+        mins = round(mins * 60)
+        if mins >= 60.0:
+            hours += 1
+            mins = 0.0
+        float_time = '%02d:%02d' % (hours, mins)
+        return float_time
+
+    @api.model
+    def create(self, values):
+        if values.get('name'):
+            times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
+            if datetime.now() < times:
+                raise ValidationError(
+                    _('You can not set time of Sing In (resp. Sing Out) which '
+                      'is later than a current time'))
+        return super(HrAttendance, self).create(values)

@@ -1,0 +1,44 @@
+<openerp>
+    <data>
+        <record id="action_hr_timesheet_overtime" model="ir.actions.act_window">
+            <field name="name">Academy teachers</field>
+            <field name="res_model">hr_timesheet_sheet.sheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_id">
+            <field name="name">view.name</field>
+            <field name="model">hr_timesheet_sheet.sheet</field>
+            <field name="arch" type="xml">
+                <tree string="Idea list">
+                    <field name="employee_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="timesheet_overtime" model="ir.ui.view">
+            <field name="name">hr_timesheet_sheet.overtime.form</field>
+            <field name="model">hr_timesheet_sheet.sheet</field>
+            <field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/group[2]" position="replace">
+                    <group>
+                        <field name="prev_timesheet_diff" widget="float_time" string="Last timesheets"/>
+                        <field name="total_timesheet" widget="float_time"/>
+                        <field name="total_attendance" widget="float_time" string="Attendance this timesheet"/>
+                        <field name="total_duty_hours" widget="float_time" string="Remaining this timesheet"/>
+                        <field name="calculate_diff_hours" widget="float_time" string="Total balance"/>
+                    </group>
+                </xpath>
+                <notebook position="inside">
+                    <page string="Overtime Analysis">
+                        <field name="analysis" widget="html" nolabel="1"/>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+    </data>
+</openerp>
