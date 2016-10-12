@@ -44,9 +44,10 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
-        times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
-        if datetime.now() < times:
-            raise ValidationError(
-                _('You can not set time of Sing In (resp. Sing Out) which '
-                  'is later than a current time'))
+        if values.get('name'):
+            times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
+            if datetime.now() < times:
+                raise ValidationError(
+                    _('You can not set time of Sing In (resp. Sing Out) which '
+                      'is later than a current time'))
         return super(HrAttendance, self).create(values)
