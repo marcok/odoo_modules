@@ -72,7 +72,6 @@ class HrTimesheetDh(models.Model):
              ('type', '=', 'remove')])
         leaves = []
         for leave in holiday_ids:
-
             leave_date_from = datetime.strptime(leave.date_from,
                                                 '%Y-%m-%d %H:%M:%S')
             leave_date_to = datetime.strptime(leave.date_to,
@@ -81,11 +80,10 @@ class HrTimesheetDh(models.Model):
                                            dtstart=parser.parse(
                                                leave.date_from),
                                            until=parser.parse(leave.date_to)))
-            print 'leave_dates  >>>>>>>>>>>>>>>>>>>>', leave_dates
-
             for date in leave_dates:
                 if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append((leave_date_from, leave_date_to))
+                    leaves.append(
+                        (leave_date_from, leave_date_to, leave.number_of_days))
                     break
         return leaves
 
@@ -200,6 +198,11 @@ class HrTimesheetDh(models.Model):
                 if not dh:
                     dh = 0.00
                 duty_hours += dh
+            else:
+                if leaves[-1] and leaves[-1][-1]:
+                    if float(leaves[-1][-1]) == (-0.5):
+                        duty_hours += dh / 2
+
         return duty_hours
 
     @api.multi
