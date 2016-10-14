@@ -82,7 +82,8 @@ class HrTimesheetDh(models.Model):
                                            until=parser.parse(leave.date_to)))
             for date in leave_dates:
                 if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append((leave_date_from, leave_date_to))
+                    leaves.append(
+                        (leave_date_from, leave_date_to, leave.number_of_days))
                     break
         return leaves
 
@@ -197,6 +198,11 @@ class HrTimesheetDh(models.Model):
                 if not dh:
                     dh = 0.00
                 duty_hours += dh
+            else:
+                if leaves[-1] and leaves[-1][-1]:
+                    if float(leaves[-1][-1]) == (-0.5):
+                        duty_hours += dh / 2
+
         return duty_hours
 
     @api.multi
