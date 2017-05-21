@@ -20,31 +20,30 @@
 ##############################################################################
 
 from openerp import tools
-from openerp.osv import fields, osv
+from odoo import api, fields, models
 
 
-class HrAttendanceAnalysisReport(osv.osv):
+class HrAttendanceAnalysisReport(models.Model):
     _name = "hr.attendance.analysis.report"
     _description = "Attendance Analysis based on Timesheet"
     _auto = False
-    _columns = {
-        'name': fields.many2one('hr.employee',
-                                'Employee'),
-        'department_id': fields.many2one('hr.department',
-                                         'Department'),
-        'timesheet_id': fields.many2one('hr_timesheet_sheet.sheet',
-                                        'Timesheet'),
-        'total_duty_hours_running': fields.float('Running Hours'),
-        'total_duty_hours_done': fields.float('Duty Hours'),
-        'user_id': fields.many2one('res.users',
-                                   'User of Employee'),
-        'parent_user_id': fields.many2one('res.users',
-                                          'User of Manager'),
-    }
 
-    def init(self, cr):
-        tools.drop_view_if_exists(cr, 'hr_attendance_analysis_report')
-        cr.execute("""
+    name = fields.Many2one('hr.employee',
+                           string='Employee')
+    department_id = fields.Many2one('hr.department',
+                                    string='Department')
+    timesheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
+                                   string='Timesheet')
+    total_duty_hours_running = fields.Float(string='Running Hours')
+    total_duty_hours_done = fields.Float(string='Duty Hours')
+    user_id = fields.Many2one('res.users',
+                              string='User of Employee')
+    parent_user_id = fields.Many2one('res.users',
+                                     string='User of Manager')
+
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, 'hr_attendance_analysis_report')
+        self.env.cr.execute("""
             CREATE or REPLACE view hr_attendance_analysis_report as (
                  select
                      min(sheet.id) as id,

@@ -22,25 +22,23 @@
 from datetime import datetime, timedelta
 import pytz
 
-from openerp.osv import fields, osv
+from openerp import fields, models, api, _
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.tools.translate import _
 
 
-class import_leave_requests(osv.osv_memory):
+class ImportLeaveRequests(models.TransientModel):
     _name = 'import.leave.requests'
     _description = 'Import Leave Requests With Employee Tag'
-    _columns = {
-        'leave_dates': fields.binary('Select *.csv',
-                                     required=True,
-                                     help="Select csv file having "
-                                          "holiday dates."),
-        'leave_type_id': fields.many2one('hr.holidays.status',
-                                         'Leave Type',
-                                         required=True),
-        'employee_tag_id': fields.many2one('hr.employee.category',
-                                           "Employee Tag", required=True),
-    }
+    leave_dates= fields.Binary('Select *.csv',
+                                 required=True,
+                                 help="Select csv file having "
+                                      "holiday dates.")
+    leave_type_id = fields.Many2one('hr.holidays.status',
+                                     'Leave Type',
+                                     required=True)
+    employee_tag_id = fields.Many2one('hr.employee.category',
+                                           "Employee Tag", required=True)
 
     def convert_to_user_timezone(self, user_tz, dt):
         input_tz = pytz.timezone(user_tz)

@@ -28,6 +28,31 @@ from openerp.exceptions import ValidationError
 class HrTimesheetSheet(models.Model):
     _inherit = "hr_timesheet_sheet.sheet"
 
+
+    def _total(self, cr, uid, ids, name, args, context=None):
+        """ Compute the attendances, analytic lines timesheets and differences between them
+            for all the days of a timesheet and the current day
+        """
+        res = dict.fromkeys(ids, {
+            'total_attendance': 0.0,
+            'total_timesheet': 0.0,
+            'total_difference': 0.0,
+        })
+
+        cr.execute("""
+            SELECT sheet_id as id,
+                   sum(total_attendance) as total_attendance,
+                   sum(total_timesheet) as total_timesheet,
+                   sum(total_difference) as  total_difference
+            FROM hr_timesheet_sheet_sheet_day
+            WHERE sheet_id IN %s
+            GROUP BY sheet_id
+        """, (tuple(ids),))
+
+        res.update(dict((x.pop('id'), x) for x in cr.dictfetchall()))
+
+        return res
+
     @api.onchange('date_from', 'date_to')
     @api.multi
     def change_date(self):
@@ -43,3 +68,9 @@ class HrTimesheetSheet(models.Model):
                 _('You added wrong date period.'))
         return super(HrTimesheetSheet, self).create(values)
 
+    total_attendance = fields.Float(compute="_total",
+                                    string='Total Attendance')
+    total_timesheet = fields.Float(compute="_total",
+                                   string='Total Timesheet')
+    total_difference = fields.Float(compute="_total",
+                                    string='Difference')

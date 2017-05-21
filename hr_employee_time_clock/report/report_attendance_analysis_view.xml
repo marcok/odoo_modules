@@ -36,8 +36,11 @@
         <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
     </record>
 
-    <menuitem action="action_hr_attendance_analysis_report"  id="menu_hr_attendance_analysis_report"
-        parent="hr.menu_hr_reporting" groups="base.group_hr_user" sequence="3"/>
+    <menuitem action="action_hr_attendance_analysis_report"
+              id="menu_hr_attendance_analysis_report"
+              parent="hr_attendance.menu_hr_attendance_root"
+              groups="hr.group_hr_attendance"
+              sequence="3"/>
 
     </data>
 </openerp>

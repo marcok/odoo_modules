@@ -23,7 +23,7 @@
             <field name="model">hr_timesheet_sheet.sheet</field>
             <field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/sheet/group/group[2]" position="replace">
+                <xpath expr="//group" position="inside">
                     <group>
                         <field name="prev_timesheet_diff" widget="float_time" string="Last timesheets"/>
                         <field name="total_timesheet" widget="float_time"/>
@@ -32,11 +32,11 @@
                         <field name="calculate_diff_hours" widget="float_time" string="Total balance"/>
                     </group>
                 </xpath>
-                <notebook position="inside">
+                <xpath expr="//notebook" position="inside">
                     <page string="Overtime Analysis">
                         <field name="analysis" widget="html" nolabel="1"/>
                     </page>
-                </notebook>
+                </xpath>
             </field>
         </record>
 

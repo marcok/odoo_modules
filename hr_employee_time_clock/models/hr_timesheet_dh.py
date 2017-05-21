@@ -304,7 +304,8 @@ class HrTimesheetDh(models.Model):
     @api.multi
     def sign_float_time_convert(self, float_time):
         sign = '-' if float_time < 0 else ''
-        attendance_obj = self.pool.get('hr.attendance')
+        attendance_obj = self.env['hr.attendance']
+        # attendance_obj = self.pool.get('hr.attendance')
         return sign + attendance_obj.float_time_convert(float_time)
 
     @api.multi

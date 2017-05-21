@@ -4,34 +4,63 @@
 
         <!--Done BY Addition IT Solutions: BEGIN -->
         <!-- Override 'My Current Timesheet' form and menu here -->
-        <record id="view_hr_timesheet_current_open_inherit" model="ir.ui.view">
-            <field name="name">hr_timesheet_current_open.form.inherit</field>
+
+
+        <record id="view_hr_timesheet_current_open" model="ir.ui.view">
+            <field name="name">hr_timesheet_current_open.form</field>
             <field name="model">hr.timesheet.current.open</field>
-            <field name="inherit_id" ref="hr_timesheet_sheet.view_hr_timesheet_current_open"/>
             <field name="arch" type="xml">
-                <xpath expr="//form/group/separator" position="attributes">
-                    <attribute name="string">Generate timesheets for employees having the following tag:</attribute>
-                </xpath>
-                <xpath expr="//form/group" position="after">
+                <form string="My Timesheet">
+                    <group>
+                        <separator
+                                string=">Generate timesheets for employees having the following tag:"/>
+                    </group>
                     <group>
                         <field name="category_id"/>
                         <group colspan="2">
-                            <field name="date_from" on_change="change_date(date_from, date_to)"/>
-                            <field name="date_to"  on_change="change_date(date_from, date_to)"/>
+                            <field name="date_from"
+                                   on_change="change_date(date_from, date_to)"/>
+                            <field name="date_to"
+                                   on_change="change_date(date_from, date_to)"/>
                         </group>
                     </group>
-                </xpath>
+                    <footer>
+                        <button name="open_timesheet" string="Open"
+                                type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_timesheet_current_open"
+                model="ir.actions.act_window">
+            <field name="name">My Timesheet</field>
+            <field name="res_model">hr.timesheet.current.open</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_current_open"/>
+            <field name="target">new</field>
+            <field name="help">My Timesheet opens your timesheet so that you can
+                book your activities into the system. From the same form, you
+                can register your attendances (Sign In/Out) and describe the
+                working hours made on the different projects. At the end of the
+                period defined in the company, the timesheet is confirmed by the
+                user and can be validated by his manager. If required, as
+                defined on the project, you can generate the invoices based on
+                the timesheet.
             </field>
         </record>
 
         <menuitem name="Generate Timesheets"
                   id="menu_act_hr_timesheet_sheet_form_open_current"
-                  parent="hr_attendance.menu_hr_time_tracking"
-                  action="hr_timesheet_sheet.action_hr_timesheet_current_open"
-                  groups="base.group_hr_manager"
+                  parent="hr_attendance.menu_hr_attendance_root"
+                  action="action_hr_timesheet_current_open"
+                  groups="hr.group_hr_manager"
                   sequence="10"/>
 
     </data>
 </openerp>
 
-<!--Done BY Addition IT Solutions: END -->
+        <!--Done BY Addition IT Solutions: END -->

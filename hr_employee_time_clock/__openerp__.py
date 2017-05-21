@@ -31,13 +31,13 @@
     'images': ['images/overundertime.png'],
     'installable': True,
     'data': [
-        'security/ir_rule.xml',
-        'security/ir.model.access.csv',
         'views/views.xml',
         # Report
         'report/report_attendance_analysis_view.xml',
+        'security/ir_rule.xml',
+        'security/ir.model.access.csv',
         # View file for the wizard
-        'wizard/create_timesheet_with_tag_view.xml', 
+        'wizard/create_timesheet_with_tag_view.xml',
         'wizard/import_leave_requests_view.xml',
     ]
 }
