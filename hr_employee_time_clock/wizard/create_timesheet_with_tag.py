@@ -22,15 +22,15 @@
 
 
 import time
-from openerp import fields, models, api, _
-from openerp.exceptions import ValidationError
+from odoo import fields, models, api, _
+from odoo.exceptions import ValidationError
 
 
 class CreateTimesheetWithTag(models.TransientModel):
     _inherit = 'hr.timesheet.current.open'
     _description = 'Create Timesheet With Employee Tag'
 
-        # Added below fields on the wizard
+    # Added below fields on the wizard
     category_id = fields.Many2one('hr.employee.category',
                                   string="Employee Tag",
                                   required=True,
@@ -82,7 +82,7 @@ class CreateTimesheetWithTag(models.TransientModel):
                 if ts_id:
                     raise ValidationError(
                         _('Timesheet already exists for {name}.'.format(
-                                name=emp.name)))
+                            name=emp.name)))
                 if not ts_id:
                     values = {'employee_id': emp.id}
                     if self.date_from and self.date_to:

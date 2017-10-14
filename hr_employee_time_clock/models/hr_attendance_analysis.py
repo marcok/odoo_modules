@@ -21,9 +21,9 @@
 ##############################################################################
 
 import math
-from openerp import models, api, _
+from odoo import models, api, _
 from datetime import datetime
-from openerp.exceptions import ValidationError
+from odoo.exceptions import ValidationError
 
 
 class HrAttendance(models.Model):

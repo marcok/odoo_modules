@@ -22,7 +22,7 @@
 
 from datetime import datetime
 import math
-from openerp import fields, models, api
+from odoo import fields, models, api
 
 
 class TimeClockResourceCalendar(models.Model):
@@ -75,7 +75,6 @@ class TimeClockResourceCalendar(models.Model):
         working_intervals = []
         for calendar_working_day in self.get_attendances_for_weekdays(
                 [start_dt.weekday()])[0]:
-
             # FIXED by Addition IT Solutions: Counting
             # minutes to get result when 0.5h are added to calendar
             minutes_from = math.modf(calendar_working_day.hour_from)[0] * 60

@@ -23,9 +23,9 @@
 import datetime as dtime
 
 from datetime import datetime, timedelta
-from openerp import api, fields, models, _
+from odoo import api, fields, models, _
 from dateutil import rrule, parser
-from openerp.tools.translate import _
+from odoo.tools.translate import _
 
 
 class HrTimesheetDh(models.Model):
@@ -117,7 +117,10 @@ class HrTimesheetDh(models.Model):
             data = self.attendance_analysis(sheet.id, function_call)
             values = []
             output = [
-                '<style>.attendanceTable td,.attendanceTable th {padding: 3px; border: 1px solid #C0C0C0; border-collapse: collapse;     text-align: right;} </style><table class="attendanceTable" >']
+                '<style>.attendanceTable td,.attendanceTable th '
+                '{padding: 3px; border: 1px solid #C0C0C0; '
+                'border-collapse: collapse;     '
+                'text-align: right;} </style><table class="attendanceTable" >']
             for val in data.values():
                 if isinstance(val, (int, float)):
                     output.append('<tr>')

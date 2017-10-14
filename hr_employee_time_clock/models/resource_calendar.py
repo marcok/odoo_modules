@@ -23,7 +23,7 @@
 import datetime as dtime
 
 from datetime import datetime
-from openerp import api, fields, models, _
+from odoo import api, fields, models, _
 
 
 class ResourceCalendar(models.Model):

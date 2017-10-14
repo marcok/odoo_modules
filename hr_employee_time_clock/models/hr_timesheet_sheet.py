@@ -21,16 +21,16 @@
 ##############################################################################
 
 
-from openerp import api, fields, models, _
-from openerp.exceptions import ValidationError
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class HrTimesheetSheet(models.Model):
     _inherit = "hr_timesheet_sheet.sheet"
 
-
     def _total(self, cr, uid, ids, name, args, context=None):
-        """ Compute the attendances, analytic lines timesheets and differences between them
+        """ Compute the attendances, analytic lines timesheets
+        and differences between them
             for all the days of a timesheet and the current day
         """
         res = dict.fromkeys(ids, {
