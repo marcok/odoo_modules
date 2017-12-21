@@ -240,6 +240,7 @@ class HrTimesheetDh(models.Model):
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
+        _logger.info('\n====> ', self, timesheet_id, function_call,'\n')
         for sheet in self:
             _logger.info('\n====> ', sheet.id, timesheet_id, '\n')
             if sheet.id == timesheet_id:
