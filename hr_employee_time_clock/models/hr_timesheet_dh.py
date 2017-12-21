@@ -26,6 +26,8 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
 from odoo.tools.translate import _
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class HrTimesheetDh(models.Model):
@@ -238,8 +240,8 @@ class HrTimesheetDh(models.Model):
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
-
         for sheet in self:
+            _logger.info('\n====> ', sheet.id, timesheet_id, '\n')
             if sheet.id == timesheet_id:
 
                 employee_id = sheet.employee_id.id
