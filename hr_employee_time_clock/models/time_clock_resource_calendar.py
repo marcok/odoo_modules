@@ -65,7 +65,7 @@ class TimeClockResourceCalendar(models.Model):
                         hour=default_interval[0], minute=0, second=0),
                     start_dt.replace(
                         hour=default_interval[1], minute=0, second=0))
-                intervals = self.interval_remove_leaves(working_interval,
+                intervals = self._interval_remove_leaves(working_interval,
                                                         work_limits)
             if intervals:
                 return intervals
@@ -85,15 +85,15 @@ class TimeClockResourceCalendar(models.Model):
                 work_dt.replace(hour=int(calendar_working_day.hour_to),
                                 minute=int(minutes_to))
             )
-            working_intervals += self.interval_remove_leaves(working_interval,
+            working_intervals += self._interval_remove_leaves(working_interval,
                                                              work_limits)
         # find leave intervals
         if leaves is None and compute_leaves:
-            leaves = self.get_leave_intervals(resource_id=resource_id)
+            leaves = self._get_leave_intervals(resource_id=resource_id)
 
         # filter according to leaves
         for interval in working_intervals:
-            work_intervals = self.interval_remove_leaves(interval, leaves)
+            work_intervals = self._interval_remove_leaves(interval, leaves)
             intervals += work_intervals
 
         return intervals

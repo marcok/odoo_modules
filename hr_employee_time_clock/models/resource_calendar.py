@@ -82,7 +82,7 @@ class ResourceCalendar(models.Model):
                                      minute=0, second=0),
                     start_dt.replace(hour=default_interval[1],
                                      minute=0, second=0))
-            intervals = self.interval_remove_leaves(working_interval,
+            intervals = self._interval_remove_leaves(working_interval,
                                                     work_limits)
             return intervals
 
@@ -93,17 +93,19 @@ class ResourceCalendar(models.Model):
                 work_dt.replace(hour=int(calendar_working_day.hour_from)),
                 work_dt.replace(hour=int(calendar_working_day.hour_to))
             )
-            working_intervals += self.interval_remove_leaves(working_interval,
+            working_intervals += self._interval_remove_leaves(working_interval,
                                                              work_limits)
         # find leave intervals
         if leaves is None and compute_leaves:
-            leaves = self.get_leave_intervals(cr, uid, ids,
+            leaves = self._get_leave_intervals(cr, uid, ids,
                                               resource_id=resource_id,
                                               context=context)
 
         # filter according to leaves
         for interval in working_intervals:
-            work_intervals = self.interval_remove_leaves(interval, leaves)
+            if not leaves:
+                leaves=[]
+            work_intervals = self._interval_remove_leaves(interval, leaves)
             intervals += work_intervals
         return intervals
 

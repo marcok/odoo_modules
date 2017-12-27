@@ -39,7 +39,6 @@
     <menuitem action="action_hr_attendance_analysis_report"
               id="menu_hr_attendance_analysis_report"
               parent="hr_attendance.menu_hr_attendance_root"
-              groups="hr.group_hr_attendance"
               sequence="3"/>
 
     </data>

@@ -192,7 +192,7 @@ class HrTimesheetDh(models.Model):
             dh = calendar_obj.get_working_hours_of_date(
                 cr=self._cr,
                 uid=self.env.user.id,
-                ids=contract.working_hours.id,
+                ids=contract.resource_calendar_id.id,
                 start_dt=date_from,
                 resource_id=self.employee_id.id,
                 context=ctx)

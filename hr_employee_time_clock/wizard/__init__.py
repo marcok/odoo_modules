@@ -20,7 +20,9 @@
 #
 ##############################################################################
 
+from . import hr_timesheet_current
 from . import create_timesheet_with_tag
 from . import import_leave_requests
+
 
 # END

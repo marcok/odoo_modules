@@ -25,6 +25,7 @@ import pytz
 from odoo import fields, models, api, _
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.translate import _
+from odoo.exceptions import UserError
 
 
 class ImportLeaveRequests(models.TransientModel):
@@ -47,28 +48,25 @@ class ImportLeaveRequests(models.TransientModel):
             DEFAULT_SERVER_DATETIME_FORMAT)
         return converted_date
 
-    def import_leave_data(self, cr, uid, ids, context=None):
-        holiday_obj = self.pool.get('hr.holidays')
-        employee_obj = self.pool.get('hr.employee')
-        timesheet_obj = self.pool.get('hr_timesheet_sheet.sheet')
-        converter = self.pool.get('ir.fields.converter')
-        for data in self.browse(cr, uid, ids, context):
+    @api.multi
+    def import_leave_data(self):
+        holiday_obj = self.env['hr.holidays']
+        employee_obj = self.env['hr.employee']
+        timesheet_obj = self.env['hr_timesheet_sheet.sheet']
+        converter = self.env['ir.fields.converter']
+        for data in self:
             leaves = (data.leave_dates.decode('base64')).split('\n')
             category_id = data.employee_tag_id.id
-            employee_ids = employee_obj.search(cr, uid, [
-                ('category_ids', 'in', [category_id])], context=context)
-            for employee_id in employee_ids:
-                employee = employee_obj.browse(cr, uid, employee_id, context)
+            employees = employee_obj.search(
+                [('category_ids', 'in', [category_id])])
+            for employee in employees:
                 for leave in leaves[:-1]:
                     dt_fmt, tm_fmt = \
-                        (timesheet_obj._get_user_datetime_format(
-                            cr,
-                            uid,
-                            context=context))
+                        (timesheet_obj._get_user_datetime_format())
                     try:
                         datetime.strptime(leave, dt_fmt)
                     except ValueError:
-                        raise osv.except_osv(_('Data Error!'), _(
+                        raise UserError(_(
                             "Date format in your .csv file does not "
                             "match with database date format."))
                     dt1 = datetime.strptime(leave, dt_fmt)
@@ -79,17 +77,15 @@ class ImportLeaveRequests(models.TransientModel):
                     user_tz = employee.user_id and employee.user_id.tz or 'utc'
                     leave_date = self.convert_to_user_timezone(user_tz, dt1)
                     leave_date_to = self.convert_to_user_timezone(user_tz, dt2)
-                    holiday_id = holiday_obj.create(cr, uid, {
+                    holiday_id = holiday_obj.create({
                         'name': data.leave_type_id.name,
                         'date_from': leave_date,
                         'date_to': leave_date_to,
                         'holiday_status_id': data.leave_type_id.id,
-                        'employee_id': employee_id,
+                        'employee_id': employee.id,
                         'number_of_days_temp': 1.0,
-                        'type': 'remove'
-                    })
-                    holiday_obj.holidays_validate(cr, uid, [holiday_id],
-                                                  context=context)
+                        'type': 'remove'})
+                    holiday_obj.holidays_validate([holiday_id])
         return True
 
         # END

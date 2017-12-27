@@ -40,8 +40,8 @@ class CreateTimesheetWithTag(models.TransientModel):
 
     @api.onchange('date_from', 'date_to')
     @api.multi
-    def change_date(self, date_from, date_to):
-        if date_to and date_from and date_from > date_to:
+    def change_date(self):
+        if self.date_to and self.date_from and self.date_from > self.date_to:
             raise ValidationError(
                 _('You added wrong date period.'))
 
@@ -98,5 +98,3 @@ class CreateTimesheetWithTag(models.TransientModel):
         value.update(domain=domain)
         value.update(view_mode='tree,form')
         return value
-
-# END

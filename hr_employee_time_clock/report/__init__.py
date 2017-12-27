@@ -19,4 +19,4 @@
 #
 ##############################################################################
 
-import report_attendance_analysis
+from . import report_attendance_analysis

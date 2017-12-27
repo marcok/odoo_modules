@@ -27,17 +27,30 @@
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '1.2',
-    'depends': ['hr_timesheet_sheet', 'hr_attendance', 'hr_contract', 'hr_holidays'], #,'hr_attendance_analysis'
+    'depends': ['hr_attendance',
+                'hr_contract',
+                'hr_holidays'],
+    # ,'hr_attendance_analysis'
     'images': ['images/overundertime.png'],
     'installable': True,
     'data': [
-        'views/views.xml',
+        'data/hr_timesheet_sheet_data.xml',
+
+        'views/hr_timesheet_sheet_templates.xml',
+        'views/hr_timesheet_sheet_views.xml',
+        'views/hr_department_views.xml',
+        # 'views/hr_timesheet_sheet_config_settings_views.xml',
+
         # Report
         'report/report_attendance_analysis_view.xml',
+
         'security/ir_rule.xml',
+        'security/hr_timesheet_sheet_security.xml',
         'security/ir.model.access.csv',
+
         # View file for the wizard
         'wizard/create_timesheet_with_tag_view.xml',
         'wizard/import_leave_requests_view.xml',
-    ]
+    ],
+    'qweb': ['static/src/xml/timesheet.xml', ],
 }

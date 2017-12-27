@@ -30,6 +30,16 @@ class HrEmployee(models.Model):
     _inherit = "hr.employee"
     _description = "Employee"
 
+    timesheet_count = fields.Integer(compute='_compute_timesheet_count',
+                                     string='Timesheets')
+
+    @api.multi
+    def _compute_timesheet_count(self):
+        for employee in self:
+            employee.timesheet_count = employee.env[
+                'hr_timesheet_sheet.sheet'].search_count(
+                [('employee_id', '=', employee.id)])
+
     @api.multi
     def attendance_action_change(self):
         hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
