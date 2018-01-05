@@ -22,7 +22,7 @@
 
 
 from datetime import date
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.exceptions import ValidationError
 
 
@@ -40,4 +40,22 @@ class HrEmployee(models.Model):
         if not hr_timesheet_ids:
             raise ValidationError(
                 _('Please contact your manager to create timesheet for you.'))
-        return super(HrEmployee, self).attendance_action_change()
+        attendance = super(HrEmployee, self).attendance_action_change()
+        if not self.env.context.get('attendance_manual'):
+            return True
+        return attendance
+
+    @api.multi
+    def attendance_manual(self, next_action, entered_pin=None):
+        self.ensure_one()
+        if not (entered_pin is None) or self.env['res.users'].browse(
+                SUPERUSER_ID).has_group(
+                'hr_attendance.group_hr_attendance_use_pin') and (
+                self.user_id and self.user_id.id != self._uid
+                or not self.user_id):
+            if entered_pin != self.pin:
+                return {'warning': _('Wrong PIN')}
+        ctx = self.env.context.copy()
+        ctx['attendance_manual'] = True
+        return self.with_context(ctx).attendance_action(next_action)
+
