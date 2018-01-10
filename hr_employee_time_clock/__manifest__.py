@@ -27,7 +27,9 @@
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '1.2',
-    'depends': ['hr_attendance',
+    'depends': ['analytic',
+                'hr_timesheet',
+                'hr_attendance',
                 'hr_contract',
                 'hr_holidays'],
     # ,'hr_attendance_analysis'
