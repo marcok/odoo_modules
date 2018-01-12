@@ -24,6 +24,9 @@
 from datetime import date
 from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class HrEmployee(models.Model):
@@ -50,8 +53,8 @@ class HrEmployee(models.Model):
         self.ensure_one()
         if not (entered_pin is None) or self.env['res.users'].browse(
                 SUPERUSER_ID).has_group(
-                'hr_attendance.group_hr_attendance_use_pin') and (
-                self.user_id and self.user_id.id != self._uid
+            'hr_attendance.group_hr_attendance_use_pin') and (
+                        self.user_id and self.user_id.id != self._uid
                 or not self.user_id):
             if entered_pin != self.pin:
                 return {'warning': _('Wrong PIN')}
@@ -59,3 +62,20 @@ class HrEmployee(models.Model):
         ctx['attendance_manual'] = True
         return self.with_context(ctx).attendance_action(next_action)
 
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        _logger.info(fields)
+        result = super(HrEmployee, self).read(fields=fields, load=load)
+        _logger.info(result)
+        new_result = []
+        for r in result:
+            if 'state' in fields and not r.get('state'):
+                employee_id = r.get('id')
+                employee = self.browse(employee_id)
+                if employee.is_absent_totay:
+                    r['state'] = 'absent'
+                else:
+                    r['state'] = 'present'
+            new_result.append(r)
+        _logger.info(new_result)
+        return new_result
