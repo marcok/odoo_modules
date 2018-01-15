@@ -137,8 +137,6 @@ class HrTimesheetSheet(models.Model):
                                     states={
                                         'draft': [('readonly', False)],
                                         'new': [('readonly', False)]})
-    # state is created in 'new', automatically goes to 'draft' when created. Then 'new' is never used again ...
-    # (=> 'new' is completely useless)
     state = fields.Selection([('new', 'New'),
                               ('draft', 'Open'),
                               ('confirm', 'Waiting Approval'),
@@ -149,9 +147,13 @@ class HrTimesheetSheet(models.Model):
                              required=True,
                              readonly=True,
                              index=True,
-                             help=' * The \'Open\' status is used when a user is encoding a new and unconfirmed timesheet. '
-                                  '\n* The \'Waiting Approval\' status is used to confirm the timesheet by user. '
-                                  '\n* The \'Approved\' status is used when the users timesheet is accepted by his/her senior.')
+                             help=' * The \'Open\' status is used when a user '
+                                  'is encoding a new and unconfirmed timesheet.'
+                                  '\n* The \'Waiting Approval\' status is used '
+                                  'to confirm the timesheet by user. '
+                                  '\n* The \'Approved\' status is used when the'
+                                  ' users timesheet is accepted by '
+                                  'his/her senior.')
     account_ids = fields.One2many('hr_timesheet_sheet.sheet.account',
                                   'sheet_id',
                                   string='Analytic accounts',
@@ -226,8 +228,9 @@ class HrTimesheetSheet(models.Model):
     def create(self, vals):
         if 'employee_id' in vals:
             if not self.env['hr.employee'].browse(vals['employee_id']).user_id:
-                raise UserError(_(
-                    'In order to create a timesheet for this employee, you must link him/her to a user.'))
+                raise UserError(_('In order to create a timesheet for '
+                                  'this employee, you must link him/her '
+                                  'to a user.'))
         res = super(HrTimesheetSheet, self).create(vals)
         res.write({'state': 'draft'})
         return res
@@ -255,11 +258,18 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def action_timesheet_confirm(self):
         for sheet in self:
-            if sheet.employee_id \
-                    and sheet.employee_id.parent_id \
-                    and sheet.employee_id.parent_id.user_id:
-                self.message_subscribe_users(
-                    user_ids=[sheet.employee_id.parent_id.user_id.id])
+            sheet.check_employee_attendance_state()
+            di = sheet.user_id.company_id.timesheet_max_difference
+            if (abs(sheet.total_difference) <= di) or not di:
+                if sheet.employee_id \
+                        and sheet.employee_id.parent_id \
+                        and sheet.employee_id.parent_id.user_id:
+                    self.message_subscribe_users(
+                        user_ids=[sheet.employee_id.parent_id.user_id.id])
+            else:
+                raise UserError(_(
+                    'Please verify that the total difference '
+                    'of the sheet is lower than %.2f.') % (di,))
         self.write({'state': 'confirm'})
         return True
 
@@ -281,11 +291,14 @@ class HrTimesheetSheet(models.Model):
 
     @api.multi
     def unlink(self):
-        sheets = self.read(['state'])
+        sheets = self.read(['state', 'total_attendance'])
         for sheet in sheets:
             if sheet['state'] in ('confirm', 'done'):
-                raise UserError(_(
-                    'You cannot delete a timesheet which is already confirmed.'))
+                raise UserError(_('You cannot delete a timesheet which '
+                                  'is already confirmed.'))
+            if sheet['total_attendance'] > 0.00:
+                raise UserError(_('You cannot delete a timesheet that '
+                                  'has attendance entries.'))
 
         analytic_timesheet_toremove = self.env['account.analytic.line']
         for sheet in self:
@@ -317,6 +330,57 @@ class HrTimesheetSheet(models.Model):
             return False
         return ['&', ('state', '=', 'confirm'),
                 ('employee_id', 'in', empids.ids)]
+
+    @api.depends('period_ids.total_attendance', 'period_ids.total_timesheet',
+                 'period_ids.total_difference')
+    def _compute_total(self):
+        """ Compute the attendances, analytic lines timesheets and differences
+            between them for all the days of a timesheet and the current day
+        """
+        if len(self.ids) == 0:
+            return
+
+        self.env.cr.execute("""
+                SELECT sheet_id as id,
+                       sum(total_attendance) as total_attendance,
+                       sum(total_timesheet) as total_timesheet,
+                       sum(total_difference) as  total_difference
+                FROM hr_timesheet_sheet_sheet_day
+                WHERE sheet_id IN %s
+                GROUP BY sheet_id
+            """, (tuple(self.ids),))
+
+        for x in self.env.cr.dictfetchall():
+            sheet = self.browse(x.pop('id'))
+            sheet.total_attendance = x.pop('total_attendance')
+            sheet.total_timesheet = x.pop('total_timesheet')
+            sheet.total_difference = x.pop('total_difference')
+
+    @api.multi
+    def action_sheet_report(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'HR Timesheet/Attendance Report',
+            'res_model': 'hr.timesheet.attendance.report',
+            'domain': [('date', '>=', self.date_from),
+                       ('date', '<=', self.date_to)],
+            'view_mode': 'pivot',
+            'context': {'search_default_user_id': self.user_id.id, }
+        }
+
+    @api.multi
+    def check_employee_attendance_state(self):
+        """ Checks the attendance records of the timesheet,
+            make sure they are all closed
+            (by making sure they have a check_out time)
+        """
+        self.ensure_one()
+        if any(self.attendances_ids.filtered(lambda r: not r.check_out)):
+            raise UserError(_("The timesheet cannot be validated as it "
+                              "contains an attendance record with no "
+                              "Check Out."))
+        return True
 
 
 class hr_timesheet_sheet_sheet_day(models.Model):
