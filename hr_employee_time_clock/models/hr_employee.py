@@ -150,7 +150,9 @@ class HrEmployee(models.Model):
                      or not self.user_id):
             if entered_pin != self.pin:
                 return {'warning': _('Wrong PIN')}
-        return self.attendance_action(next_action)
+        ctx = self.env.context.copy()
+        ctx['attendance_manual'] = True
+        return self.with_context(ctx).attendance_action(next_action)\
 
     @api.multi
     def attendance_action(self, next_action):
@@ -184,6 +186,14 @@ class HrEmployee(models.Model):
 
     @api.multi
     def attendance_action_change(self):
+        hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
+        hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
+            [('employee_id', '=', self.id),
+             ('date_from', '<=', date.today()),
+             ('date_to', '>=', date.today())])
+        if not hr_timesheet_ids:
+            raise ValidationError(
+                _('Please contact your manager to create timesheet for you.'))
         """ Check In/Check Out action
             Check In: create a new attendance record
             Check Out: modify check_out field of appropriate attendance record
@@ -199,7 +209,7 @@ class HrEmployee(models.Model):
                 'employee_id': self.id,
                 'check_in': action_date,
             }
-            return self.env['hr.attendance'].create(vals)
+            attendance = self.env['hr.attendance'].create(vals)
         else:
             attendance = self.env['hr.attendance'].search(
                 [('employee_id', '=', self.id),
@@ -212,7 +222,9 @@ class HrEmployee(models.Model):
                       'could not find corresponding check in. '
                       'Your attendances have probably been modified manually '
                       'by human resources.') % {'empl_name': self.name, })
-            return attendance
+        if not self.env.context.get('attendance_manual'):
+            return True
+        return attendance
 
     @api.model_cr_context
     def _init_column(self, column_name):
@@ -237,14 +249,4 @@ class HrEmployee(models.Model):
                     self._table, column_name, employee_id[0])
                 self.env.cr.execute(query, (default_value,))
 
-    @api.multi
-    def attendance_action_change(self):
-        hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
-        hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
-            [('employee_id', '=', self.id),
-             ('date_from', '<=', date.today()),
-             ('date_to', '>=', date.today())])
-        if not hr_timesheet_ids:
-            raise ValidationError(
-                _('Please contact your manager to create timesheet for you.'))
-        return super(HrEmployee, self).attendance_action_change()
+
