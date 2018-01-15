@@ -78,7 +78,9 @@ class HrEmployee(models.Model):
             if 'state' in fields and not r.get('state'):
                 employee_id = r.get('id')
                 employee = self.browse(employee_id)
-                if employee.is_absent_totay:
+                _logger.info(employee.name)
+                _logger.info(employee.attendance_state)
+                if employee.attendance_state == 'checked_out':
                     r['state'] = 'absent'
                 else:
                     r['state'] = 'present'
