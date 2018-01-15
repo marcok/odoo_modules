@@ -64,28 +64,15 @@ class HrEmployee(models.Model):
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
-        _logger.info(fields)
         result = super(HrEmployee, self).read(fields=fields, load=load)
-        _logger.info(result)
         new_result = []
         for r in result:
-            _logger.info('\n\n')
-            if 'state' in fields:
-                _logger.info('FIRST')
-            if not r.get('state'):
-                _logger.info('SECOND')
-
             if 'state' in fields and not r.get('state'):
                 employee_id = r.get('id')
                 employee = self.browse(employee_id)
-                _logger.info(employee.name)
-                _logger.info(employee.attendance_state)
                 if employee.attendance_state == 'checked_out':
                     r['state'] = 'absent'
                 else:
                     r['state'] = 'present'
-            _logger.info('\n\n')
-            _logger.info(r.get('state'))
             new_result.append(r)
-        # _logger.info(new_result)
         return new_result
