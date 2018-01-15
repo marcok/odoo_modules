@@ -69,6 +69,12 @@ class HrEmployee(models.Model):
         _logger.info(result)
         new_result = []
         for r in result:
+            _logger.info('\n\n')
+            if 'state' in fields:
+                _logger.info('FIRST')
+            if not r.get('state'):
+                _logger.info('SECOND')
+
             if 'state' in fields and not r.get('state'):
                 employee_id = r.get('id')
                 employee = self.browse(employee_id)
@@ -76,6 +82,8 @@ class HrEmployee(models.Model):
                     r['state'] = 'absent'
                 else:
                     r['state'] = 'present'
+            _logger.info('\n\n')
+            _logger.info(r.get('state'))
             new_result.append(r)
-        _logger.info(new_result)
+        # _logger.info(new_result)
         return new_result
