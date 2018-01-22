@@ -18,7 +18,7 @@
         <field name="name">hr.attendance.analysis.report.graph</field>
         <field name="model">hr.attendance.analysis.report</field>
         <field name="arch" type="xml">
-            <graph string="Analysis by Timesheet" type="pivot" stacked="True">
+            <graph string="Analysis by Timesheet" type="bar" stacked="True">
                 <field name="department_id" type="row"/>
                 <field name="name" type="row"/>
                 <field name="total_duty_hours_running" type="measure"/>
