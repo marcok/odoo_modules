@@ -49,9 +49,9 @@ class HrTimesheetDh(models.Model):
                 period = {'date_from': sheet.date_from,
                           'date_to': sheet.date_to}
 
-                models = self.env['ir.model'].search(
+                model = self.env['ir.model'].search(
                     [('model', '=', 'hr.holidays.public.line')])
-                if models:
+                if model:
                     holiday_obj = self.env['hr.holidays']
                     public_holidays = holiday_obj.search(
                         [('date_from', '>=', sheet.date_from),
