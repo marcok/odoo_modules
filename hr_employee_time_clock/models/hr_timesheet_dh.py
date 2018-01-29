@@ -48,6 +48,22 @@ class HrTimesheetDh(models.Model):
                                          until=parser.parse(sheet.date_to)))
                 period = {'date_from': sheet.date_from,
                           'date_to': sheet.date_to}
+
+                models = self.env['ir.model'].search(
+                    [('model', '=', 'hr.holidays.public.line')])
+                if models:
+                    holiday_obj = self.env['hr.holidays']
+                    public_holidays = holiday_obj.search(
+                        [('date_from', '>=', sheet.date_from),
+                         ('date_from', '<=', sheet.date_to),
+                         ('holiday_type', '=', 'public_holiday')])
+                    for public_holiday in public_holidays:
+                        public_holiday_date = datetime.strptime(
+                            '%s' % public_holiday.date_from.split(' ')[0],
+                            '%Y-%m-%d')
+                        if public_holiday_date in dates:
+                            dates.remove(public_holiday_date)
+
                 for date_line in dates:
                     duty_hours = sheet.calculate_duty_hours(date_from=date_line,
                                                             period=period,
@@ -88,6 +104,17 @@ class HrTimesheetDh(models.Model):
                         (leave_date_from, leave_date_to, leave.number_of_days))
                     break
         return leaves
+
+    @api.model
+    def count_public_holiday(self, date_from, period):
+        public_holidays = []
+        models = self.env['ir.model'].search(
+            [('model', '=', 'hr.holidays.public.line')])
+        if models:
+            holiday_obj = self.env['hr.holidays.public.line']
+            public_holidays = holiday_obj.search(
+                [('date', '=', date_from)])
+        return public_holidays
 
     @api.multi
     def get_overtime(self, start_date):
@@ -199,9 +226,13 @@ class HrTimesheetDh(models.Model):
                 resource_id=self.employee_id.id,
                 context=ctx)
             leaves = self.count_leaves(date_from, self.employee_id.id, period)
-            if not leaves:
+            public_holiday = self.count_public_holiday(date_from, period)
+            if not leaves and not public_holiday:
                 if not dh:
                     dh = 0.00
+                duty_hours += dh
+            elif not leaves and public_holiday:
+                dh = 0.00
                 duty_hours += dh
             else:
                 if leaves[-1] and leaves[-1][-1]:
