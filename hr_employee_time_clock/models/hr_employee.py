@@ -250,3 +250,17 @@ class HrEmployee(models.Model):
                 self.env.cr.execute(query, (default_value,))
 
 
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        result = super(HrEmployee, self).read(fields=fields, load=load)
+        new_result = []
+        for r in result:
+            if 'state' in fields and not r.get('state'):
+                employee_id = r.get('id')
+                employee = self.browse(employee_id)
+                if employee.attendance_state == 'checked_out':
+                    r['state'] = 'absent'
+                else:
+                    r['state'] = 'present'
+            new_result.append(r)
+        return new_result
