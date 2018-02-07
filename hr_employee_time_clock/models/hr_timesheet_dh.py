@@ -271,6 +271,8 @@ class HrTimesheetDh(models.Model):
         date_format, time_format = self._get_user_datetime_format()
 
         for sheet in self:
+            if not timesheet_id:
+                timesheet_id = self[-1].id
             if sheet.id == timesheet_id:
 
                 employee_id = sheet.employee_id.id
