@@ -103,10 +103,9 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def change_date(self):
         if self.date_to and self.date_from and self.date_from > self.date_to:
-            self.date_to = self._default_date_to()
-
-            raise ValidationError(
-                _('You added wrong date period.'))
+            self.date_from = self._default_date_from()
+            # raise ValidationError(
+            #     _('You added wrong date period.'))
 
     name = fields.Char(string="Note",
                        states={'confirm': [('readonly', True)],
