@@ -60,6 +60,9 @@ class HrTimesheetSheet(models.Model):
                 weekday=6)).strftime('%Y-%m-%d')
         elif r == 'year':
             return time.strftime('%Y-12-31')
+        else:
+            (self.date_from + relativedelta(
+                weekday=14)).strftime('%Y-%m-%d')
         return fields.Date.context_today(self)
 
     def _default_employee(self):
@@ -103,7 +106,7 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def change_date(self):
         if self.date_to and self.date_from and self.date_from > self.date_to:
-            self.date_from = self._default_date_from()
+            self.date_to = self._default_date_to()
             # raise ValidationError(
             #     _('You added wrong date period.'))
 
