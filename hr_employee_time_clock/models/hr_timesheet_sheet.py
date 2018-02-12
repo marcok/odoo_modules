@@ -105,8 +105,8 @@ class HrTimesheetSheet(models.Model):
         if self.date_to and self.date_from and self.date_from > self.date_to:
             self.date_to = self._default_date_to()
 
-            raise ValidationError(
-                _('You added wrong date period.'))
+            # raise ValidationError(
+            #     _('You added wrong date period.'))
 
     name = fields.Char(string="Note",
                        states={'confirm': [('readonly', True)],
