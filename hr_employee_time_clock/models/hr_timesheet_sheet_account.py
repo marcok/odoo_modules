@@ -33,7 +33,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class HrTimesheetSheetSheetAccount(models.Model):
     _name = "hr_timesheet_sheet.sheet.account"
-    _description = "Timesheets by Period"
+    _description = "Timesheet Sheet Account"
     _auto = False
     _order = 'name'
 

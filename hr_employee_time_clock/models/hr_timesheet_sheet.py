@@ -383,7 +383,7 @@ class HrTimesheetSheet(models.Model):
         return True
 
 
-class hr_timesheet_sheet_sheet_day(models.Model):
+class TimesheetsByPeriod(models.Model):
     _name = "hr_timesheet_sheet.sheet.day"
     _description = "Timesheets by Period"
     _auto = False
