@@ -29,6 +29,7 @@ from odoo.exceptions import UserError, ValidationError
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class HrTimesheetSheet(models.Model):
     _name = "hr_timesheet_sheet.sheet"
     _inherit = ['mail.thread']
@@ -87,9 +88,11 @@ class HrTimesheetSheet(models.Model):
         res = self.env.cr.dictfetchall()
         _logger.info(res)
         if res:
-            self.total_attendance = res[0].get('total_attendance')
-            self.total_timesheet = res[0].get('total_timesheet')
-            self.total_difference = res[0].get('total_difference')
+            for sheet in self:
+                if sheet.id == res[0].get('id'):
+                    sheet.total_attendance = res[0].get('total_attendance')
+                    sheet.total_timesheet = res[0].get('total_timesheet')
+                    sheet.total_difference = res[0].get('total_difference')
 
     @api.depends('attendances_ids')
     def _compute_attendances(self):
