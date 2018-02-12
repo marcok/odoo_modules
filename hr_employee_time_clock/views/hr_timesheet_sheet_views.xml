@@ -146,7 +146,10 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Summary">
+                        <page string="Overtime Analysis">
+                            <field name="analysis" widget="html" nolabel="1"/>
+                        </page>
+                        <page string="Summary" invisible="1">
                             <!--<widget type="weekly_timesheet" attrs="{'readonly': [['state', 'not in', ['new', 'draft']]]}">-->
                             <!--</widget>-->
                         </page>
@@ -203,9 +206,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Overtime Analysis">
-                            <field name="analysis" widget="html" nolabel="1"/>
-                        </page>
+
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -266,15 +267,20 @@
         </field>
     </record>
 
+    <menuitem id="menu_hr_attendance_analysis_report_root"
+              parent="hr_attendance.menu_hr_attendance_root"
+              name="Attendance Analysis"
+              sequence="3"/>
+
     <menuitem name="My Current Timesheet"
               id="menu_act_hr_timesheet_sheet_form_my_current"
-              parent="hr_timesheet.menu_hr_time_tracking"
-              action="ir_actions_server_timesheet_sheet" sequence="2"/>
+              parent="menu_hr_attendance_analysis_report_root"
+              action="ir_actions_server_timesheet_sheet" sequence="10"/>
 
     <menuitem action="act_hr_timesheet_sheet_my_timesheets"
               id="menu_act_hr_timesheet_sheet_my_timesheets"
-              parent="hr_timesheet.menu_hr_time_tracking"
-              sequence="3"/>
+              parent="menu_hr_attendance_analysis_report_root"
+              sequence="20"/>
 
     <record id="act_hr_timesheet_sheet_form" model="ir.actions.act_window">
         <field name="name">Timesheets to Approve</field>
@@ -300,6 +306,8 @@
         </field>
     </record>
 
+
+
     <record model="ir.actions.act_window.view"
             id="action_open_timesheet_sheet_holidays_tree">
         <field name="sequence" eval="2"/>
@@ -308,12 +316,15 @@
         <field name="act_window_id" ref="act_hr_timesheet_sheet_form"/>
     </record>
 
+
     <menuitem id="menu_hr_to_approve" name="To Approve"
-              parent="hr_timesheet.timesheet_menu_root" sequence="7"/>
+              parent="hr_attendance.menu_hr_attendance_root" sequence="15"/>
 
     <menuitem action="act_hr_timesheet_sheet_form"
-              id="menu_act_hr_timesheet_sheet_form" parent="menu_hr_to_approve"
-              sequence="11" groups="hr_timesheet.group_hr_timesheet_user"/>
+              id="menu_act_hr_timesheet_sheet_form"
+              parent="menu_hr_to_approve"
+              sequence="11"
+              groups="hr_timesheet.group_hr_timesheet_user"/>
 
     <!--
         account.analytic.line inheritancy

@@ -38,8 +38,8 @@
 
     <menuitem action="action_hr_attendance_analysis_report"
               id="menu_hr_attendance_analysis_report"
-              parent="hr_attendance.menu_hr_attendance_root"
-              sequence="3"/>
+              parent="menu_hr_attendance_analysis_report_root"
+              sequence="30"/>
 
     </data>
 </openerp>
