@@ -26,7 +26,8 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class HrTimesheetSheet(models.Model):
     _name = "hr_timesheet_sheet.sheet"
@@ -72,11 +73,6 @@ class HrTimesheetSheet(models.Model):
             for all the days of a timesheet and the current day
         """
         ids = [i.id for i in self]
-        res = dict.fromkeys(ids, {
-            'total_attendance': 0.0,
-            'total_timesheet': 0.0,
-            'total_difference': 0.0,
-        })
 
         self.env.cr.execute("""
             SELECT sheet_id as id,
@@ -89,6 +85,7 @@ class HrTimesheetSheet(models.Model):
         """, (tuple(ids),))
 
         res = self.env.cr.dictfetchall()
+        _logger.info(res)
         if res:
             self.total_attendance = res[0].get('total_attendance')
             self.total_timesheet = res[0].get('total_timesheet')
