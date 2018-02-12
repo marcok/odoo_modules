@@ -103,6 +103,8 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def change_date(self):
         if self.date_to and self.date_from and self.date_from > self.date_to:
+            self.date_to = self._default_date_to()
+
             raise ValidationError(
                 _('You added wrong date period.'))
 
@@ -196,16 +198,11 @@ class HrTimesheetSheet(models.Model):
 
     @api.constrains('date_to', 'date_from', 'employee_id')
     def _check_sheet_date(self, forced_user_id=False):
-        _logger.info(self)
         for sheet in self:
             new_user_id = forced_user_id or sheet.user_id and sheet.user_id.id
-            _logger.info(new_user_id)
             if new_user_id:
-                _logger.info(sheet.date_to)
                 _logger.info(sheet.date_from)
-                _logger.info(sheet.id)
-
-
+                _logger.info(sheet.date_to)
                 self.env.cr.execute('''
                     SELECT id
                     FROM hr_timesheet_sheet_sheet
@@ -216,9 +213,7 @@ class HrTimesheetSheet(models.Model):
                                      sheet.date_from,
                                      new_user_id,
                                      sheet.id))
-                res = self.env.cr.fetchall()
-                if any(res):
-                    _logger.info(res)
+                if any(self.env.cr.fetchall()):
                     raise ValidationError(_(
                         'You cannot have 2 timesheets that overlap!\n'
                         'Please use the menu \'My Current Timesheet\' '
