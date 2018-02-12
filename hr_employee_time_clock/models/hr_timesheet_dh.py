@@ -138,7 +138,6 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def _get_analysis(self):
-        res = {}
         for sheet in self:
             function_call = True
             data = self.attendance_analysis(sheet.id, function_call)
@@ -155,14 +154,20 @@ class HrTimesheetDh(models.Model):
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
                     output.append('<td colspan="3">' + str(val) + '</td>')
                     output.append('</tr>')
-            for k, v in data.items():
+            keys = ('Date', 'Duty Hours', 'Worked Hours',
+                    'Difference', 'Running')
+            a = ('previous_month_diff', 'hours', 'total')
+            for k in a:
+                v = data.get(k)
                 if isinstance(v, list):
                     output.append('<tr>')
-                    for th in v[0].keys():
+
+                    for th in keys:
                         output.append('<th>' + th + '</th>')
                     output.append('</tr>')
+
                     for res in v:
-                        values.append(res.values())
+                        values.append([res.get(key) for key in keys])
                     for tr in values:
                         output.append('<tr>')
                         for td in tr:
@@ -173,8 +178,10 @@ class HrTimesheetDh(models.Model):
                     output.append('<tr>')
                     total_ts = _('Total:')
                     output.append('<th>' + total_ts + ' </th>')
-                    for td in v.values():
-                        output.append('<td>' + '%s' % round(td, 4) + '</td>')
+                    for td in ('duty_hours', 'worked_hours',
+                               'work_current_month_diff', 'diff'):
+                        output.append(
+                            '<td>' + '%s' % round(v.get(td), 4) + '</td>')
                     output.append('</tr>')
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
@@ -333,6 +340,7 @@ class HrTimesheetDh(models.Model):
                     total['diff'] += diff
                     total['work_current_month_diff'] = work_current_month_diff
                     res['total'] = total
+                print('\n res >>>>>> %s' % res)
                 return res
 
     @api.multi

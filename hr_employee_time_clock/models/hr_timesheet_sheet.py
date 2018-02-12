@@ -198,6 +198,7 @@ class HrTimesheetSheet(models.Model):
     def _check_sheet_date(self, forced_user_id=False):
         for sheet in self:
             new_user_id = forced_user_id or sheet.user_id and sheet.user_id.id
+            _logger.info(new_user_id)
             if new_user_id:
                 self.env.cr.execute('''
                     SELECT id
@@ -210,6 +211,7 @@ class HrTimesheetSheet(models.Model):
                                      new_user_id,
                                      sheet.id))
                 if any(self.env.cr.fetchall()):
+                    _logger.info(self.env.cr.fetchall())
                     raise ValidationError(_(
                         'You cannot have 2 timesheets that overlap!\n'
                         'Please use the menu \'My Current Timesheet\' '
