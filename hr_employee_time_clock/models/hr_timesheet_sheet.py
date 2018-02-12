@@ -196,10 +196,16 @@ class HrTimesheetSheet(models.Model):
 
     @api.constrains('date_to', 'date_from', 'employee_id')
     def _check_sheet_date(self, forced_user_id=False):
+        _logger.info(self)
         for sheet in self:
             new_user_id = forced_user_id or sheet.user_id and sheet.user_id.id
             _logger.info(new_user_id)
             if new_user_id:
+                _logger.info(sheet.date_to)
+                _logger.info(sheet.date_from)
+                _logger.info(sheet.id)
+
+
                 self.env.cr.execute('''
                     SELECT id
                     FROM hr_timesheet_sheet_sheet
