@@ -10,6 +10,10 @@
                 <attribute name="string">Timesheets</attribute>
             </xpath>
             <xpath expr="//group[@name='timesheets']" position="inside">
+                <label for="timesheet_max_difference"/>
+                <div>
+                    <field name="timesheet_max_difference" required="1" class="oe_inline"/>
+                </div>
                 <field name="timesheet_range" required="1" class="oe_inline"/>
                 <label for="id" string="Extra features"/>
                 <div>
