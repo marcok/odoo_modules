@@ -53,12 +53,12 @@
             </field>
         </record>
 
-        <menuitem name="Generate Timesheets"
+        <menuitem name="Generate attendance sheets"
                   id="menu_act_hr_timesheet_sheet_form_open_current"
-                  parent="hr_attendance.menu_hr_attendance_root"
+                  parent="menu_hr_attendance_analysis_report_root"
                   action="action_hr_timesheet_current_open"
                   groups="hr.group_hr_manager"
-                  sequence="10"/>
+                  sequence="50"/>
 
     </data>
 </openerp>

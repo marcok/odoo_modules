@@ -245,7 +245,7 @@
 
     <record id="act_hr_timesheet_sheet_my_timesheets"
             model="ir.actions.act_window">
-        <field name="name">My Timesheets</field>
+        <field name="name">My attendance sheets</field>
         <field name="res_model">hr_timesheet_sheet.sheet</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
@@ -272,7 +272,7 @@
               name="Attendance Analysis"
               sequence="3"/>
 
-    <menuitem name="My Current Timesheet"
+    <menuitem name="My current attendance sheet"
               id="menu_act_hr_timesheet_sheet_form_my_current"
               parent="menu_hr_attendance_analysis_report_root"
               action="ir_actions_server_timesheet_sheet" sequence="10"/>
@@ -283,7 +283,7 @@
               sequence="20"/>
 
     <record id="act_hr_timesheet_sheet_form" model="ir.actions.act_window">
-        <field name="name">Timesheets to Approve</field>
+        <field name="name">Attendance sheets to approve.</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hr_timesheet_sheet.sheet</field>
         <field name="view_type">form</field>
@@ -306,8 +306,6 @@
         </field>
     </record>
 
-
-
     <record model="ir.actions.act_window.view"
             id="action_open_timesheet_sheet_holidays_tree">
         <field name="sequence" eval="2"/>
@@ -317,13 +315,10 @@
     </record>
 
 
-    <menuitem id="menu_hr_to_approve" name="To Approve"
-              parent="hr_attendance.menu_hr_attendance_root" sequence="15"/>
-
     <menuitem action="act_hr_timesheet_sheet_form"
               id="menu_act_hr_timesheet_sheet_form"
-              parent="menu_hr_to_approve"
-              sequence="11"
+              parent="menu_hr_attendance_analysis_report_root"
+              sequence="40"
               groups="hr_timesheet.group_hr_timesheet_user"/>
 
     <!--
