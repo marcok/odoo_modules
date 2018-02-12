@@ -105,8 +105,8 @@ class HrTimesheetSheet(models.Model):
         if self.date_to and self.date_from and self.date_from > self.date_to:
             self.date_to = self._default_date_to()
 
-            # raise ValidationError(
-            #     _('You added wrong date period.'))
+            raise ValidationError(
+                _('You added wrong date period.'))
 
     name = fields.Char(string="Note",
                        states={'confirm': [('readonly', True)],
@@ -201,8 +201,8 @@ class HrTimesheetSheet(models.Model):
         for sheet in self:
             new_user_id = forced_user_id or sheet.user_id and sheet.user_id.id
             if new_user_id:
-                _logger.info(sheet.date_from)
                 _logger.info(sheet.date_to)
+                _logger.info(sheet.date_from)
                 self.env.cr.execute('''
                     SELECT id
                     FROM hr_timesheet_sheet_sheet
