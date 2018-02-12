@@ -21,7 +21,7 @@
 ##############################################################################
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
@@ -60,9 +60,6 @@ class HrTimesheetSheet(models.Model):
                 weekday=6)).strftime('%Y-%m-%d')
         elif r == 'year':
             return time.strftime('%Y-12-31')
-        else:
-            (self.date_from + relativedelta(
-                weekday=14)).strftime('%Y-%m-%d')
         return fields.Date.context_today(self)
 
     def _default_employee(self):
@@ -104,11 +101,18 @@ class HrTimesheetSheet(models.Model):
 
     @api.onchange('date_from', 'date_to')
     @api.multi
-    def change_date(self):
-        if self.date_to and self.date_from and self.date_from > self.date_to:
-            self.date_to = self._default_date_to()
-            # raise ValidationError(
-            #     _('You added wrong date period.'))
+    def change_date_from(self):
+        date_from = self.date_from
+        date_to = self.date_to
+        if date_from and not date_to:
+            date_to_with_delta = \
+                fields.Date.from_string(date_from) + timedelta(hours=164)
+            self.date_to = date_to_with_delta
+        elif date_from and date_to and date_from > date_to:
+            date_to_with_delta = \
+                fields.Date.from_string(date_from) + timedelta(hours=164)
+            self.date_to = str(date_to_with_delta)
+
 
     name = fields.Char(string="Note",
                        states={'confirm': [('readonly', True)],
