@@ -32,7 +32,6 @@
                 'hr_attendance',
                 'hr_contract',
                 'hr_holidays'],
-    # ,'hr_attendance_analysis'
     'images': ['images/overundertime.png'],
     'installable': True,
     'data': [
