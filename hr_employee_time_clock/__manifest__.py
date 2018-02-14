@@ -38,7 +38,6 @@
     'data': [
         'data/hr_timesheet_sheet_data.xml',
 
-        'views/hr_timesheet_sheet_templates.xml',
         'views/hr_timesheet_sheet_views.xml',
         'views/hr_department_views.xml',
         # 'views/hr_timesheet_sheet_config_settings_views.xml',
