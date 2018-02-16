@@ -149,10 +149,14 @@ class HrTimesheetDh(models.Model):
                 'text-align: right;} </style><table class="attendanceTable" >']
             for val in data.values():
                 if isinstance(val, (int, float)):
+                    t = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * 60, 60))
+                    if val < 0:
+                        t = '-{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * -60, 60))
+
                     output.append('<tr>')
                     prev_ts = _('Previous Timesheet:')
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
-                    output.append('<td colspan="3">' + '{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * 60, 60)) + '</td>')
+                    output.append('<td colspan="3">' + t + '</td>')
                     output.append('</tr>')
             keys = ('Date', 'Duty Hours', 'Worked Hours',
                     'Difference', 'Running')
@@ -180,8 +184,12 @@ class HrTimesheetDh(models.Model):
                     output.append('<th>' + total_ts + ' </th>')
                     for td in ('duty_hours', 'worked_hours',
                                'work_current_month_diff', 'diff'):
+                        t = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * 60, 60))
+                        if float(v.get(td)) < 0.0:
+                            t = '-{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * -60, 60))
+
                         output.append(
-                            '<td>' + '%s' % '{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * 60, 60)) + '</td>')
+                            '<td>' + '%s' % t + '</td>')
                     output.append('</tr>')
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
