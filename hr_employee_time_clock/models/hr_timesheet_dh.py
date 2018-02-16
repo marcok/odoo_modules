@@ -152,7 +152,7 @@ class HrTimesheetDh(models.Model):
                     output.append('<tr>')
                     prev_ts = _('Previous Timesheet:')
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
-                    output.append('<td colspan="3">' + str(val) + '</td>')
+                    output.append('<td colspan="3">' + '{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * 60, 60)) + '</td>')
                     output.append('</tr>')
             keys = ('Date', 'Duty Hours', 'Worked Hours',
                     'Difference', 'Running')
@@ -181,10 +181,11 @@ class HrTimesheetDh(models.Model):
                     for td in ('duty_hours', 'worked_hours',
                                'work_current_month_diff', 'diff'):
                         output.append(
-                            '<td>' + '%s' % round(v.get(td), 4) + '</td>')
+                            '<td>' + '%s' % '{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * 60, 60)) + '</td>')
                     output.append('</tr>')
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
+
 
     total_duty_hours = fields.Float(compute='_duty_hours',
                                     string='Total Duty Hours',
@@ -305,8 +306,7 @@ class HrTimesheetDh(models.Model):
                 for date_line in dates:
 
                     dh = sheet.calculate_duty_hours(date_from=date_line,
-                                                    period=period,
-                                                    )
+                                                    period=period)
                     worked_hours = 0.0
                     for att in sheet.period_ids:
                         if att.name == date_line.strftime('%Y-%m-%d'):
@@ -339,8 +339,8 @@ class HrTimesheetDh(models.Model):
                     total['worked_hours'] += worked_hours
                     total['diff'] += diff
                     total['work_current_month_diff'] = work_current_month_diff
+
                     res['total'] = total
-                print('\n res >>>>>> %s' % res)
                 return res
 
     @api.multi
