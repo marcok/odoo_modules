@@ -136,7 +136,7 @@
                     </div>
                     <group>
                         <group>
-                            <label for="date_from" string="Timesheet Period"/>
+                            <label for="date_from" string="Attendance Sheet Period"/>
                             <div>
                                 <field name="date_from" class="oe_inline"/>
                                 to
@@ -150,12 +150,13 @@
                         <group>
                             <field name="prev_timesheet_diff"
                                    widget="float_time"
-                                   string="Last timesheets"/>
-                            <field name="total_timesheet" widget="float_time"/>
+                                   string="Last attendance sheets"/>
+                            <field name="total_timesheet" widget="float_time"
+                                   invisible="True"/>
                             <field name="total_attendance" widget="float_time"
-                                   string="Attendance this timesheet"/>
+                                   string="Attendance this attendance sheet"/>
                             <field name="total_duty_hours" widget="float_time"
-                                   string="Remaining this timesheet"/>
+                                   string="Remaining this attendance sheet"/>
                             <field name="calculate_diff_hours"
                                    widget="float_time" string="Total balance"/>
                         </group>
@@ -298,7 +299,7 @@
               sequence="20"/>
 
     <record id="act_hr_timesheet_sheet_form" model="ir.actions.act_window">
-        <field name="name">Attendance sheets to approve.</field>
+        <field name="name">Attendance sheets to approve</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hr_timesheet_sheet.sheet</field>
         <field name="view_type">form</field>
@@ -307,15 +308,15 @@
         <field name="search_view_id" ref="view_hr_timesheet_sheet_filter"/>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
-                New timesheet to approve.
+                New attendance sheet to approve.
             </p>
             <p>
-                You must record timesheets every day and confirm at the end
-                of the week. Once the timesheet is confirmed, it should be
+                You must record attendance sheets every day and confirm at the end
+                of the week. Once the attendance sheet is confirmed, it should be
                 validated by a manager.
             </p>
             <p>
-                Timesheets can also be invoiced to customers, depending on the
+                Attendance sheets can also be invoiced to customers, depending on the
                 configuration of each project's related contract.
             </p>
         </field>
@@ -386,7 +387,7 @@
                         icon="fa-clock-o"
                         groups="hr_timesheet.group_hr_timesheet_user">
                     <field name="timesheet_count" widget="statinfo"
-                           string="Timesheets"/>
+                           string="Attendance sheets"/>
                 </button>
             </div>
         </field>

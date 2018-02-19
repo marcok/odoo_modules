@@ -154,7 +154,7 @@ class HrTimesheetDh(models.Model):
                         t = '-{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * -60, 60))
 
                     output.append('<tr>')
-                    prev_ts = _('Previous Timesheet:')
+                    prev_ts = _('Previous Attendance Sheet:')
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
                     output.append('<td colspan="3">' + t + '</td>')
                     output.append('</tr>')

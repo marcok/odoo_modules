@@ -13,7 +13,7 @@
                 <form string="My Timesheet">
                     <group>
                         <separator
-                                string=">Generate timesheets for employees having the following tag:"/>
+                                string=">Generate attendance sheets for employees having the following tag:"/>
                     </group>
                     <group>
                         <field name="category_id"/>
