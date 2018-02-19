@@ -38,12 +38,14 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 def _employee_get(obj):
     employee = obj.env['hr.employee'].search([('user_id', '=', obj.env.uid)])
     if employee:
         return employee.id and employee[0].id
     else:
         return False
+
 
 class HrAttendance(models.Model):
     _inherit = "hr.attendance"
@@ -73,7 +75,6 @@ class HrAttendance(models.Model):
 
     @api.multi
     def _get_current_sheet(self, employee_id, date=False):
-
         sheet_obj = self.env['hr_timesheet_sheet.sheet']
         if not date:
             date = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
@@ -121,14 +122,6 @@ class HrAttendance(models.Model):
             if sheet:
                 attendance.sheet_id = sheet.id
 
-    # store = {'hr_timesheet_sheet.sheet': (_get_hr_timesheet_sheet,
-    #                                       ['employee_id', 'date_from',
-    #                                        'date_to'], 10),
-    #          'hr.attendance': (lambda self, cr, uid, ids, context=None: ids,
-    #                            ['employee_id', 'name', 'day'], 10),
-    #          },
-
-
     name = fields.Datetime(string='Date',
                            required=True,
                            select=1,
@@ -152,6 +145,8 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
+        if not values.get('name'):
+            values['name'] = values.get('check_in')
         if values.get('name'):
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:
