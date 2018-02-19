@@ -379,6 +379,7 @@ class HrTimesheetSheet(models.Model):
             'context': {'search_default_user_id': self.user_id.id, }
         }
 
+
     @api.multi
     def check_employee_attendance_state(self):
         """ Checks the attendance records of the timesheet,

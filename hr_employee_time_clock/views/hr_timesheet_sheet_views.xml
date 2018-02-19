@@ -67,6 +67,33 @@
         <field name="domain">[('project_id','!=',False)]</field>
     </record>
 
+    <record id="hr_attendance_view_filter" model="ir.ui.view">
+        <field name="name">hr_attendance_view_filter</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[2]" position="replace">
+                <filter string="Current Month" name="current_month" domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]" />
+            </xpath>
+            <xpath expr="//filter[4]" position="replace">
+                <filter string="My Attendances" name="my_attendances" domain="[('employee_id.user_id.id', '=', uid)]" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_action" model="ir.actions.act_window">
+        <field name="name">Attendances</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{"search_default_current_month":1, "search_default_my_attendances":1}</field>
+        <field name="search_view_id" ref="hr_attendance.hr_attendance_view_filter" />
+        <field name="help" type="html">
+            <p>The attendance records of your employees will be displayed here.</p>
+            <p>Please make sure you're using the correct filter if you expected to see any.</p>
+        </field>
+    </record>
+
     <record id="hr_timesheet_sheet_form" model="ir.ui.view">
         <field name="name">hr.timesheet.sheet.form</field>
         <field name="model">hr_timesheet_sheet.sheet</field>
@@ -92,21 +119,9 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button type="action"
-                                name="%(act_hr_timesheet_sheet_sheet_2_hr_analytic_timesheet)d"
-                                class="oe_stat_button"
-                                icon="fa-clock-o">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value">
-                                    <field name="total_timesheet"
-                                           widget="float_time"/>
-                                </span>
-                                <span class="o_stat_text">Timesheet</span>
-                            </div>
-                        </button>
-                        <button type="object"
                                 groups="hr_attendance.group_hr_attendance"
                                 class="oe_stat_button" icon="fa-users"
-                                name="action_sheet_report">
+                                name="%(hr_attendance_action)d">
                             <field name="attendance_count" widget="statinfo"
                                    string="Attendances"/>
                         </button>
