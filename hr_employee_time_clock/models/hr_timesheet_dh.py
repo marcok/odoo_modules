@@ -241,17 +241,21 @@ class HrTimesheetDh(models.Model):
                 context=ctx)
             leaves = self.count_leaves(date_from, self.employee_id.id, period)
             public_holiday = self.count_public_holiday(date_from, period)
-            if not leaves and not public_holiday:
-                if not dh:
+            if contract.state != 'cancel':
+                if not leaves and not public_holiday:
+                    if not dh:
+                        dh = 0.00
+                    duty_hours += dh
+                elif not leaves and public_holiday:
                     dh = 0.00
-                duty_hours += dh
-            elif not leaves and public_holiday:
+                    duty_hours += dh
+                else:
+                    if leaves[-1] and leaves[-1][-1]:
+                        if float(leaves[-1][-1]) == (-0.5):
+                            duty_hours += dh / 2
+            else:
                 dh = 0.00
                 duty_hours += dh
-            else:
-                if leaves[-1] and leaves[-1][-1]:
-                    if float(leaves[-1][-1]) == (-0.5):
-                        duty_hours += dh / 2
 
         return duty_hours
 
