@@ -44,6 +44,8 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
+        if not values.get('name'):
+            values['name'] = values.get('check_in')
         if values.get('name'):
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:

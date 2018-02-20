@@ -140,7 +140,6 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def _get_analysis(self):
-        res = {}
         for sheet in self:
             function_call = True
             data = self.attendance_analysis(sheet.id, function_call)
@@ -152,19 +151,27 @@ class HrTimesheetDh(models.Model):
                 'text-align: right;} </style><table class="attendanceTable" >']
             for val in data.values():
                 if isinstance(val, (int, float)):
+                    t = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * 60, 60))
+                    if val < 0:
+                        t = '-{0:02.0f}:{1:02.0f}'.format(*divmod(float(val) * -60, 60))
                     output.append('<tr>')
                     prev_ts = _('Previous Timesheet:')
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
-                    output.append('<td colspan="3">' + str(val) + '</td>')
+                    output.append('<td colspan="3">' + t + '</td>')
                     output.append('</tr>')
-            for k, v in data.items():
+            keys = ('Date', 'Duty Hours', 'Worked Hours',
+                    'Difference', 'Running')
+            a = ('previous_month_diff', 'hours', 'total')
+            for k in a:
+                v = data.get(k)
                 if isinstance(v, list):
                     output.append('<tr>')
-                    for th in v[0].keys():
+                    for th in keys:
                         output.append('<th>' + th + '</th>')
                     output.append('</tr>')
+
                     for res in v:
-                        values.append(res.values())
+                        values.append([res.get(key) for key in keys])
                     for tr in values:
                         output.append('<tr>')
                         for td in tr:
@@ -175,8 +182,14 @@ class HrTimesheetDh(models.Model):
                     output.append('<tr>')
                     total_ts = _('Total:')
                     output.append('<th>' + total_ts + ' </th>')
-                    for td in v.values():
-                        output.append('<td>' + '%s' % round(td, 4) + '</td>')
+                    for td in ('duty_hours', 'worked_hours',
+                               'work_current_month_diff', 'diff'):
+                        t = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * 60, 60))
+                        if float(v.get(td)) < 0.0:
+                            t = '-{0:02.0f}:{1:02.0f}'.format(*divmod(float(round(v.get(td), 4)) * -60, 60))
+
+                        output.append(
+                            '<td>' + '%s' % t + '</td>')
                     output.append('</tr>')
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
