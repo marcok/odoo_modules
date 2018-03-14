@@ -41,7 +41,7 @@ class HrEmployee(models.Model):
              ('date_from', '<=', date.today()),
              ('date_to', '>=', date.today())])
         if not self.env.context.get('attendance_manual'):
-            hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
+            hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.sudo().search(
                 [('employee_id', '=', self.id),
                  ('date_from', '<=', date.today()),
                  ('date_to', '>=', date.today())])
