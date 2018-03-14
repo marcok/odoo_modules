@@ -40,6 +40,12 @@ class HrEmployee(models.Model):
             [('employee_id', '=', self.id),
              ('date_from', '<=', date.today()),
              ('date_to', '>=', date.today())])
+        if not self.env.context.get('attendance_manual'):
+            hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
+                [('employee_id', '=', self.id),
+                 ('date_from', '<=', date.today()),
+                 ('date_to', '>=', date.today())])
+
         if not hr_timesheet_ids:
             raise ValidationError(
                 _('Please contact your manager to create timesheet for you.'))
