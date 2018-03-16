@@ -49,7 +49,10 @@ class HrEmployee(models.Model):
         if not hr_timesheet_ids:
             raise ValidationError(
                 _('Please contact your manager to create timesheet for you.'))
-        attendance = super(HrEmployee, self).attendance_action_change()
+        if not self.env.context.get('attendance_manual'):
+            attendance = super(HrEmployee, self.sudo()).attendance_action_change()
+        else:
+            attendance = super(HrEmployee, self).attendance_action_change()
         if not self.env.context.get('attendance_manual'):
             return True
         return attendance

@@ -78,6 +78,8 @@ class HrTimesheetDh(models.Model):
         res = super(HrTimesheetDh, self).sudo().search_read(
             domain=domain, fields=fields, offset=offset, limit=limit,
             order=order)
+        _logger.info('\n aaaaa \n')
+        _logger.info(res)
         return res
 
     @api.multi
@@ -292,7 +294,7 @@ class HrTimesheetDh(models.Model):
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
-        for sheet in self:
+        for sheet in self.sudo():
             if not timesheet_id:
                 timesheet_id = self[-1].id
             if sheet.id == timesheet_id:
