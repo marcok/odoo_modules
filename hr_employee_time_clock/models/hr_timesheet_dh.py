@@ -218,7 +218,7 @@ class HrTimesheetDh(models.Model):
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None,
                     order=None):
-        res = super(HrTimesheetDh, self).sudo().search_read(
+        res = super(HrTimesheetDh, self.sudo()).search_read(
             domain=domain, fields=fields, offset=offset, limit=limit,
             order=order)
         return res
