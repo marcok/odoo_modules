@@ -193,6 +193,11 @@ class HrEmployee(models.Model):
             [('employee_id', '=', self.id),
              ('date_from', '<=', date.today()),
              ('date_to', '>=', date.today())])
+        if not self.env.context.get('attendance_manual'):
+            hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.sudo().search(
+                [('employee_id', '=', self.id),
+                 ('date_from', '<=', date.today()),
+                 ('date_to', '>=', date.today())])
         if not hr_timesheet_ids:
             raise ValidationError(
                 _('Please contact your manager to create timesheet for you.'))
@@ -205,25 +210,46 @@ class HrEmployee(models.Model):
                 _('Cannot perform check in or '
                   'check out on multiple employees.'))
         action_date = fields.Datetime.now()
-
-        if self.attendance_state != 'checked_in':
-            vals = {
-                'employee_id': self.id,
-                'check_in': action_date,
-            }
-            attendance = self.env['hr.attendance'].create(vals)
-        else:
-            attendance = self.env['hr.attendance'].search(
-                [('employee_id', '=', self.id),
-                 ('check_out', '=', False)], limit=1)
-            if attendance:
-                attendance.check_out = action_date
+        if not self.env.context.get('attendance_manual'):
+            if self.sudo().attendance_state != 'checked_in':
+                vals = {
+                    'employee_id': self.id,
+                    'check_in': action_date,
+                }
+                attendance = self.env['hr.attendance'].sudo().create(vals)
             else:
-                raise exceptions.UserError(
-                    _('Cannot perform check out on %(empl_name)s, '
-                      'could not find corresponding check in. '
-                      'Your attendances have probably been modified manually '
-                      'by human resources.') % {'empl_name': self.name, })
+                attendance = self.env['hr.attendance'].sudo().search(
+                    [('employee_id', '=', self.id),
+                     ('check_out', '=', False)], limit=1)
+                if attendance:
+                    attendance.sudo().check_out = action_date
+                else:
+                    raise exceptions.UserError(
+                        _('Cannot perform check out on %(empl_name)s, '
+                          'could not find corresponding check in. '
+                          'Your attendances have probably been modified '
+                          'manually by human resources.') % {
+                            'empl_name': self.name, })
+        else:
+            if self.attendance_state != 'checked_in':
+                vals = {
+                    'employee_id': self.id,
+                    'check_in': action_date,
+                }
+                attendance = self.env['hr.attendance'].create(vals)
+            else:
+                attendance = self.env['hr.attendance'].search(
+                    [('employee_id', '=', self.id),
+                     ('check_out', '=', False)], limit=1)
+                if attendance:
+                    attendance.check_out = action_date
+                else:
+                    raise exceptions.UserError(
+                        _('Cannot perform check out on %(empl_name)s, '
+                          'could not find corresponding check in. '
+                          'Your attendances have probably been modified'
+                          ' manually by human resources.') % {
+                            'empl_name': self.name, })
         if not self.env.context.get('attendance_manual'):
             return True
         return attendance
