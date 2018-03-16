@@ -72,6 +72,14 @@ class HrTimesheetDh(models.Model):
                 sheet['total_duty_hours'] = (sheet.total_duty_hours -
                                              sheet.total_attendance)
 
+    @api.model
+    def search_read(self, domain=None, fields=None, offset=0, limit=None,
+                    order=None):
+        res = super(HrTimesheetDh, self).sudo().search_read(
+            domain=domain, fields=fields, offset=offset, limit=limit,
+            order=order)
+        return res
+
     @api.multi
     def count_leaves(self, date_from, employee_id, period):
         holiday_obj = self.env['hr.holidays']
