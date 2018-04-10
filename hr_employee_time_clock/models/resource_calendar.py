@@ -83,28 +83,39 @@ class ResourceCalendar(models.Model):
                     start_dt.replace(hour=default_interval[1],
                                      minute=0, second=0))
             intervals = self._interval_remove_leaves(working_interval,
-                                                    work_limits)
+                                                     work_limits)
             return intervals
 
         working_intervals = []
         for calendar_working_day in self.get_attendances_for_weekdays(
                 ids, [start_dt.weekday()]):
+
+            str_time_from_dict = str(calendar_working_day.hour_from).split('.')
+            hour_from = int(str_time_from_dict[0])
+            minutes_from = int(str_time_from_dict[1])
+            str_time_to_dict = str(calendar_working_day.hour_to).split('.')
+            hour_to = int(str_time_to_dict[0])
+            if int(str_time_to_dict[1]) < 10:
+                minutes_to = int(60 * int(str_time_to_dict[1]) / 10)
+            else:
+                minutes_to = int(60 * int(str_time_to_dict[1][:2]) / 100)
+
             working_interval = (
-                work_dt.replace(hour=int(calendar_working_day.hour_from)),
-                work_dt.replace(hour=int(calendar_working_day.hour_to))
+                work_dt.replace(hour=hour_from).replace(minute=minutes_from),
+                work_dt.replace(hour=hour_to).replace(minute=minutes_to)
             )
             working_intervals += self._interval_remove_leaves(working_interval,
-                                                             work_limits)
+                                                              work_limits)
         # find leave intervals
         if leaves is None and compute_leaves:
             leaves = self._get_leave_intervals(cr, uid, ids,
-                                              resource_id=resource_id,
-                                              context=context)
+                                               resource_id=resource_id,
+                                               context=context)
 
         # filter according to leaves
         for interval in working_intervals:
             if not leaves:
-                leaves=[]
+                leaves = []
             work_intervals = self._interval_remove_leaves(interval, leaves)
             intervals += work_intervals
         return intervals
