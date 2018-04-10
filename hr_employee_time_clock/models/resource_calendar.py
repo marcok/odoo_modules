@@ -92,13 +92,24 @@ class ResourceCalendar(models.Model):
 
             str_time_from_dict = str(calendar_working_day.hour_from).split('.')
             hour_from = int(str_time_from_dict[0])
-            minutes_from = int(str_time_from_dict[1])
+            if int(str_time_from_dict[1]) < 10:
+                minutes_from = int(60 * int(str_time_from_dict[1]) / 10)
+            elif int(str_time_from_dict[1]) > 100:
+                m = str_time_from_dict[1][:2] + '.' + str_time_from_dict[1][2:]
+                m = float(m)
+                minutes_from = round(60 * m / 100)
+            else:
+                minutes_from = int(60 * int(str_time_from_dict[1]) / 100)
             str_time_to_dict = str(calendar_working_day.hour_to).split('.')
             hour_to = int(str_time_to_dict[0])
             if int(str_time_to_dict[1]) < 10:
                 minutes_to = int(60 * int(str_time_to_dict[1]) / 10)
+            elif int(str_time_to_dict[1]) > 100:
+                m = str_time_to_dict[1][:2] + '.' + str_time_to_dict[1][2:]
+                m = float(m)
+                minutes_to = round(60 * m / 100)
             else:
-                minutes_to = int(60 * int(str_time_to_dict[1][:2]) / 100)
+                minutes_to = int(60 * int(str_time_to_dict[1]) / 100)
 
             working_interval = (
                 work_dt.replace(hour=hour_from).replace(minute=minutes_from),
