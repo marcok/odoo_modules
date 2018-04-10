@@ -1,9 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_hr_contract_user,hr.contract.employee,hr_contract.model_hr_contract,base.group_user,1,0,0,0
 access_resource_calendar_user,resource.calendar.employee,resource.model_resource_calendar,base.group_user,1,0,0,0
-access_resource_calendar_hr_manager,resource.calendar.hr_manager,resource.model_resource_calendar,base.group_hr_manager,1,1,1,0
+access_resource_calendar_hr_manager,resource.calendar.hr_manager,resource.model_resource_calendar,hr.group_hr_manager,1,1,1,0
 access_resource_calendar_attendance_user,resource.calendar.attendance.employee,resource.model_resource_calendar_attendance,base.group_user,1,0,0,0
-access_resource_calendar_attendance_hr_manager,resource.calendar.hr_manager,resource.model_resource_calendar_attendance,base.group_hr_manager,1,1,1,0
+access_resource_calendar_attendance_hr_manager,resource.calendar.hr_manager,resource.model_resource_calendar_attendance,hr.group_hr_manager,1,1,1,0
 access_hr_attendance_analysis_report_user,hr.attendance.analysis.report.officer,model_hr_attendance_analysis_report,base.group_user,1,1,1,0
 access_hr_timesheet_sheet_sheet_user,hr_timesheet_sheet.sheet.user,model_hr_timesheet_sheet_sheet,base.group_user,1,1,1,1
 access_hr_timesheet_sheet_sheet_system_employee,hr_timesheet_sheet.sheet.system.employee,model_hr_timesheet_sheet_sheet,base.group_user,1,1,1,0
