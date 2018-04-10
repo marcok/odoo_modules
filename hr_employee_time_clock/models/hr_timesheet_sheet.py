@@ -234,17 +234,6 @@ class HrTimesheetSheet(models.Model):
     def copy(self, *args, **argv):
         raise UserError(_('You cannot duplicate a timesheet.'))
 
-    @api.model
-    def create(self, vals):
-        if 'employee_id' in vals:
-            if not self.env['hr.employee'].browse(vals['employee_id']).user_id:
-                raise UserError(_('In order to create a timesheet for '
-                                  'this employee, you must link him/her '
-                                  'to a user.'))
-        res = super(HrTimesheetSheet, self).create(vals)
-        res.write({'state': 'draft'})
-        return res
-
     @api.multi
     def write(self, vals):
         if 'employee_id' in vals:
