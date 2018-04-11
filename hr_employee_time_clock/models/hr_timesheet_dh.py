@@ -274,7 +274,9 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def get_previous_month_diff(self, employee_id, prev_timesheet_date_from):
-        total_diff = 0.0
+
+        total_diff = self.env['hr.employee'].browse(
+            employee_id).start_time_different
         timesheet_ids = self.search(
             [('employee_id', '=', employee_id),
              ('date_from', '<', prev_timesheet_date_from)

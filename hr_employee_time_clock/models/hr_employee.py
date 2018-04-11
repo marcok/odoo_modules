@@ -82,6 +82,9 @@ class HrEmployee(models.Model):
         help='The employee will have access to the "My Attendances" '
              'menu to check in and out from his session')
 
+    start_time_different = fields.Float(string='Start Time Different',
+                                        default=0.00)
+
     _sql_constraints = [('barcode_uniq', 'unique (barcode)',
                          "The Badge ID must be unique, this one is "
                          "already assigned to another employee.")]
@@ -90,7 +93,7 @@ class HrEmployee(models.Model):
     def _compute_manual_attendance(self):
         for employee in self:
             employee.manual_attendance = employee.user_id.has_group(
-                'hr_attendance.group_hr_attendance')\
+                'hr_attendance.group_hr_attendance') \
                 if employee.user_id else False
 
     @api.multi
@@ -154,7 +157,7 @@ class HrEmployee(models.Model):
                 return {'warning': _('Wrong PIN')}
         ctx = self.env.context.copy()
         ctx['attendance_manual'] = True
-        return self.with_context(ctx).attendance_action(next_action)\
+        return self.with_context(ctx).attendance_action(next_action)
 
     @api.multi
     def attendance_action(self, next_action):
@@ -277,13 +280,12 @@ class HrEmployee(models.Model):
                     self._table, column_name, employee_id[0])
                 self.env.cr.execute(query, (default_value,))
 
-
     @api.multi
-    def read(self, fields=None, load='_classic_read'):
-        result = super(HrEmployee, self).read(fields=fields, load=load)
+    def read(self, field=None, load='_classic_read'):
+        result = super(HrEmployee, self).read(fields=field, load=load)
         new_result = []
         for r in result:
-            if 'state' in fields and not r.get('state'):
+            if 'state' in field and not r.get('state'):
                 employee_id = r.get('id')
                 employee = self.browse(employee_id)
                 if employee.attendance_state == 'checked_out':
