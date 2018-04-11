@@ -178,6 +178,8 @@ class HrTimesheetDh(models.Model):
                     for tr in values:
                         output.append('<tr>')
                         for td in tr:
+                            if not td:
+                                td = '-'
                             output.append('<td>' + td + '</td>')
                         output.append('</tr>')
 
