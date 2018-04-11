@@ -79,10 +79,10 @@ class CreateTimesheetWithTag(models.TransientModel):
                     ('date_from', '<=', date_from),
                     ('date_to', '>=', date_to)
                 ])
-                if ts_id:
-                    raise ValidationError(
-                        _('Timesheet already exists for {name}.'.format(
-                            name=emp.name)))
+                # if ts_id:
+                #     raise ValidationError(
+                #         _('Timesheet already exists for {name}.'.format(
+                #             name=emp.name)))
                 if not ts_id:
                     values = {'employee_id': emp.id}
                     if self.date_from and self.date_to:
