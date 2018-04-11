@@ -44,7 +44,7 @@
         # Report
         'report/report_attendance_analysis_view.xml',
 
-        'security/ir_rule.xml',
+        # 'security/ir_rule.xml',
         'security/hr_timesheet_sheet_security.xml',
         'security/ir.model.access.csv',
 
