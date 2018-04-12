@@ -335,7 +335,7 @@
               id="menu_act_hr_timesheet_sheet_form"
               parent="menu_hr_attendance_analysis_report_root"
               sequence="40"
-              groups="hr_timesheet.group_hr_timesheet_user"/>
+              groups="hr_timesheet.group_timesheet_manager"/>
 
     <!--
         account.analytic.line inheritancy
