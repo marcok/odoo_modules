@@ -281,11 +281,11 @@ class HrEmployee(models.Model):
                 self.env.cr.execute(query, (default_value,))
 
     @api.multi
-    def read(self, field=None, load='_classic_read'):
-        result = super(HrEmployee, self).read(fields=field, load=load)
+    def read(self, fields=None, load='_classic_read'):
+        result = super(HrEmployee, self).read(fields=fields, load=load)
         new_result = []
         for r in result:
-            if 'state' in field and not r.get('state'):
+            if 'state' in fields and not r.get('state'):
                 employee_id = r.get('id')
                 employee = self.browse(employee_id)
                 if employee.attendance_state == 'checked_out':
