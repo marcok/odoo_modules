@@ -146,8 +146,6 @@ class HrTimesheetDh(models.Model):
     def _get_analysis(self):
         for sheet in self:
             function_call = True
-            _logger.info(sheet)
-            _logger.info(function_call)
             data = self.attendance_analysis(timesheet_id=sheet.id,
                                             function_call=function_call)
             values = []
@@ -169,10 +167,9 @@ class HrTimesheetDh(models.Model):
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
                     output.append('<td colspan="3">' + t + '</td>')
                     output.append('</tr>')
-            keys = ('Date', 'Duty Hours', 'Worked Hours',
-                    'Difference', 'Running')
+            keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
+                    _('Difference'), _('Running'))
             a = ('previous_month_diff', 'hours', 'total')
-            _logger.info(data)
             for k in a:
                 v = data.get(k)
                 if isinstance(v, list):
@@ -181,11 +178,9 @@ class HrTimesheetDh(models.Model):
                     for th in keys:
                         output.append('<th>' + th + '</th>')
                     output.append('</tr>')
-                    _logger.info(v)
                     for res in v:
                         values.append([res.get(key) for key in keys])
                     for tr in values:
-                        _logger.info(tr)
                         output.append('<tr>')
                         for td in tr:
                             if not td:
@@ -313,24 +308,17 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
-        _logger.info('\n\n attendance_analysis \n\n')
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
         for sheet in self.sudo():
-            _logger.info('sheet')
-            _logger.info(sheet)
             if not timesheet_id:
                 timesheet_id = self[-1].id
-            _logger.info('timesheet_id')
-            _logger.info(timesheet_id)
             if sheet.id == timesheet_id:
                 employee_id = sheet.employee_id.id
                 start_date = sheet.date_from
                 end_date = sheet.date_to
                 previous_month_diff = self.get_previous_month_diff(
                     employee_id, start_date)
-                _logger.info('previous_month_diff')
-                _logger.info(previous_month_diff)
                 current_month_diff = previous_month_diff
                 res = {
                     'previous_month_diff': previous_month_diff,
