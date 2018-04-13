@@ -2,11 +2,11 @@
 <odoo>
     <data noupdate="1">
 
-        <record model="ir.rule" id="timesheet_comp_rule">
-            <field name="name">Timesheet multi-company</field>
-            <field name="model_id" search="[('model','=','hr_timesheet_sheet.sheet')]" model="ir.model"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        <record id="group_timesheet_supervisor" model="res.groups">
+            <field name="name">Supervisor</field>
+            <field name="category_id" ref="base.module_category_hr_timesheet"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_timesheet_manager'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
 
     </data>
