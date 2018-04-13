@@ -46,7 +46,8 @@
 
         # 'security/ir_rule.xml',
         # 'security/ir_rule_contract.xml',
-        'security/hr_timesheet_sheet_security.xml',
+        # 'security/hr_timesheet_sheet_security.xml',
+        'security/hr_timesheet_security.xml',
         'security/ir.model.access.csv',
 
         # View file for the wizard
