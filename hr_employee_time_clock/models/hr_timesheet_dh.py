@@ -230,7 +230,9 @@ class HrTimesheetDh(models.Model):
     def search_read(self, domain=None, fields=None, offset=0, limit=None,
                     order=None):
         if 'search_default_to_approve' in self.env.context.keys():
-            if self.user_has_groups('hr_timesheet.group_timesheet_manager'):
+            if self.user_has_groups('hr_employee_time_clock.group_timesheet_supervisor'):
+                pass
+            elif self.user_has_groups('hr_timesheet.group_timesheet_manager'):
                 domain.append(
                     ['employee_id.parent_id.user_id', '=', self.env.uid])
             elif self.user_has_groups(
@@ -405,13 +407,3 @@ class HrTimesheetDh(models.Model):
     def calculate_diff(self, end_date=None):
         for sheet in self:
             return sheet.total_duty_hours * (-1)
-
-    @api.model
-    def read_group(self, domain, fields, groupby, offset=0, limit=None,
-                   orderby=False, lazy=True):
-        print("<<< domain >>> \n %s" % domain)
-        print("<<< fields >>> \n %s" % fields)
-        print("<<< groupby >>> \n %s" % groupby)
-        return super(HrTimesheetDh, self).read_group(domain, fields, groupby,
-                                             offset=offset, limit=limit,
-                                             orderby=orderby, lazy=lazy)
