@@ -125,7 +125,8 @@ class HrAttendance(models.Model):
     name = fields.Datetime(string='Date',
                            required=True,
                            select=1,
-                           default = (lambda *a: time.strftime('%Y-%m-%d %H:%M:%S')))
+                           default=(
+                           lambda *a: time.strftime('%Y-%m-%d %H:%M:%S')))
 
     sheet_id = fields.Many2one(
         'hr_timesheet_sheet.sheet',

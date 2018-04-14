@@ -407,3 +407,28 @@ class HrTimesheetDh(models.Model):
     def calculate_diff(self, end_date=None):
         for sheet in self:
             return sheet.total_duty_hours * (-1)
+
+    @api.multi
+    def hr_attendance_employee_action(self):
+        ctx = {'default_employee_id': self.employee_id.id}
+
+        def ref(module, xml_id):
+            proxy = self.env['ir.model.data']
+            return proxy.get_object_reference(module, xml_id)
+
+        model, search_view_id = ref('hr_attendance',
+                                    'hr_attendance_view_filter')
+
+        return {
+            'name': 'Attendances',
+            'view_type': 'form',
+            'view_mode': 'tree,kanban,form',
+            'target': 'current',
+            'res_model': 'hr.attendance',
+            'type': 'ir.actions.act_window',
+            'domain': [('employee_id', '=', self.employee_id.id)],
+            'context': ctx,
+            'help': _('''<p>The attendance records of your employees will be displayed here.</p>
+            <p>Please make sure you're using the correct filter if you expected to see any.</p>'''),
+            'search_view_id': search_view_id,
+        }
