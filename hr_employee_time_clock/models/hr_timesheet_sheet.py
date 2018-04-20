@@ -86,7 +86,6 @@ class HrTimesheetSheet(models.Model):
         """, (tuple(ids),))
 
         res = self.env.cr.dictfetchall()
-        _logger.info(res)
         if res:
             for sheet in self:
                 if sheet.id == res[0].get('id'):
@@ -207,8 +206,6 @@ class HrTimesheetSheet(models.Model):
         for sheet in self:
             new_user_id = forced_user_id or sheet.user_id and sheet.user_id.id
             if new_user_id:
-                _logger.info(sheet.date_to)
-                _logger.info(sheet.date_from)
                 self.env.cr.execute('''
                     SELECT id
                     FROM hr_timesheet_sheet_sheet
