@@ -61,8 +61,6 @@ class HrAttendance(models.Model):
                 ('user_id', '=', self.env.uid)])
             departments = self.env['hr.department'].search([
                 ('manager_id', '=', is_employee.id)])
-            domain.append(
-                ['department_id', 'in', departments.ids])
             employee_ids = []
             all_employees = self.env['hr.employee'].search([])
             for employee_id in all_employees:
