@@ -63,10 +63,15 @@ class HrAttendance(models.Model):
                 ('manager_id', '=', is_employee.id)])
             employee_ids = []
             all_employees = self.env['hr.employee'].search([])
-            for employee_id in all_employees:
-                if employee_id.department_id in departments:
-                    employee_ids.append(employee_id.id)
-            domain.append(['employee_id', 'in', employee_ids])
+            if departments:
+                for employee_id in all_employees:
+                    if employee_id.department_id in departments:
+                        employee_ids.append(employee_id.id)
+                domain.append(['employee_id', 'in', employee_ids])
+            else:
+                if is_employee:
+                    domain.append(
+                        ['employee_id', '=', is_employee.id])
 
         else:
             employee_id = self.env['hr.employee'].search(
