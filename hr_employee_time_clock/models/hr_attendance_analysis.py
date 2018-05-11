@@ -48,7 +48,12 @@ def _employee_get(obj):
 
 
 class HrAttendance(models.Model):
-    _inherit = "hr.attendance"
+    _name = "hr.attendance"
+    _inherit = ["hr.attendance", "mail.thread"]
+
+    check_in = fields.Datetime(string="Check In", default=fields.Datetime.now,
+                               required=True, track_visibility='always')
+    check_out = fields.Datetime(string="Check Out", track_visibility='always')
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None,
