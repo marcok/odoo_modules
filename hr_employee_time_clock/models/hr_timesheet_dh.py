@@ -83,6 +83,10 @@ class HrTimesheetDh(models.Model):
         if period.get('date_from') and period.get('date_to'):
             start_leave_period = period.get('date_from')
             end_leave_period = period.get('date_to')
+
+        compensation_leave_type = self.env['hr.holidays.status'].search(
+            [('name', '=', 'Kompensation')], limit=1)
+
         holiday_ids = holiday_obj.search(
             ['|', '&',
              ('date_from', '>=', start_leave_period),
@@ -91,8 +95,10 @@ class HrTimesheetDh(models.Model):
              ('date_to', '>=', start_leave_period),
              ('employee_id', '=', employee_id),
              ('state', '=', 'validate'),
-             ('type', '=', 'remove')])
+             ('type', '=', 'remove'),
+             ('holiday_status_id', '!=', compensation_leave_type.id)])
         leaves = []
+
         for leave in holiday_ids:
             leave_date_from = datetime.strptime(leave.date_from,
                                                 '%Y-%m-%d %H:%M:%S')
@@ -101,11 +107,12 @@ class HrTimesheetDh(models.Model):
             leave_dates = list(rrule.rrule(rrule.DAILY,
                                            dtstart=parser.parse(
                                                leave.date_from),
-                                           until=parser.parse(leave.date_to)))
+                                           until=parser.parse(
+                                               leave.date_to)))
             for date in leave_dates:
                 if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append(
-                        (leave_date_from, leave_date_to, leave.number_of_days))
+                    leaves.append((leave_date_from, leave_date_to,
+                                   leave.number_of_days))
                     break
         return leaves
 
@@ -339,8 +346,7 @@ class HrTimesheetDh(models.Model):
                           }
                 dates = list(rrule.rrule(rrule.DAILY,
                                          dtstart=parser.parse(start_date),
-                                         until=parser.parse(
-                                             end_date)))
+                                         until=parser.parse(end_date)))
                 work_current_month_diff = 0.0
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff':
