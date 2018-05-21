@@ -27,7 +27,8 @@
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '1.2',
-    'depends': ['analytic',
+    'depends': ['mail',
+                'analytic',
                 'hr_timesheet',
                 'hr_attendance',
                 'hr_contract',
@@ -39,6 +40,7 @@
 
         'views/hr_timesheet_sheet_views.xml',
         'views/hr_department_views.xml',
+        'views/hr_attendance_subtypes.xml',
         # 'views/hr_timesheet_sheet_config_settings_views.xml',
 
         # Report

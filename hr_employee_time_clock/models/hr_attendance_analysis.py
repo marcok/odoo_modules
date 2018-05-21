@@ -48,7 +48,46 @@ def _employee_get(obj):
 
 
 class HrAttendance(models.Model):
-    _inherit = "hr.attendance"
+    _name = "hr.attendance"
+    _inherit = ["hr.attendance", "mail.thread"]
+
+    check_in = fields.Datetime(string="Check In", default=fields.Datetime.now,
+                               required=True, track_visibility='always')
+    check_out = fields.Datetime(string="Check Out", track_visibility='always')
+
+    @api.model
+    def search_read(self, domain=None, fields=None, offset=0, limit=None,
+                    order=None):
+        ctx = self.env.context.copy()
+        if self.user_has_groups('hr.group_hr_manager'):
+            pass
+        elif self.user_has_groups('hr.group_hr_user'):
+            is_employee = self.env['hr.employee'].search([
+                ('user_id', '=', self.env.uid)])
+            departments = self.env['hr.department'].search([
+                ('manager_id', '=', is_employee.id)])
+            employee_ids = []
+            all_employees = self.env['hr.employee'].search([])
+            if departments:
+                for employee_id in all_employees:
+                    if employee_id.department_id in departments:
+                        employee_ids.append(employee_id.id)
+                domain.append(['employee_id', 'in', employee_ids])
+            else:
+                if is_employee:
+                    domain.append(
+                        ['employee_id', '=', is_employee.id])
+
+        else:
+            employee_id = self.env['hr.employee'].search(
+                [('user_id', '=', self.env.uid)])
+            if employee_id:
+                domain.append(
+                    ['employee_id', '=', employee_id.id])
+        res = super(HrAttendance, self.with_context(ctx)).search_read(
+            domain=domain, fields=fields, offset=offset, limit=limit,
+            order=order)
+        return res
 
     @api.multi
     def _get_attendance_employee_tz(self, employee_id, date):
