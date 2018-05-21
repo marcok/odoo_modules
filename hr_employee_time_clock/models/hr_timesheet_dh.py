@@ -77,15 +77,17 @@ class HrTimesheetDh(models.Model):
                                              sheet.total_attendance)
 
     @api.multi
+    def take_holiday_status(self):
+        return self.env['hr.holidays.status'].search(
+            [('take_into_attendance', '=', True)])
+
+    @api.multi
     def count_leaves(self, date_from, employee_id, period):
         holiday_obj = self.env['hr.holidays']
         start_leave_period = end_leave_period = False
         if period.get('date_from') and period.get('date_to'):
             start_leave_period = period.get('date_from')
             end_leave_period = period.get('date_to')
-
-        compensation_leave_type = self.env['hr.holidays.status'].search(
-            [('name', '=', 'Kompensation')], limit=1)
 
         holiday_ids = holiday_obj.search(
             ['|', '&',
@@ -96,9 +98,8 @@ class HrTimesheetDh(models.Model):
              ('employee_id', '=', employee_id),
              ('state', '=', 'validate'),
              ('type', '=', 'remove'),
-             ('holiday_status_id', '!=', compensation_leave_type.id)])
+             ('holiday_status_id', 'in', self.take_holiday_status().ids)])
         leaves = []
-
         for leave in holiday_ids:
             leave_date_from = datetime.strptime(leave.date_from,
                                                 '%Y-%m-%d %H:%M:%S')
@@ -145,8 +146,8 @@ class HrTimesheetDh(models.Model):
                     old_timesheet_start_from.strftime('%Y-%m-%d')
                 )
             sheet['calculate_diff_hours'] = (
-                self.get_overtime(datetime.today().strftime('%Y-%m-%d'), ) +
-                prev_timesheet_diff)
+                    self.get_overtime(datetime.today().strftime('%Y-%m-%d'), ) +
+                    prev_timesheet_diff)
             sheet['prev_timesheet_diff'] = prev_timesheet_diff
 
     @api.multi
@@ -237,7 +238,8 @@ class HrTimesheetDh(models.Model):
     def search_read(self, domain=None, fields=None, offset=0, limit=None,
                     order=None):
         if 'search_default_to_approve' in self.env.context.keys():
-            if self.user_has_groups('hr_employee_time_clock.group_timesheet_supervisor'):
+            if self.user_has_groups(
+                    'hr_employee_time_clock.group_timesheet_supervisor'):
                 pass
             elif self.user_has_groups('hr_timesheet.group_timesheet_manager'):
                 domain.append(

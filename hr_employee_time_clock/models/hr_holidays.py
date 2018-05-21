@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    Clear Groups for Odoo
@@ -19,18 +20,15 @@
 #
 ##############################################################################
 
-from . import hr_attendance_analysis
-from . import time_clock_resource_calendar
-from . import resource_calendar
-from . import hr_holidays
+import logging
 
-from . import account_analytic_line
-from . import hr_department
-from . import hr_employee
-from . import hr_timesheet_sheet
-from . import hr_timesheet_dh
-from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
-from . import res_company
+from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
+class HolidaysType(models.Model):
+    _inherit = "hr.holidays.status"
+
+    take_into_attendance = fields.Boolean(default=True,
+                                          string='Take Into Attendance')
