@@ -194,3 +194,9 @@ class HrAttendance(models.Model):
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
+
+    @api.model
+    def write(self, values):
+        print('\n\n >>>>>>>>>>>>>>>>> HrAttendance write')
+        print(values)
+        return super(HrAttendance, self).write(values)
