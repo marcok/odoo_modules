@@ -26,6 +26,7 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
 from odoo.tools.translate import _
+import math
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -99,23 +100,41 @@ class HrTimesheetDh(models.Model):
              ('state', '=', 'validate'),
              ('type', '=', 'remove'),
              ('holiday_status_id', 'in', self.take_holiday_status().ids)])
-        leaves = []
-        for leave in holiday_ids:
-            leave_date_from = datetime.strptime(leave.date_from,
+        new_holidays = []
+        for holiday in holiday_ids:
+            holiday_date_from = datetime.strptime(holiday.date_from,
+                                                  '%Y-%m-%d %H:%M:%S')
+            holiday_date_to = datetime.strptime(holiday.date_to,
                                                 '%Y-%m-%d %H:%M:%S')
-            leave_date_to = datetime.strptime(leave.date_to,
-                                              '%Y-%m-%d %H:%M:%S')
-            leave_dates = list(rrule.rrule(rrule.DAILY,
-                                           dtstart=parser.parse(
-                                               leave.date_from),
-                                           until=parser.parse(
-                                               leave.date_to)))
-            for date in leave_dates:
-                if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append((leave_date_from, leave_date_to,
-                                   leave.number_of_days))
-                    break
-        return leaves
+            if holiday_date_from.date() == holiday_date_to.date():
+                if holiday_date_from.strftime('%Y-%m-%d') == date_from.strftime(
+                        '%Y-%m-%d'):
+                    new_holidays.append((holiday_date_from, holiday_date_to,
+                                         holiday.number_of_days))
+                break
+            else:
+                leave_dates = list(rrule.rrule(rrule.DAILY,
+                                               dtstart=parser.parse(
+                                                   holiday.date_from),
+                                               until=parser.parse(
+                                                   holiday.date_to)))
+                frac_part, int_part = math.modf(holiday.number_of_days)
+                for date in leave_dates:
+                    if int_part < 0:
+                        number_of_days = -1
+                        if date.strftime('%Y-%m-%d') == date_from.strftime(
+                                '%Y-%m-%d'):
+                            new_holidays.append((date, date, number_of_days))
+                            break
+                        int_part += 1
+                    else:
+                        number_of_days = frac_part
+                        if date.strftime('%Y-%m-%d') == date_from.strftime(
+                                '%Y-%m-%d'):
+                            if number_of_days != 0:
+                                new_holidays.append((date, date, number_of_days))
+                                break
+        return new_holidays
 
     @api.model
     def count_public_holiday(self, date_from, period):
@@ -288,8 +307,8 @@ class HrTimesheetDh(models.Model):
                     duty_hours += dh
                 else:
                     if leaves[-1] and leaves[-1][-1]:
-                        if float(leaves[-1][-1]) == (-0.5):
-                            duty_hours += dh / 2
+                        if float(leaves[-1][-1]):
+                            duty_hours += dh * (1 + float(leaves[-1][-1]))
             else:
                 dh = 0.00
                 duty_hours += dh
@@ -354,7 +373,6 @@ class HrTimesheetDh(models.Model):
                          'diff':
                              current_month_diff, 'work_current_month_diff': ''}
                 for date_line in dates:
-
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
                     worked_hours = 0.0
