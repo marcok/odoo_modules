@@ -185,41 +185,28 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
-        print('\n\n >>>>>>>>>>>> create')
-        print('values', values)
         employee = values.get('employee_id')
         if employee:
             attendance_ids = self.env['hr.attendance'].search([
                 ('employee_id', '=', employee)], limit=100)
-            print('attendance_ids', attendance_ids)
-            print(attendance_ids[0].check_in, attendance_ids[0].check_out)
-            print(type(attendance_ids[0].check_in))
             for attendance in attendance_ids:
                 check_in = fields.Datetime.from_string(attendance.check_in)
                 check_out = fields.Datetime.from_string(attendance.check_out)
                 midnight_time = datetime.strptime("000000", "%H%M%S").time()
                 midnight = datetime.combine(check_out.date(), midnight_time)
-                print('\ntime_check_in', check_in, ', time_check_out', check_out, 'midnight', midnight)
-                print('1', check_in < midnight < check_out)
                 if check_in < midnight < check_out:
-                    print('2', check_in < midnight < check_out)
                     check_out_old = attendance.check_out
                     check_out_new = str(check_in.date()) + ' ' + '23:59:59'
                     self.env['hr.attendance'].search([
                         ('id', '=', attendance.id)]).write(
                         {'check_out': check_out_new})
-                    print('\n\nwrite\n\n')
-                    # TODO: check for overtime
                     check_in_new = str(midnight)
-                    print(attendance.check_out)
                     self.env['hr.attendance'].create({
                         'employee_id': employee,
                         'have_overtime': attendance.have_overtime,
                         'check_in': check_in_new,
                         'check_out': str(check_out_old),
                         'overtime_change': attendance.overtime_change})
-                    print('\n\ncreate\n\n')
-
 
         if not values.get('name'):
             values['name'] = values.get('check_in')
