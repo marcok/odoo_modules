@@ -48,6 +48,26 @@ class ResourceCalendar(models.Model):
         return seconds(res) / 3600.0
 
     @api.multi
+    def get_bonus_hours_of_date(self, cr, uid, ids, start_dt=None,
+                                  end_dt=None, leaves=None,
+                                  compute_leaves=False, resource_id=None,
+                                  default_interval=None, context=None):
+        """ Get the working hours of the day based on calendar. This method uses
+        get_working_intervals_of_day to have the work intervals of the day. It
+        then calculates the number of hours contained in those intervals. """
+        print('self >>>>>', ids)
+        res = dtime.timedelta()
+        intervals = self.get_working_intervals_of_day(
+            cr, uid, ids,
+            start_dt, end_dt, leaves,
+            compute_leaves, resource_id,
+            default_interval, context)
+        print('intervals >>>>>', resource_id)
+        for interval in intervals:
+            res += interval[1] - interval[0]
+        return seconds(res) / 3600.0
+
+    @api.multi
     def get_working_intervals_of_day(self, cr, uid, ids, start_dt=None,
                                      end_dt=None, leaves=None,
                                      compute_leaves=False, resource_id=None,
