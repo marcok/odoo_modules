@@ -32,7 +32,7 @@ from odoo.tools import (
 
 import math
 from odoo import models, api, _, fields
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from odoo.exceptions import ValidationError, AccessError
 import logging
 
@@ -151,30 +151,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
-        # TODO: check TZ
-        employee = values.get('employee_id')
-        if employee:
-            attendance_ids = self.env['hr.attendance'].search([
-                ('employee_id', '=', employee)], limit=100)
-            for attendance in attendance_ids:
-                check_in = fields.Datetime.from_string(attendance.check_in)
-                check_out = fields.Datetime.from_string(attendance.check_out)
-                midnight_time = datetime.strptime("000000", "%H%M%S").time()
-                midnight = datetime.combine(check_out.date(), midnight_time)
-                if check_in < midnight < check_out:
-                    check_out_old = attendance.check_out
-                    check_out_new = str(check_in.date()) + ' ' + '23:59:59'
-                    self.env['hr.attendance'].search([
-                        ('id', '=', attendance.id)]).write(
-                        {'check_out': check_out_new})
-                    check_in_new = str(midnight)
-                    self.env['hr.attendance'].create({
-                        'employee_id': employee,
-                        'have_overtime': attendance.have_overtime,
-                        'check_in': check_in_new,
-                        'check_out': str(check_out_old),
-                        'overtime_change': attendance.overtime_change})
-
         if not values.get('name'):
             values['name'] = values.get('check_in')
         if values.get('name'):
@@ -193,6 +169,41 @@ class HrAttendance(models.Model):
                 _(
                     "Sorry, only manager is allowed to edit attendance"
                     " of approved attendance sheet."))
+
+        if values.get('check_out') or self.check_out:
+            local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+
+            if values.get('check_in'):
+                check_in = fields.Datetime.from_string(values.get('check_in'))
+            else:
+                check_in = fields.Datetime.from_string(self.check_in).replace(
+                    tzinfo=pytz.utc).astimezone(local_tz)
+            check_in = check_in.replace(tzinfo=None)
+
+            if values.get('check_out'):
+                check_out = fields.Datetime.from_string(values.get('check_out'))
+            else:
+                check_out = fields.Datetime.from_string(
+                    self.check_out).replace(tzinfo=pytz.utc).astimezone(
+                    local_tz)
+            check_out = check_out.replace(tzinfo=None)
+
+            midnight_without_tzinfo = datetime.combine(check_out.date(), time())
+            midnight = local_tz.localize(midnight_without_tzinfo).astimezone(
+                pytz.utc)
+            midnight = midnight.replace(tzinfo=None)
+
+            if check_in < midnight < check_out:
+                check_out_old = check_out
+                check_out_new = midnight - timedelta(seconds=1)
+                self.env['hr.attendance'].create({
+                    'employee_id': self.employee_id.id,
+                    'have_overtime': self.have_overtime,
+                    'check_in': str(midnight),
+                    'check_out': str(check_out_old),
+                    'overtime_change': self.overtime_change})
+
+                values.update({'check_out': str(check_out_new)})
 
         return super(HrAttendance, self).write(values)
 
