@@ -33,7 +33,7 @@ from odoo.tools import (
 import math
 from odoo import models, api, _, fields
 from datetime import datetime
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, AccessError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -151,6 +151,7 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
+        # TODO: check TZ
         employee = values.get('employee_id')
         if employee:
             attendance_ids = self.env['hr.attendance'].search([
@@ -183,3 +184,15 @@ class HrAttendance(models.Model):
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
+
+    @api.model
+    def write(self, values):
+        if self.sheet_id.state == 'done' and not \
+                self.user_has_groups('hr.group_hr_manager'):
+            raise AccessError(
+                _(
+                    "Sorry, only manager is allowed to edit attendance"
+                    " of approved attendance sheet."))
+
+        return super(HrAttendance, self).write(values)
+
