@@ -32,8 +32,8 @@ from odoo.tools import (
 
 import math
 from odoo import models, api, _, fields
-from datetime import datetime
-from odoo.exceptions import ValidationError
+from datetime import datetime, time, timedelta
+from odoo.exceptions import ValidationError, AccessError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -54,40 +54,6 @@ class HrAttendance(models.Model):
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now,
                                required=True, track_visibility='always')
     check_out = fields.Datetime(string="Check Out", track_visibility='always')
-
-    @api.model
-    def search_read(self, domain=None, fields=None, offset=0, limit=None,
-                    order=None):
-        ctx = self.env.context.copy()
-        if self.user_has_groups('hr.group_hr_manager'):
-            pass
-        elif self.user_has_groups('hr.group_hr_user'):
-            is_employee = self.env['hr.employee'].search([
-                ('user_id', '=', self.env.uid)])
-            departments = self.env['hr.department'].search([
-                ('manager_id', '=', is_employee.id)])
-            employee_ids = []
-            all_employees = self.env['hr.employee'].search([])
-            if departments:
-                for employee_id in all_employees:
-                    if employee_id.department_id in departments:
-                        employee_ids.append(employee_id.id)
-                domain.append(['employee_id', 'in', employee_ids])
-            else:
-                if is_employee:
-                    domain.append(
-                        ['employee_id', '=', is_employee.id])
-
-        else:
-            employee_id = self.env['hr.employee'].search(
-                [('user_id', '=', self.env.uid)])
-            if employee_id:
-                domain.append(
-                    ['employee_id', '=', employee_id.id])
-        res = super(HrAttendance, self.with_context(ctx)).search_read(
-            domain=domain, fields=fields, offset=offset, limit=limit,
-            order=order)
-        return res
 
     @api.multi
     def _get_attendance_employee_tz(self, employee_id, date):
@@ -185,29 +151,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
-        employee = values.get('employee_id')
-        if employee:
-            attendance_ids = self.env['hr.attendance'].search([
-                ('employee_id', '=', employee)], limit=100)
-            for attendance in attendance_ids:
-                check_in = fields.Datetime.from_string(attendance.check_in)
-                check_out = fields.Datetime.from_string(attendance.check_out)
-                midnight_time = datetime.strptime("000000", "%H%M%S").time()
-                midnight = datetime.combine(check_out.date(), midnight_time)
-                if check_in < midnight < check_out:
-                    check_out_old = attendance.check_out
-                    check_out_new = str(check_in.date()) + ' ' + '23:59:59'
-                    self.env['hr.attendance'].search([
-                        ('id', '=', attendance.id)]).write(
-                        {'check_out': check_out_new})
-                    check_in_new = str(midnight)
-                    self.env['hr.attendance'].create({
-                        'employee_id': employee,
-                        'have_overtime': attendance.have_overtime,
-                        'check_in': check_in_new,
-                        'check_out': str(check_out_old),
-                        'overtime_change': attendance.overtime_change})
-
         if not values.get('name'):
             values['name'] = values.get('check_in')
         if values.get('name'):
@@ -217,3 +160,49 @@ class HrAttendance(models.Model):
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
+
+    @api.model
+    def write(self, values):
+        if self.sheet_id.state == 'done' and not \
+                self.user_has_groups('hr.group_hr_manager'):
+            raise AccessError(
+                _(
+                    "Sorry, only manager is allowed to edit attendance"
+                    " of approved attendance sheet."))
+
+        if values.get('check_out'):
+            local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+
+            if values.get('check_in'):
+                check_in = fields.Datetime.from_string(values.get('check_in'))
+            else:
+                check_in = fields.Datetime.from_string(self.check_in).replace(
+                    tzinfo=pytz.utc).astimezone(local_tz)
+            check_in = check_in.replace(tzinfo=None)
+
+            if values.get('check_out'):
+                check_out = fields.Datetime.from_string(values.get('check_out'))
+            else:
+                check_out = fields.Datetime.from_string(
+                    self.check_out).replace(tzinfo=pytz.utc).astimezone(
+                    local_tz)
+            check_out = check_out.replace(tzinfo=None)
+
+            midnight_without_tzinfo = datetime.combine(check_out.date(), time())
+            midnight = local_tz.localize(midnight_without_tzinfo).astimezone(
+                pytz.utc)
+            midnight = midnight.replace(tzinfo=None)
+
+            if check_in < midnight < check_out:
+                check_out_old = check_out
+                check_out_new = midnight - timedelta(seconds=1)
+                self.env['hr.attendance'].create({
+                    'employee_id': self.employee_id.id,
+                    'check_in': str(midnight),
+                    'check_out': str(check_out_old),
+                    'name': str(midnight)})
+
+                values.update({'check_out': str(check_out_new)})
+
+        return super(HrAttendance, self).write(values)
+

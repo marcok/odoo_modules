@@ -71,8 +71,7 @@ class HrTimesheetDh(models.Model):
 
                 for date_line in dates:
                     duty_hours = sheet.calculate_duty_hours(date_from=date_line,
-                                                            period=period,
-                                                            )
+                                                            period=period)
                     sheet['total_duty_hours'] += duty_hours
                 sheet['total_duty_hours'] = (sheet.total_duty_hours -
                                              sheet.total_attendance)
@@ -277,14 +276,10 @@ class HrTimesheetDh(models.Model):
         calendar_obj = self.env['resource.calendar']
         duty_hours = 0.0
         contract_ids = contract_obj.search(
-            [
-                ('employee_id', '=', self.employee_id.id),
-                ('date_start', '<=', date_from),
-                '|',
-                ('date_end', '>=', date_from),
-                ('date_end', '=', None)
-            ]
-        )
+            [('employee_id', '=', self.employee_id.id),
+             ('date_start', '<=', date_from), '|',
+             ('date_end', '>=', date_from),
+             ('date_end', '=', None)])
         for contract in contract_ids:
             ctx = dict(self.env.context).copy()
             ctx.update(period)
