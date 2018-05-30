@@ -161,48 +161,49 @@ class HrAttendance(models.Model):
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
 
-    @api.model
-    def write(self, values):
-        if self.sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
-            raise AccessError(
-                _(
-                    "Sorry, only manager is allowed to edit attendance"
-                    " of approved attendance sheet."))
-
-        if values.get('check_out'):
-            local_tz = pytz.timezone(self.env.user.tz or 'UTC')
-
-            if values.get('check_in'):
-                check_in = fields.Datetime.from_string(values.get('check_in'))
-            else:
-                check_in = fields.Datetime.from_string(self.check_in).replace(
-                    tzinfo=pytz.utc).astimezone(local_tz)
-            check_in = check_in.replace(tzinfo=None)
-
-            if values.get('check_out'):
-                check_out = fields.Datetime.from_string(values.get('check_out'))
-            else:
-                check_out = fields.Datetime.from_string(
-                    self.check_out).replace(tzinfo=pytz.utc).astimezone(
-                    local_tz)
-            check_out = check_out.replace(tzinfo=None)
-
-            midnight_without_tzinfo = datetime.combine(check_out.date(), time())
-            midnight = local_tz.localize(midnight_without_tzinfo).astimezone(
-                pytz.utc)
-            midnight = midnight.replace(tzinfo=None)
-
-            if check_in < midnight < check_out:
-                check_out_old = check_out
-                check_out_new = midnight - timedelta(seconds=1)
-                self.env['hr.attendance'].create({
-                    'employee_id': self.employee_id.id,
-                    'check_in': str(midnight),
-                    'check_out': str(check_out_old),
-                    'name': str(midnight)})
-
-                values.update({'check_out': str(check_out_new)})
-
-        return super(HrAttendance, self).write(values)
+    # @api.model
+    # def write(self, values):
+    #     if self.sheet_id.state == 'done' and not \
+    #             self.user_has_groups('hr.group_hr_manager'):
+    #         raise AccessError(
+    #             _(
+    #                 "Sorry, only manager is allowed to edit attendance"
+    #                 " of approved attendance sheet."))
+    #
+    #     if values.get('check_out'):
+    #         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+    #
+    #         if values.get('check_in'):
+    #             check_in = fields.Datetime.from_string(values.get('check_in'))
+    #         else:
+    #             check_in = fields.Datetime.from_string(self.check_in).replace(
+    #                 tzinfo=pytz.utc).astimezone(local_tz)
+    #         check_in = check_in.replace(tzinfo=None)
+    #
+    #         if values.get('check_out'):
+    #             check_out = fields.Datetime.from_string(values.get('check_out'))
+    #         else:
+    #             check_out = fields.Datetime.from_string(
+    #                 self.check_out).replace(tzinfo=pytz.utc).astimezone(
+    #                 local_tz)
+    #         check_out = check_out.replace(tzinfo=None)
+    #
+    #         midnight_without_tzinfo = datetime.combine(check_out.date(), time())
+    #         midnight = local_tz.localize(midnight_without_tzinfo).astimezone(
+    #             pytz.utc)
+    #         midnight = midnight.replace(tzinfo=None)
+    #
+    #         if check_in < midnight < check_out:
+    #             check_out_old = check_out
+    #             check_out_new = midnight - timedelta(seconds=1)
+    #             values.update(check_out=str(check_out_new))
+    #             res = super(HrAttendance, self).write(values)
+    #             att = self.env['hr.attendance'].create({
+    #                 'employee_id': self.employee_id.id,
+    #                 'check_in': str(midnight),
+    #
+    #                 'name': str(midnight)})
+    #             att.write({'check_out': str(check_out_old)})
+    #             return res
+    #     return super(HrAttendance, self).write(values)
 
