@@ -170,7 +170,7 @@ class HrAttendance(models.Model):
                     "Sorry, only manager is allowed to edit attendance"
                     " of approved attendance sheet."))
 
-        if values.get('check_out') or self.check_out:
+        if values.get('check_out'):
             local_tz = pytz.timezone(self.env.user.tz or 'UTC')
 
             if values.get('check_in'):
@@ -198,10 +198,9 @@ class HrAttendance(models.Model):
                 check_out_new = midnight - timedelta(seconds=1)
                 self.env['hr.attendance'].create({
                     'employee_id': self.employee_id.id,
-                    'have_overtime': self.have_overtime,
                     'check_in': str(midnight),
                     'check_out': str(check_out_old),
-                    'overtime_change': self.overtime_change})
+                    'name': str(midnight)})
 
                 values.update({'check_out': str(check_out_new)})
 
