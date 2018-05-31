@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError, AccessError
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -233,6 +233,15 @@ class HrTimesheetSheet(models.Model):
 
     @api.multi
     def write(self, vals):
+        if vals.get('state'):
+            if vals.get('state') == 'done' or vals.get('state') == 'draft':
+                employee = self.env['hr.employee'].search([
+                    ('user_id', '=', self.env.uid)])
+                if employee == self.employee_id:
+                    raise AccessError(
+                        _("You are not allowed to approve/reset to draft "
+                          "your timesheet."))
+
         if 'employee_id' in vals:
             new_user_id = self.env['hr.employee'].browse(
                 vals['employee_id']).user_id.id
