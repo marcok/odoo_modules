@@ -130,8 +130,7 @@ class HrAttendance(models.Model):
     name = fields.Datetime(string='Date',
                            required=True,
                            select=1,
-                           default=(
-                           lambda *a: time.strftime('%Y-%m-%d %H:%M:%S')))
+                           default=datetime.now())
 
     sheet_id = fields.Many2one(
         'hr_timesheet_sheet.sheet',
@@ -164,8 +163,7 @@ class HrAttendance(models.Model):
                     "Sorry, only manager is allowed to create attendance"
                     " of approved attendance sheet."))
 
-        if not values.get('name'):
-            values['name'] = values.get('check_in')
+        values['name'] = values.get('check_in')
         if values.get('name'):
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:
@@ -174,7 +172,7 @@ class HrAttendance(models.Model):
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
 
-    @api.model
+    @api.multi
     def write(self, values):
         if self.sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
