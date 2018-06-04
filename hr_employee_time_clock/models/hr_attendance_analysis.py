@@ -164,8 +164,7 @@ class HrAttendance(models.Model):
                     "Sorry, only manager is allowed to create attendance"
                     " of approved attendance sheet."))
 
-        if not values.get('name'):
-            values['name'] = values.get('check_in')
+        values['name'] = values.get('check_in')
         if values.get('name'):
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:
@@ -174,12 +173,7 @@ class HrAttendance(models.Model):
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
 
-    # def _check_state_access_right(self, values):
-    #     if values.get('state') and values['state'] == 'done' and not self.user_has_groups('hr.group_hr_manager'):
-    #         return False
-    #     return True
-
-    @api.model
+    @api.multi
     def write(self, values):
         print('\n\n >>>>>>>>>>>>>>>>>. write')
         print(values)
