@@ -174,14 +174,22 @@ class HrAttendance(models.Model):
                       'is later than a current time'))
         return super(HrAttendance, self).create(values)
 
+    # def _check_state_access_right(self, values):
+    #     if values.get('state') and values['state'] == 'done' and not self.user_has_groups('hr.group_hr_manager'):
+    #         return False
+    #     return True
+
     @api.model
     def write(self, values):
-        if self.sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
-            raise AccessError(
-                _(
-                    "Sorry, only manager is allowed to edit attendance"
-                    " of approved attendance sheet."))
+        print('\n\n >>>>>>>>>>>>>>>>>. write')
+        print(values)
+        if values:
+            if self.sheet_id.state == 'done' and not \
+                    self.user_has_groups('hr.group_hr_manager'):
+                raise AccessError(
+                    _(
+                        "Sorry, only manager is allowed to edit attendance"
+                        " of approved attendance sheet."))
     ##################################################
     # Attendance separating
     ##################################################
