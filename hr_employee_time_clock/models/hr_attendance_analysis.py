@@ -130,8 +130,7 @@ class HrAttendance(models.Model):
     name = fields.Datetime(string='Date',
                            required=True,
                            select=1,
-                           default=(
-                           lambda *a: time.strftime('%Y-%m-%d %H:%M:%S')))
+                           default=datetime.now())
 
     sheet_id = fields.Many2one(
         'hr_timesheet_sheet.sheet',
@@ -156,7 +155,7 @@ class HrAttendance(models.Model):
         sheet_id = self.env['hr_timesheet_sheet.sheet'].search([
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
-             ('date_to', '>=', check_in.date())], limit=1)
+            ('date_to', '>=', check_in.date())], limit=1)
         if sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
@@ -175,15 +174,12 @@ class HrAttendance(models.Model):
 
     @api.multi
     def write(self, values):
-        print('\n\n >>>>>>>>>>>>>>>>>. write')
-        print(values)
-        if values:
-            if self.sheet_id.state == 'done' and not \
-                    self.user_has_groups('hr.group_hr_manager'):
-                raise AccessError(
-                    _(
-                        "Sorry, only manager is allowed to edit attendance"
-                        " of approved attendance sheet."))
+        if self.sheet_id.state == 'done' and not \
+                self.user_has_groups('hr.group_hr_manager'):
+            raise AccessError(
+                _(
+                    "Sorry, only manager is allowed to edit attendance"
+                    " of approved attendance sheet."))
     ##################################################
     # Attendance separating
     ##################################################
