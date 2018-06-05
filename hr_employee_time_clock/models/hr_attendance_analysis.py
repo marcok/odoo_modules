@@ -155,7 +155,7 @@ class HrAttendance(models.Model):
         sheet_id = self.env['hr_timesheet_sheet.sheet'].search([
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
-             ('date_to', '>=', check_in.date())], limit=1)
+            ('date_to', '>=', check_in.date())], limit=1)
         if sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
