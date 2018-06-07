@@ -22,9 +22,9 @@
 
 from random import choice
 from string import digits
-
+import logging
 from odoo import exceptions, SUPERUSER_ID
-
+_logger = logging.getLogger(__name__)
 from datetime import date
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
@@ -282,7 +282,9 @@ class HrEmployee(models.Model):
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
+        _logger.info(fields)
         result = super(HrEmployee, self).read(fields=fields, load=load)
+        _logger.info(result)
         new_result = []
         for r in result:
             if 'state' in fields and not r.get('state'):
@@ -293,4 +295,5 @@ class HrEmployee(models.Model):
                 else:
                     r['state'] = 'present'
             new_result.append(r)
+        _logger.info(new_result)
         return new_result
