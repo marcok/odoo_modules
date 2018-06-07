@@ -234,13 +234,13 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def write(self, vals):
         if vals.get('state'):
-            if vals.get('state') == 'done' or vals.get('state') == 'draft':
+            if vals.get('state') == 'done':
                 employee = self.env['hr.employee'].search([
                     ('user_id', '=', self.env.uid)])
                 if employee == self.employee_id:
                     raise AccessError(
-                        _("You are not allowed to approve/reset to draft "
-                          "your timesheet."))
+                        _("You are not allowed to approve your "
+                          "attendance sheet."))
 
         if 'employee_id' in vals:
             new_user_id = self.env['hr.employee'].browse(
