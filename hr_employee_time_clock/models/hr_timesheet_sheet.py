@@ -193,6 +193,14 @@ class HrTimesheetSheet(models.Model):
                 raise UserError(_(
                     'In order to create a timesheet for this employee,'
                     ' you must link him/her to a user.'))
+            if not self.env['hr.employee'].browse(
+                    values['employee_id']).department_id:
+                raise UserError(_(
+                    'In order to create a timesheet for this employee,'
+                    ' you must link him/her to a department.'))
+            else:
+                values['department_id']= self.env['hr.employee'].browse(
+                    values['employee_id']).department_id.id
         if values.get('date_to') and values.get('date_from') \
                 and values.get('date_from') > values.get('date_to'):
             raise ValidationError(
@@ -225,7 +233,7 @@ class HrTimesheetSheet(models.Model):
     @api.onchange('employee_id')
     def onchange_employee_id(self):
         if self.employee_id:
-            self.department_id = self.employee_id.department_id
+            self.department_id = self.employee_id.department_id.id
             self.user_id = self.employee_id.user_id
 
     def copy(self, *args, **argv):
