@@ -112,19 +112,21 @@ class HrTimesheetSheet(models.Model):
                 fields.Date.from_string(date_from) + timedelta(hours=164)
             self.date_to = str(date_to_with_delta)
 
-
     name = fields.Char(string="Note",
                        states={'confirm': [('readonly', True)],
                                'done': [('readonly', True)]})
     employee_id = fields.Many2one('hr.employee',
                                   string='Employee',
                                   default=_default_employee,
-                                  required=True)
+                                  required=True,
+                                  readonly=True,
+                                  states={'new': [('readonly', False)]})
     user_id = fields.Many2one('res.users',
                               related='employee_id.user_id',
                               string='User',
                               store=True,
-                              readonly=True)
+                              readonly=True,
+                              states={'new': [('readonly', False)]})
     date_from = fields.Date(string='Date From',
                             default=_default_date_from,
                             required=True,

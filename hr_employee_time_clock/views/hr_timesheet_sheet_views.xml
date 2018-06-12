@@ -384,6 +384,41 @@
         </field>
     </record>
 
+
+    <record id="hr_attendance.view_employee_form_inherit_hr_attendance" model="ir.ui.view">
+        <field name="name">hr.employee</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority">10</field>
+        <field name="groups_id" eval="[(3,ref('hr_attendance.group_hr_attendance_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='toggle_active']" position="before">
+                <field name="attendance_state" invisible="1"/>
+                <button name="%(hr_attendance.hr_attendance_action_employee)d"
+                        groups="hr_attendance.group_hr_attendance"
+                    class="oe_stat_button"
+                    type="action" attrs="{'invisible': [('attendance_state', '=', False)]}">
+                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_green" attrs="{'invisible': [('attendance_state', '=', 'checked_out')]}"/>
+                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_red" attrs="{'invisible': [('attendance_state', '=', 'checked_in')]}"/>
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Attendance</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//group[@name='active_group']" position="after">
+                <group string='Attendance' groups="hr_attendance.group_hr_attendance_user">
+                    <field name="barcode"/>
+                    <field name="pin" groups="hr_attendance.group_hr_attendance_use_pin"/>
+                    <field name="manual_attendance" attrs="{'invisible': [('user_id', '=', False)]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+
+
+
     <record id="hr_timesheet_action_from_department"
             model="ir.actions.act_window">
         <field name="name">Timesheets to Approve</field>
