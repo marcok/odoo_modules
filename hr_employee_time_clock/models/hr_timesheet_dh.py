@@ -22,6 +22,7 @@
 
 import datetime as dtime
 
+import pytz
 from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
@@ -352,10 +353,20 @@ class HrTimesheetDh(models.Model):
 
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
+                    local_tz = pytz.timezone(self.env.user.tz or 'UTC')
                     worked_hours = 0.0
-                    for att in sheet.period_ids:
-                        if att.name == date_line.strftime('%Y-%m-%d'):
-                            worked_hours = att.total_attendance
+                    for att in sheet.attendances_ids:
+                        att_name = fields.Datetime.from_string(att.name).replace(
+                            tzinfo=pytz.utc).astimezone(local_tz)
+                        name = att_name.replace(tzinfo=None)
+                        if name.strftime('%Y-%m-%d') == \
+                                date_line.strftime('%Y-%m-%d'):
+                            worked_hours += att.worked_hours
+                            if not att.check_out:
+                                tz = pytz.timezone('UTC')
+                                t = datetime.now(tz=tz)
+                                d = t - att_name
+                                worked_hours += (d.total_seconds() / 3600)
 
                     diff = worked_hours - dh
                     current_month_diff += diff

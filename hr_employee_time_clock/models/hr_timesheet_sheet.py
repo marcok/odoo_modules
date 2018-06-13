@@ -89,9 +89,12 @@ class HrTimesheetSheet(models.Model):
         if res:
             for sheet in self:
                 if sheet.id == res[0].get('id'):
-                    sheet.total_attendance = res[0].get('total_attendance')
-                    sheet.total_timesheet = res[0].get('total_timesheet')
-                    sheet.total_difference = res[0].get('total_difference')
+                    sheet.total_attendance = self.attendance_analysis()[
+                        'total'].get('worked_hours')
+                    sheet.total_timesheet = res[0].get(
+                        'total_timesheet')
+                    sheet.total_difference = res[0].get(
+                        'total_difference')
 
     @api.depends('attendances_ids')
     def _compute_attendances(self):
