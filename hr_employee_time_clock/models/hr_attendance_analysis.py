@@ -81,8 +81,6 @@ class HrAttendance(models.Model):
     @api.multi
     def _get_current_sheet(self, employee_id, date=False):
         sheet_obj = self.env['hr_timesheet_sheet.sheet']
-        _logger.info(date)
-        _logger.info(dir(date))
         if not date:
             date = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
