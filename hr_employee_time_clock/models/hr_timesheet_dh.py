@@ -397,6 +397,8 @@ class HrTimesheetDh(models.Model):
                     total['work_current_month_diff'] = work_current_month_diff
 
                     res['total'] = total
+
+
                 return res
 
     @api.multi
