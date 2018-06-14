@@ -175,6 +175,8 @@ class HrAttendance(models.Model):
 
     @api.multi
     def write(self, values):
+        if values.get('check_in'):
+            values['name'] = values.get('check_in')
         if self.sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
