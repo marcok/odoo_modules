@@ -177,6 +177,12 @@ class HrAttendance(models.Model):
     def write(self, values):
         if values.get('check_in'):
             values['name'] = values.get('check_in')
+            times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
+            if datetime.now() < times:
+                raise ValidationError(
+                    _('You can not set time of Sing In (resp. Sing Out) which '
+                      'is later than a current time'))
+
         if self.sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
