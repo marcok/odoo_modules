@@ -324,7 +324,6 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
-        print('self.env.context >>>>>', self.env.context)
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
         if not self.env.context.get('online_analysis') \
@@ -359,11 +358,13 @@ class HrTimesheetDh(models.Model):
 
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
-                    local_tz = pytz.timezone(self.env.user.tz or 'UTC')
                     worked_hours = 0.0
                     for att in sheet.attendances_ids:
-                        att_name = fields.Datetime.from_string(att.name).replace(
-                            tzinfo=pytz.utc).astimezone(local_tz)
+                        user_tz = pytz.timezone(
+                            att.employee_id.user_id.tz or 'UTC')
+                        att_name = fields.Datetime.from_string(
+                            att.name).replace(
+                            tzinfo=pytz.utc).astimezone(user_tz)
                         name = att_name.replace(tzinfo=None)
                         if name.strftime('%Y-%m-%d') == \
                                 date_line.strftime('%Y-%m-%d'):
