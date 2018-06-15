@@ -356,6 +356,8 @@ class HrTimesheetDh(models.Model):
                              current_month_diff, 'work_current_month_diff': ''}
                 last_date = dates[-1]
                 today_worked_hours = 0.0
+                today_diff = 0
+                today_current_month_diff = 0
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
@@ -376,15 +378,23 @@ class HrTimesheetDh(models.Model):
                                 t = datetime.now(tz=tz)
                                 d = t - att_name
                                 worked_hours += (d.total_seconds() / 3600)
-
-                        if date_line.date() == date.today():
-                            today_worked_hours = worked_hours
-                    if date_line == last_date:
-                        if not self.env.context.get('online_analysis'):
-                            worked_hours = today_worked_hours
                     diff = worked_hours - dh
                     current_month_diff += diff
                     work_current_month_diff += diff
+                    if date_line.date() == date.today():
+                        today_worked_hours = worked_hours
+                        today_diff = diff
+                        today_current_month_diff =current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = work_current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = today_current_month_diff
                     if function_call:
                         res['hours'].append({
                             _('Date'): date_line.strftime(date_format),
