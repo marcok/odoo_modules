@@ -154,8 +154,10 @@ class HrTimesheetDh(models.Model):
     def _get_analysis(self):
         for sheet in self:
             function_call = True
-            data = self.attendance_analysis(timesheet_id=sheet.id,
-                                            function_call=function_call)
+            ctx = self.env.context.copy()
+            ctx['online_analysis'] = True
+            data = self.with_context(ctx).attendance_analysis(
+                timesheet_id=sheet.id, function_call=function_call)
             values = []
             output = [
                 '<style>.attendanceTable td,.attendanceTable th '
@@ -322,8 +324,12 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
+        print('self.env.context >>>>>', self.env.context)
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
+        if not self.env.context.get('online_analysis') \
+                and date_format != '%m/%d/%Y':
+            date_format = '%m/%d/%Y'
         for sheet in self.sudo():
             if not timesheet_id:
                 timesheet_id = self[-1].id
