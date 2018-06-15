@@ -355,11 +355,12 @@ class HrTimesheetDh(models.Model):
                          'diff':
                              current_month_diff, 'work_current_month_diff': ''}
                 last_date = dates[-1]
+                today_worked_hours = 0.0
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
                     worked_hours = 0.0
-                    today_worked_hours = 0.0
+
                     for att in sheet.attendances_ids:
                         user_tz = pytz.timezone(
                             att.employee_id.user_id.tz or 'UTC')
