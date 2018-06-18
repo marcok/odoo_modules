@@ -23,7 +23,7 @@
 import datetime as dtime
 
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
 from odoo.tools.translate import _
@@ -354,11 +354,15 @@ class HrTimesheetDh(models.Model):
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff':
                              current_month_diff, 'work_current_month_diff': ''}
+                last_date = dates[-1]
+                today_worked_hours = 0.0
+                today_diff = 0
+                today_current_month_diff = 0
                 for date_line in dates:
-
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
                     worked_hours = 0.0
+
                     for att in sheet.attendances_ids:
                         user_tz = pytz.timezone(
                             att.employee_id.user_id.tz or 'UTC')
@@ -374,10 +378,23 @@ class HrTimesheetDh(models.Model):
                                 t = datetime.now(tz=tz)
                                 d = t - att_name
                                 worked_hours += (d.total_seconds() / 3600)
-
                     diff = worked_hours - dh
                     current_month_diff += diff
                     work_current_month_diff += diff
+                    if date_line.date() == date.today():
+                        today_worked_hours = worked_hours
+                        today_diff = diff
+                        today_current_month_diff =current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = work_current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = today_current_month_diff
                     if function_call:
                         res['hours'].append({
                             _('Date'): date_line.strftime(date_format),
