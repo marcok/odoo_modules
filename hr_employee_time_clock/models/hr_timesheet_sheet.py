@@ -87,9 +87,12 @@ class HrTimesheetSheet(models.Model):
 
         res = self.env.cr.dictfetchall()
         if res:
+            ctx = self.env.context.copy()
+            ctx['online_analysis'] = True
             for sheet in self:
                 if sheet.id == res[0].get('id'):
-                    sheet.total_attendance = self.attendance_analysis()[
+                    sheet.total_attendance = \
+                        self.with_context(ctx).attendance_analysis()[
                         'total'].get('worked_hours')
                     sheet.total_timesheet = res[0].get(
                         'total_timesheet')
