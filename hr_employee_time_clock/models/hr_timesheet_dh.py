@@ -225,13 +225,13 @@ class HrTimesheetDh(models.Model):
     total_diff_hours = fields.Float(string='Total Diff Hours',
                                     readonly=True,
                                     default=0.0)
-    calculate_diff_hours = fields.Char(compute='_overtime_diff',
+    calculate_diff_hours = fields.Float(compute='_overtime_diff',
                                        string="Diff (worked-duty)",
                                        multi="_diff")
-    prev_timesheet_diff = fields.Char(compute='_overtime_diff',
-                                      method=True,
-                                      string="Diff from old",
-                                      multi="_diff")
+    prev_timesheet_diff = fields.Float(compute='_overtime_diff',
+                                       method=True,
+                                       string="Diff from old",
+                                       multi="_diff")
     analysis = fields.Text(compute='_get_analysis',
                            type="text",
                            string="Attendance Analysis")
