@@ -69,7 +69,8 @@ class ResourceCalendar(models.Model):
 
         working_intervals = []
         for calendar_working_day in self.get_attendances_for_weekdays(
-                ids, [start_dt.weekday()]):
+                ids, [start_dt.weekday()], start_dt,
+                end_dt):
 
             str_time_from_dict = str(calendar_working_day.hour_from).split('.')
             hour_from = int(str_time_from_dict[0])
@@ -149,12 +150,23 @@ class ResourceCalendar(models.Model):
         return seconds(res) / 3600.0
 
     @api.multi
-    def get_attendances_for_weekdays(self, ids, weekdays):
+    def get_attendances_for_weekdays(self, ids, weekdays, start_dt, end_dt):
         """ Given a list of weekdays, return matching
         resource.calendar.attendance"""
         calendar = self.browse(ids)
-        return [att for att in calendar.attendance_ids
-                if int(att.dayofweek) in weekdays]
+
+        res = []
+        for att in calendar.attendance_ids:
+            if int(att.dayofweek) in weekdays:
+                if not att.date_from or not att.date_to:
+                    res = [att]
+                else:
+                    date_from = datetime.strptime(att.date_from, '%Y-%m-%d')
+                    date_to = datetime.strptime(att.date_to, '%Y-%m-%d')
+
+                    if date_from <= start_dt <= date_to:
+                        res = [att]
+        return res
 
 
 def seconds(td):
