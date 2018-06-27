@@ -150,6 +150,46 @@ class HrTimesheetDh(models.Model):
                     prev_timesheet_diff)
             sheet['prev_timesheet_diff'] = prev_timesheet_diff
 
+    def get_date_format(self, values):
+        splitter = '.'
+        for symbol in ['-', '/']:
+            find_splitter = values[0][0].find(symbol)
+            if find_splitter != -1:
+                splitter = symbol
+                break
+        year = str(datetime.today().year)
+        year_index_find = values[0][0].find(year)
+        if year_index_find == 6:
+            year_index = 2
+            find_month_index = [0, 1]
+        else:
+            year_index = 0
+            find_month_index = [1, 2]
+        month_index = 0
+        for i in range(len(values) - 1):
+            value_lst_1 = values[i][0].split(splitter)
+            value_lst_2 = values[i + 1][0].split(splitter)
+            print('value_lst_1, value_lst_2', value_lst_1, value_lst_2)
+            if value_lst_1[find_month_index[0]] == value_lst_2[
+                                                        find_month_index[0]]:
+                month_index = find_month_index[0]
+                break
+            if value_lst_1[find_month_index[1]] == value_lst_2[
+                                                        find_month_index[1]]:
+                month_index = find_month_index[1]
+                break
+
+        indexes = [0, 1, 2]
+        for number in [month_index, year_index]:
+            indexes.remove(number)
+        day_index = indexes[0]
+        format_unsorted = {day_index: 'd', month_index: 'm', year_index: 'Y'}
+        date_format = '%' + format_unsorted.get(0) + splitter + '%'\
+                      + format_unsorted.get(1) + splitter + '%' \
+                      + format_unsorted.get(2)
+
+        return date_format
+
     @api.multi
     def _get_analysis(self):
         for sheet in self:
@@ -190,8 +230,13 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
                     for res in v:
                         values.append([res.get(key) for key in keys])
+                    date_format = self.get_date_format(values)
                     for tr in values:
-                        output.append('<tr>')
+                        sheet_day = datetime.strptime(tr[0], date_format).date()
+                        if datetime.today().date() == sheet_day:
+                            output.append('<tr style="background-color:#bdde9f96;">')
+                        else:
+                            output.append('<tr>')
                         for td in tr:
                             if not td:
                                 td = '-'
