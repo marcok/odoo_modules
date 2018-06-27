@@ -165,7 +165,7 @@ class ResourceCalendar(models.Model):
                     date_to = datetime.strptime(att.date_to, '%Y-%m-%d')
 
                     if date_from <= start_dt <= date_to:
-                        res = [att]
+                        res.append(att)
         return res
 
 
