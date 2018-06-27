@@ -152,7 +152,7 @@ class HrTimesheetDh(models.Model):
 
     def get_date_format(self, values):
         splitter = '.'
-        for symbol in ['-', '/']:
+        for symbol in ['-', '/', '.']:
             find_splitter = values[0][0].find(symbol)
             if find_splitter != -1:
                 splitter = symbol
