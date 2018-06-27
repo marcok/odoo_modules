@@ -159,7 +159,7 @@ class ResourceCalendar(models.Model):
         for att in calendar.attendance_ids:
             if int(att.dayofweek) in weekdays:
                 if not att.date_from or not att.date_to:
-                    res = [att]
+                    res.append(att)
                 else:
                     date_from = datetime.strptime(att.date_from, '%Y-%m-%d')
                     date_to = datetime.strptime(att.date_to, '%Y-%m-%d')
