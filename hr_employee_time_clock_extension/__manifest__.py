@@ -28,7 +28,6 @@
     'category': 'Human Resources',
     'version': '11.0.0.0.2',
     'depends': ['hr_employee_time_clock', ],
-    'installable': True,
     'data': [
         'views/hr_employee_views.xml',
         'views/res_users_views.xml',

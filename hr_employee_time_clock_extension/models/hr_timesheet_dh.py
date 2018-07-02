@@ -199,6 +199,10 @@ class HrTimesheetDh(models.Model):
                     output.append('<th>' + total_ts + ' </th>')
                     for td in ('duty_hours', 'worked_hours', 'bonus_hours',
                                'work_current_month_diff', 'diff'):
+                        # START CRUTCH
+                        if not v.get(td):
+                            v.update({td: 0.0})
+                        # END CRUTCH
                         t = '{0:02.0f}:{1:02.0f}'.format(
                             *divmod(float(round(v.get(td), 4)) * 60, 60))
                         if float(v.get(td)) < 0.0:
@@ -210,31 +214,3 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
-
-    @api.one
-    def _total(self):
-        """ Compute the attendances, analytic lines timesheets
-        and differences between them
-            for all the days of a timesheet and the current day
-        """
-        ids = [i.id for i in self]
-
-        self.env.cr.execute("""
-                SELECT sheet_id as id,
-                       sum(total_timesheet) as total_timesheet,
-                       sum(total_difference) as  total_difference
-                FROM hr_timesheet_sheet_sheet_day
-                WHERE sheet_id IN %s
-                GROUP BY sheet_id
-            """, (tuple(ids),))
-
-        res = self.env.cr.dictfetchall()
-        if res:
-            for sheet in self:
-                if sheet.id == res[0].get('id'):
-                    sheet.total_attendance = self.attendance_analysis()[
-                        'total'].get('worked_hours')
-                    sheet.total_timesheet = res[0].get(
-                        'total_timesheet')
-                    sheet.total_difference = res[0].get(
-                        'total_difference')
