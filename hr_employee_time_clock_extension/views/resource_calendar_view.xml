@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="resource_calendar_form" model="ir.ui.view">
+        <field name="name">resource.calendar.form</field>
+        <field name="model">resource.calendar</field>
+        <field name="inherit_id" ref="resource.resource_calendar_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]" position="after">
+                <group>
+                <field name="use_overtime"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook//page[1]" position="after">
+                <page string="Overtime settings" attrs="{'invisible':[('use_overtime','!=',True)]}">
+                    <group>
+                        <group>
+                            <field name="count"/>
+                             <field name="uom"/>
+                        </group>
+                        <group>
+                            <field name="min_overtime_count"/>
+                        </group>
+                    </group>
+                    <field name="overtime_attendance_ids"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_resource_calendar_attendance_overtime_tree" model="ir.ui.view">
+        <field name="name">resource.calendar.attendance.overtime.tree</field>
+        <field name="model">resource.calendar.attendance.overtime</field>
+        <field name="arch" type="xml">
+            <tree string="Overtime" editable="top">
+                <field name="name"/>
+                <field name="dayofweek"/>
+                <field name="hour_from" widget="float_time"/>
+                <field name="hour_to" widget="float_time"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="hr_attendance_view_form" model="ir.ui.view">
+        <field name="name">hr.attendance.form</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]" position="inside">
+                <field name="have_overtime" invisible="True"/>
+                <field name="overtime_change" invisible="True"/>
+                <field name="bonus_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}" widget="float_time"/>
+                <field name="worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
