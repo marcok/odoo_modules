@@ -3,7 +3,7 @@
 ##############################################################################
 #
 #    Clear Groups for Odoo
-#    Copyright (C) 2016 Bytebrand GmbH (<http://www.bytebrand.net>).
+#    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as
