@@ -199,10 +199,6 @@ class HrTimesheetDh(models.Model):
                     output.append('<th>' + total_ts + ' </th>')
                     for td in ('duty_hours', 'worked_hours', 'bonus_hours',
                                'work_current_month_diff', 'diff'):
-                        # START CRUTCH
-                        if not v.get(td):
-                            v.update({td: 0.0})
-                        # END CRUTCH
                         t = '{0:02.0f}:{1:02.0f}'.format(
                             *divmod(float(round(v.get(td), 4)) * 60, 60))
                         if float(v.get(td)) < 0.0:
