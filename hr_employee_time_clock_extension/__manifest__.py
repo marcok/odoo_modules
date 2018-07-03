@@ -21,7 +21,7 @@
 ##############################################################################
 
 {
-    'name': "Employee time clock extension",
+    'name': "Employee Time Clock Extension",
     'author': "Bytebrand Outsourcing AG",
     'summary': 'Overtime configurations',
     'website': "http://www.bytebrand.net",
