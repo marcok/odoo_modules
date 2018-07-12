@@ -81,6 +81,8 @@ class HrAttendance(models.Model):
     @api.multi
     def _get_current_sheet(self, employee_id, date=False):
         sheet_obj = self.env['hr_timesheet_sheet.sheet']
+        logging.getLogger(employee_id)
+        logging.getLogger(date)
         if not date:
             date = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
@@ -122,6 +124,7 @@ class HrAttendance(models.Model):
     def _sheet(self):
         res = {}.fromkeys(self, False)
         for attendance in self:
+            logging.getLogger(attendance.name)
             sheet = self._get_current_sheet(
                 attendance.employee_id.id, attendance.check_in)
             if sheet:
@@ -151,6 +154,7 @@ class HrAttendance(models.Model):
     @api.model
     def create(self, values):
         check_in = fields.Datetime.from_string(values.get('check_in'))
+        # check_in = check_in.replace(tzinfo=None)
         sheet_id = self.env['hr_timesheet_sheet.sheet'].search([
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
