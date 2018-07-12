@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    Clear Groups for Odoo
-#    Copyright (C) 2016 Bytebrand GmbH (<http://www.bytebrand.net>).
+#    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as
@@ -19,20 +20,25 @@
 #
 ##############################################################################
 
-from . import hr_attendance_analysis
-# from . import time_clock_resource_calendar
-from . import resource_calendar
-from . import hr_holidays
+{
+    'name': "Employee Time Clock Extension",
+    'author': "Bytebrand Outsourcing AG",
+    'summary': 'Overtime configurations',
+    'website': "http://www.bytebrand.net",
+    'category': 'Human Resources',
+    'version': '11.0.0.0.2',
+    'depends': ['hr_employee_time_clock', ],
+    'data': [
+        'views/hr_employee_views.xml',
+        'views/res_users_views.xml',
+        'views/resource_calendar_view.xml',
+    ],
 
-from . import account_analytic_line
-from . import hr_department
-from . import hr_employee
-from . import hr_timesheet_sheet
-from . import hr_timesheet_dh
-from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
-from . import res_company
+    'images': ['static/description/icon.png'],
+    'installable': True,
+    'auto_install': False,
+    'application': False,
 
-from . import res_config_settings
-
-
+    'js': [],
+    'qweb': [],
+}

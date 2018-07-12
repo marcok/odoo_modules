@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    Clear Groups for Odoo
@@ -19,20 +20,19 @@
 #
 ##############################################################################
 
-from . import hr_attendance_analysis
-# from . import time_clock_resource_calendar
-from . import resource_calendar
-from . import hr_holidays
+from odoo import api, models, fields, _
+from odoo.exceptions import AccessError
+import logging
+import calendar
+from datetime import date, datetime
 
-from . import account_analytic_line
-from . import hr_department
-from . import hr_employee
-from . import hr_timesheet_sheet
-from . import hr_timesheet_dh
-from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
-from . import res_company
+from dateutil import rrule, parser
 
-from . import res_config_settings
+_logger = logging.getLogger(__name__)
 
 
+class HrEmployee(models.Model):
+    _inherit = "hr.employee"
+
+    start_overtime_different = fields.Integer(string='Start Overtime Count',
+                                              default=0.00)

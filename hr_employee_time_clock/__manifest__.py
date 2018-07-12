@@ -57,6 +57,9 @@
         # View file for the wizard
         'wizard/create_timesheet_with_tag_view.xml',
         'wizard/import_leave_requests_view.xml',
+
+        # Extension
+        'views/res_config_settings_views.xml',
     ],
     'qweb': ['static/src/xml/timesheet.xml', ],
 }

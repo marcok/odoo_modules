@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-_search_show_leaves
+
 ##############################################################################
 #
 #    Clear Groups for Odoo
@@ -19,20 +20,8 @@
 #
 ##############################################################################
 
-from . import hr_attendance_analysis
-# from . import time_clock_resource_calendar
-from . import resource_calendar
-from . import hr_holidays
-
-from . import account_analytic_line
-from . import hr_department
-from . import hr_employee
-from . import hr_timesheet_sheet
+from . import resource
 from . import hr_timesheet_dh
-from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
-from . import res_company
-
-from . import res_config_settings
-
-
+from . import hr_employee
+from . import hr_attendance
+from . import res_users
