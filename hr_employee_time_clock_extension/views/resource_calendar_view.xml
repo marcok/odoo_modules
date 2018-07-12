@@ -15,7 +15,7 @@
                     <group>
                         <group>
                             <field name="count"/>
-                             <field name="uom"/>
+                             <!--<field name="uom"/>-->
                         </group>
                         <group>
                             <field name="min_overtime_count"/>

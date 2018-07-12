@@ -366,15 +366,9 @@ class HrAttendance(models.Model):
                                  start_overtime).total_seconds() / 60
                 i += 1
 
-                if resource_calendar_id.uom == 'percent':
-                    delta_minutes = \
-                        (overtime_minutes *
-                         resource_calendar_id.count / 100)
-                elif resource_calendar_id.uom == 'minute':
-                    delta_minutes = resource_calendar_id.count
-                else:
-                    delta_minutes = \
-                        resource_calendar_id.count * 60
+                delta_minutes = \
+                    (overtime_minutes *
+                     resource_calendar_id.count / 100)
             if need_overtime:
                 this_year_sheets = self.get_employee_sheets(
                     self.employee_id, check_in)
@@ -382,7 +376,6 @@ class HrAttendance(models.Model):
                               bonus_worked_hours=delta_minutes / 60,
                               calculate_overtime=self._calculate_overtime(
                                   check_in, check_out, this_year_sheets))
-                              # night_shift_worked_hours=overtime_minutes)
 
                 res = super(HrAttendance, self).write(values)
 
@@ -426,13 +419,11 @@ class HrAttendance(models.Model):
                 values.update(have_overtime=False,
                               bonus_worked_hours=0.0,
                               calculate_overtime=False)
-                              # night_shift_worked_hours=0.0)
                 res = super(HrAttendance, self).write(values)
         elif not self.env.context.get('bonus_time'):
             values.update(have_overtime=False,
                           bonus_worked_hours=0.0,
                           calculate_overtime=False)
-                          # night_shift_worked_hours=0.0)
             res = super(HrAttendance, self).write(values)
         # return res
 

@@ -25,15 +25,15 @@ class ResourceCalendar(models.Model):
     min_overtime_count = fields.Integer(string="Minimum overtime days",
                                         default=0,
                                         required=True)
-    count = fields.Integer(string="Count",
+    count = fields.Integer(string="Percent Count",
                            default=0,
                            required=True)
-    uom = fields.Selection([('percent', '%'),
-                            ('minute', 'Minutes'),
-                            ('hour', 'Hours'), ],
-                           string='UoM',
-                           required=True,
-                           default='percent')
+    # uom = fields.Selection([('percent', '%'),
+    #                         ('minute', 'Minutes'),
+    #                         ('hour', 'Hours'), ],
+    #                        string='UoM',
+    #                        required=True,
+    #                        default='percent')
     overtime_attendance_ids = fields.One2many(
         'resource.calendar.attendance.overtime',
         'overtime_calendar_id',

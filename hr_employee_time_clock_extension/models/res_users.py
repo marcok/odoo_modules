@@ -22,10 +22,6 @@
 
 from odoo import api, models, fields
 import logging
-import calendar
-from datetime import datetime
-
-from dateutil import rrule, parser
 
 _logger = logging.getLogger(__name__)
 
@@ -37,8 +33,10 @@ class ResUsers(models.Model):
     def initial_overtime(self):
         users = self.env['res.users'].search([])
         for user in users:
-            user.tz = 'Europe/Zurich'
-        values= {}
+            if not user.tz:
+                raise ValueError("Timezone for {user} is not set.".format(
+                    user=user.name))
+        values = {}
         attendances = self.env['hr.attendance'].search([])
         values.update(have_overtime=False,
                       bonus_worked_hours=0.0,

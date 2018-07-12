@@ -23,7 +23,7 @@
 {
     'name': "Employee Time Clock Extension",
     'author': "Bytebrand Outsourcing AG",
-    'summary': 'Overtime configurations',
+    'summary': 'Night shift configurations',
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '11.0.0.0.2',

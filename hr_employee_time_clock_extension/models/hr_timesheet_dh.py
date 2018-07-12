@@ -86,8 +86,6 @@ class HrTimesheetDh(models.Model):
             leave_descr = descr[0].name
         return leave_descr
 
-
-
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
