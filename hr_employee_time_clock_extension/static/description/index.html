@@ -1,0 +1,82 @@
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan">Employee Time Clock Extension</h2>
+        <h3 class="oe_slogan">Extension for "Employee Time Clock" module</h3>
+        <h4 class="oe_slogan" style="margin-bottom: 16px; margin-top: 16px;">by Bytebrand Outsourcing AG</h4>
+        <div class="oe_row oe_centeralign">
+            <a href="mailto:odoo@bytebrand.net" class="btn btn-primary btn-lg mt8" style="color: white;"><span class="fa fa-envelope fa-1x"></span>&nbsp;Help Mail&nbsp; </a>
+            <a href="https://github.com/marcok/odoo_modules/issues" class="btn btn-primary btn-lg mt8" style="color: white;"><span class="fa fa-bug fa-1x"></span>&nbsp;Bugs&nbsp; </a>
+            <a href="https://github.com/marcok/odoo_modules/issues" class="btn btn-primary btn-lg mt8" style="color: white;"><span class="fa fa-wrench fa-1x"></span>&nbsp;Request new Features </a>
+        </div>
+        <div class="oe_mt32">
+            Employee Time Clock Extension provides opportunity to use overtime settings for each employee and allows to configure overtime settings.
+        </div>
+        <p>
+            Once you install the module, you'll see additional checkbox on the employee contract working schedule page called <i>Use Overtime Setting</i>. On checking this button you can observe additional tab called <i>Overtime settings</i> which allows you to set up:
+            <ul>
+                <li><i>"Count"</i> which represent salary increment;</li>
+                <li><i>"UoM"</i> - unit of measurement;</li>
+                <li><i>"Minimum overtime days"</i> which allows to set up how many days employee should work to have an increased salary;</li>
+                <li>Days of week and overtime working hours, start/end date for each weekday;</li>
+            </ul>
+            <img class="oe_picture oe_screenshot" src="Screenshot-1.png" alt="">
+        </p>
+    </div>
+</section>
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h4 class="oe_slogan">Features</h4>
+        <ul class="list-unstyled">
+            <li><i class="fa fa-check-square-o text-primary"></i> Calculates "bonus hours" based on individual employee contracts</li>
+        </ul>
+    </div>
+</section>
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3>How it works</h3>
+        <p>The module adds a new data type called <i>bonus hours</i>, which is the baseline for all calcualtions. Bonus hours are calculated based on the overtime schedule assigned to an employee/contract. Whenever an employee works on overtime hours, bonus hours for those days are set to configured count.</p>
+        <p>Once you have a overtime schedule set up for an employee, his bonus hours are tracked using sign in/out timestamps. Each employee can use one of these methods to sign in/out:
+            <ul>
+                <li>Sign in/out to your Odoo instance</li>
+                <li>Sign in/out from our iPhone app</li>
+                <li>Sign in/out at the company's entrance using our QR code scanning iPhone/iPad app</li>
+            </ul>
+        </p>
+    </div>
+</section>
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2>How to configure overtime settings</h2>
+        <p>To allow employees use overtime settings in system you'd need to:
+            <ul>
+                <li>create contract for employees;</li>
+                <li>set up contract working schedule.</li>
+            </ul>
+        </p>
+        <h5>Set up contract working schedule</h5>
+        <p>Follow below steps to set up contract working schedule.
+            <ul>
+                <li>Open Odoo's Employees page and switch to the Contracts tab.
+                    <img class="oe_picture oe_screenshot" src="Screenshot-2.png" alt="">
+                </li>
+                <li>Select contract and go to <i>Other information</i> tab -> press on <i>Working Schedule</i> value.
+                    <img class="oe_picture oe_screenshot" src="Screenshot-3.png" alt="">
+                </li>
+                <li>Check <i>Use Overtime Setting</i> button.
+                    <img class="oe_picture oe_screenshot" src="Screenshot-4.png" alt="">
+                </li>
+                <li>Go to <i>Overtime settings</i> tab and set up overtime configurations.
+                    <img class="oe_picture oe_screenshot" src="Screenshot-5.png" alt="">
+                </li>
+            </ul>
+        </p>
+    </div>
+</section>
+<section class="oe_container">
+    <div class="oe_row oe_spaced oe_centeralign">
+        <h3>Bytebrand Outsourcing AG</h3>
+        <a class="btn" href="https://bytebrand.net" style="color:#31AD56;" target="_blank" ><span class="fa fa-internet-explorer fa-1x"></span> Bytebrand.net</a>
+        <a class="btn" href="https://www.facebook.com/bytebrand/" style="color:#31AD56;" target="_blank"><span class="fa fa-facebook fa-1x"></span> Facebook</a>
+        <a class="btn" href="https://www.linkedin.com/company/10154565/" style="color:#31AD56;" target="_blank"><span class="fa fa-linkedin fa-1x"></span> LinkedIn</a>
+    </div>
+</section>
