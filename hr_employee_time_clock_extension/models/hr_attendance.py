@@ -370,7 +370,7 @@ class HrAttendance(models.Model):
                     delta_minutes = \
                         (overtime_minutes *
                          resource_calendar_id.count / 100)
-                elif resource_calendar_id.uom == 'minutes':
+                elif resource_calendar_id.uom == 'minute':
                     delta_minutes = resource_calendar_id.count
                 else:
                     delta_minutes = \
