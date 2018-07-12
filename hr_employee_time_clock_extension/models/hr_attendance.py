@@ -371,10 +371,10 @@ class HrAttendance(models.Model):
                         (overtime_minutes *
                          resource_calendar_id.count / 100)
                 elif resource_calendar_id.uom == 'minutes':
-                    delta_minutes = resource_calendar_id.count
+                    delta_minutes = resource_calendar_id.count / 60
                 else:
                     delta_minutes = \
-                        resource_calendar_id.count * 60
+                        resource_calendar_id.count
             if need_overtime:
                 this_year_sheets = self.get_employee_sheets(
                     self.employee_id, check_in)
