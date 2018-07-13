@@ -20,7 +20,8 @@
 #
 ##############################################################################
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -34,13 +35,14 @@ class ResUsers(models.Model):
         users = self.env['res.users'].search([])
         for user in users:
             if not user.tz:
-                raise ValueError("Timezone for {user} is not set.".format(
-                    user=user.name))
+                raise ValidationError(_("Timezone for {user} "
+                                        "is not set.".format(user=user.name)))
         values = {}
         attendances = self.env['hr.attendance'].search([])
         values.update(have_overtime=False,
                       bonus_worked_hours=0.0,
-                      calculate_overtime=False)
+                      calculate_overtime=False,
+                      night_shift_worked_hours=0.0)
         for attendance in attendances:
             attendance.write(values)
         for attendance in attendances:

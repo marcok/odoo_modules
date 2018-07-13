@@ -22,6 +22,7 @@
 
 from . import resource
 from . import hr_timesheet_dh
+from . import hr_timesheet_sheet
 from . import hr_employee
 from . import hr_attendance
 from . import res_users

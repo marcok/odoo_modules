@@ -78,8 +78,7 @@ class HrAttendance(models.Model):
                                      default=False)
     bonus_worked_hours = fields.Float(string='Bonus Worked Hours',
                                       readonly=True)
-    night_shift_worked_hours = fields.Float(string='Night Shift', readonly=True,
-                                            compute='get_night_shift_worked_hours')
+    night_shift_worked_hours = fields.Float(string='Night Shift', readonly=True)
 
     @api.multi
     def get_employee_sheets(self, employee, check_in):
@@ -163,105 +162,6 @@ class HrAttendance(models.Model):
             contract = contract[-1]
 
         return contract
-
-    def get_night_shift_worked_hours(self):
-        for record in self:
-            overtime_context = self.env.context.copy()
-            overtime_context['check_overtime'] = True
-            check_out = record.check_out
-
-            if not check_out:
-                check_out = record.check_out
-            contract = record.get_contract(check_out)
-            if contract:
-                resource_calendar_id = contract.resource_calendar_id
-            else:
-                resource_calendar_id = record.employee_id.resource_calendar_id
-
-            if check_out and resource_calendar_id \
-                    and resource_calendar_id.use_overtime \
-                    and not record.env.context.get('bonus_time'):
-
-                user_tz = pytz.timezone(
-                    record.employee_id.user_id.tz or 'UTC')
-                check_out_local_date = fields.Datetime.from_string(
-                    check_out).replace(tzinfo=pytz.utc).astimezone(user_tz)
-                check_out_local_date = check_out_local_date.replace(tzinfo=None)
-                check_in = record.check_in
-                check_in_local_date = fields.Datetime.from_string(
-                    check_in).replace(tzinfo=pytz.utc).astimezone(user_tz)
-                check_in_local_date = check_in_local_date.replace(tzinfo=None)
-
-                str_check_in_local_date = (
-                        check_in_local_date -
-                        timedelta(days=1)).strftime('%Y-%m-%d')
-
-                str_check_out_local_date = (
-                        check_out_local_date +
-                        timedelta(days=1)).strftime('%Y-%m-%d')
-
-                dates = list(rrule.rrule(
-                    rrule.DAILY,
-                    dtstart=parser.parse(str_check_in_local_date),
-                    until=parser.parse(str_check_out_local_date)))
-                date_len = len(dates)
-                i = 0
-                overtime_minutes = 0.0
-                while i < date_len - 1:
-                    day_of_week = calendar.weekday(dates[i].year,
-                                                   dates[i].month,
-                                                   dates[i].day)
-
-                    overtime_calendar_attendances = \
-                        self.env[
-                            'resource.calendar.attendance.overtime'].search(
-                            [('overtime_calendar_id', '=',
-                              resource_calendar_id.id),
-                             ('dayofweek', '=', day_of_week)])
-                    start_overtime = datetime.combine(
-                        date(dates[i].year,
-                             dates[i].month,
-                             dates[i].day),
-                        float_to_time(overtime_calendar_attendances.hour_from))
-
-                    finish_overtime = datetime.combine(
-                        date(dates[i + 1].year,
-                             dates[i + 1].month,
-                             dates[i + 1].day),
-                        float_to_time(overtime_calendar_attendances.hour_to))
-                    if finish_overtime.hour == 23 \
-                            and finish_overtime.minute >= 55:
-                        finish_overtime = finish_overtime.replace(
-                            minute=59, second=59, microsecond=9999)
-                    if (check_in_local_date < start_overtime
-                        and (start_overtime < check_out_local_date < finish_overtime
-                             or check_out_local_date > finish_overtime)) \
-                            or (finish_overtime > check_in_local_date
-                                > start_overtime
-                                and (start_overtime < check_out_local_date
-                                     < finish_overtime
-                                     or check_out_local_date > finish_overtime)):
-                        if check_in_local_date > start_overtime:
-                            if finish_overtime > check_out_local_date:
-                                overtime_minutes += \
-                                    (check_out_local_date -
-                                     check_in_local_date).total_seconds() / 60
-                            else:
-                                overtime_minutes += \
-                                    (finish_overtime -
-                                     check_in_local_date).total_seconds() / 60
-                        elif start_overtime > check_in_local_date:
-                            if finish_overtime > check_out_local_date:
-                                overtime_minutes += \
-                                    (check_out_local_date -
-                                     start_overtime).total_seconds() / 60
-                            else:
-                                overtime_minutes += \
-                                    (finish_overtime -
-                                     start_overtime).total_seconds() / 60
-                    record.night_shift_worked_hours = overtime_minutes / 60
-                    i += 1
-
 
     @api.multi
     def check_overtime(self, values):
@@ -375,7 +275,8 @@ class HrAttendance(models.Model):
                 values.update(have_overtime=True,
                               bonus_worked_hours=delta_minutes / 60,
                               calculate_overtime=self._calculate_overtime(
-                                  check_in, check_out, this_year_sheets))
+                                  check_in, check_out, this_year_sheets),
+                              night_shift_worked_hours=overtime_minutes / 60)
 
                 res = super(HrAttendance, self).write(values)
 
@@ -413,17 +314,19 @@ class HrAttendance(models.Model):
                     for over in overtime_attendance:
                         # super(HrAttendance, over).write({'overtime_change':False})
                         over.with_context(overtime_context).write(
-                            {'overtime_change':False})
+                            {'overtime_change': False})
                 # return res
             else:
                 values.update(have_overtime=False,
                               bonus_worked_hours=0.0,
-                              calculate_overtime=False)
+                              calculate_overtime=False,
+                              night_shift_worked_hours=0.0)
                 res = super(HrAttendance, self).write(values)
         elif not self.env.context.get('bonus_time'):
             values.update(have_overtime=False,
                           bonus_worked_hours=0.0,
-                          calculate_overtime=False)
+                          calculate_overtime=False,
+                          night_shift_worked_hours=0.0)
             res = super(HrAttendance, self).write(values)
         # return res
 

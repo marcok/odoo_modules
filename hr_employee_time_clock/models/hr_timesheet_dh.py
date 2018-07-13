@@ -169,7 +169,6 @@ class HrTimesheetDh(models.Model):
         for i in range(len(values) - 1):
             value_lst_1 = values[i][0].split(splitter)
             value_lst_2 = values[i + 1][0].split(splitter)
-            print('value_lst_1, value_lst_2', value_lst_1, value_lst_2)
             if value_lst_1[find_month_index[0]] == value_lst_2[
                                                         find_month_index[0]]:
                 month_index = find_month_index[0]

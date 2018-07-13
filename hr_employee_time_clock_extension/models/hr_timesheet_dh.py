@@ -86,6 +86,51 @@ class HrTimesheetDh(models.Model):
             leave_descr = descr[0].name
         return leave_descr
 
+    def get_date_format(self, values):
+        if values[0][0].find('* ') != -1:
+            values[0][0] = values[0][0].replace('* ', '')
+        splitter = '.'
+        for symbol in ['-', '/', '.']:
+            find_splitter = values[0][0].find(symbol)
+            if find_splitter != -1:
+                splitter = symbol
+                break
+        year = str(datetime.today().year)
+        year_index_find = values[0][0].find(year)
+        if year_index_find == 6:
+            year_index = 2
+            find_month_index = [0, 1]
+        else:
+            year_index = 0
+            find_month_index = [1, 2]
+        month_index = 0
+        for i in range(len(values) - 1):
+            if values[i][0].find('* ') != -1:
+                values[i][0] = values[i][0].replace('* ', '')
+            if values[i + 1][0].find('* ') != -1:
+                values[i + 1][0] = values[i + 1][0].replace('* ', '')
+            value_lst_1 = values[i][0].split(splitter)
+            value_lst_2 = values[i + 1][0].split(splitter)
+            if value_lst_1[find_month_index[0]] == value_lst_2[
+                                                        find_month_index[0]]:
+                month_index = find_month_index[0]
+                break
+            if value_lst_1[find_month_index[1]] == value_lst_2[
+                                                        find_month_index[1]]:
+                month_index = find_month_index[1]
+                break
+
+        indexes = [0, 1, 2]
+        for number in [month_index, year_index]:
+            indexes.remove(number)
+        day_index = indexes[0]
+        format_unsorted = {day_index: 'd', month_index: 'm', year_index: 'Y'}
+        date_format = '%' + format_unsorted.get(0) + splitter + '%'\
+                      + format_unsorted.get(1) + splitter + '%' \
+                      + format_unsorted.get(2)
+
+        return date_format
+
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
@@ -238,8 +283,17 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
                     for res in v:
                         values.append([res.get(key) for key in keys])
+                    date_format = self.get_date_format(values)
                     for tr in values:
-                        output.append('<tr>')
+                        formatted_tr = tr[0]
+                        if formatted_tr.find('* ') != -1:
+                            formatted_tr = formatted_tr.replace('* ', '')
+                        sheet_day = datetime.strptime(formatted_tr, date_format).date()
+                        if datetime.today().date() == sheet_day:
+                            output.append(
+                                '<tr style="background-color:#bdde9f96;">')
+                        else:
+                            output.append('<tr>')
                         for td in tr:
                             if not td:
                                 td = '-'

@@ -53,6 +53,7 @@
                 <field name="overtime_change" invisible="True"/>
                 <field name="bonus_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}" widget="float_time"/>
                 <field name="worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>
+                <field name="night_shift_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>
             </xpath>
         </field>
     </record>
