@@ -312,10 +312,8 @@ class HrAttendance(models.Model):
                             over.with_context(ctx).write(val)
                 else:
                     for over in overtime_attendance:
-                        # super(HrAttendance, over).write({'overtime_change':False})
                         over.with_context(overtime_context).write(
                             {'overtime_change': False})
-                # return res
             else:
                 values.update(have_overtime=False,
                               bonus_worked_hours=0.0,
@@ -340,8 +338,6 @@ class HrAttendance(models.Model):
     def create(self, values):
         if values.get('check_out'):
             attendance = super(HrAttendance, self).create(values)
-            # attendance.check_overtime(values)
             return attendance
         attendance = super(HrAttendance, self).create(values)
-        contract = attendance.get_contract(values.get('check_in'))
         return attendance

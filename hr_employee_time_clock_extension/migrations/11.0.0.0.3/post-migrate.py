@@ -20,8 +20,9 @@
 #
 ##############################################################################
 
-from . import resource
-from . import hr_timesheet_dh
-from . import hr_timesheet_sheet
-from . import hr_employee
-from . import hr_attendance
+
+def migrate(cr, version):
+    cr.execute(
+        """UPDATE hr_attendance  SET have_overtime = FALSE , 
+                    bonus_worked_hours = 0.0, calculate_overtime = FALSE , 
+                    night_shift_worked_hours = 0.0, overtime_change = FALSE """)

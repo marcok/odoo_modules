@@ -26,11 +26,10 @@
     'summary': 'Night shift configurations',
     'website': "http://www.bytebrand.net",
     'category': 'Human Resources',
-    'version': '11.0.0.0.2',
+    'version': '11.0.0.0.3',
     'depends': ['hr_employee_time_clock', ],
     'data': [
         'views/hr_employee_views.xml',
-        'views/res_users_views.xml',
         'views/resource_calendar_view.xml',
     ],
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <record id="resource_calendar_form" model="ir.ui.view">
         <field name="name">resource.calendar.form</field>
         <field name="model">resource.calendar</field>
@@ -15,11 +16,13 @@
                     <group>
                         <group>
                             <field name="count"/>
-                             <!--<field name="uom"/>-->
                         </group>
                         <group>
                             <field name="min_overtime_count"/>
                         </group>
+                    </group>
+                    <group>
+                        <button name="initial_overtime" type="object" string="Initial Employee Overtime" class="btn-primary"/>
                     </group>
                     <field name="overtime_attendance_ids"/>
                 </page>
@@ -57,6 +60,5 @@
             </xpath>
         </field>
     </record>
-
 
 </odoo>
