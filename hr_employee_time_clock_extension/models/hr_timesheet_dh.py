@@ -145,6 +145,15 @@ class HrTimesheetDh(models.Model):
                 employee_id = sheet.employee_id.id
                 start_date = sheet.date_from
                 end_date = sheet.date_to
+
+                contract = self.check_contract(employee_id, start_date)
+                if contract:
+                    resource_calendar_id = contract.resource_calendar_id
+                else:
+                    resource_calendar_id = self.employee_id.resource_calendar_id
+
+                use_overtime = resource_calendar_id.use_overtime
+
                 previous_month_diff = self.get_previous_month_diff(
                     employee_id, start_date)
                 current_month_diff = previous_month_diff
@@ -163,9 +172,11 @@ class HrTimesheetDh(models.Model):
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff': current_month_diff,
                          'work_current_month_diff': '',
-                         'bonus_hours': 0.0,
-                         'night_shift': 0.0,
                          'leaves_descr': ''}
+                if use_overtime:
+                    total.update({'bonus_hours': 0.0,
+                                  'night_shift': 0.0})
+
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
@@ -191,51 +202,83 @@ class HrTimesheetDh(models.Model):
                                 bonus_hours += att.bonus_worked_hours
                                 night_shift_hours += \
                                     att.night_shift_worked_hours
-
-                    diff = (worked_hours + bonus_hours) - dh
+                    if use_overtime:
+                        diff = (worked_hours + bonus_hours) - dh
+                    else:
+                        diff = worked_hours - dh
                     current_month_diff += diff
                     work_current_month_diff += diff
                     date_mark = sheet.get_date_mark(date_line, period)
                     leave_descr = sheet.get_leave_descr(date_line, employee_id)
                     if function_call:
-                        res['hours'].append({
-                            _('Date'): date_mark + date_line.strftime(date_format),
-                            _('Duty Hours'):
-                                attendance_obj.float_time_convert(dh),
-                            _('Worked Hours'):
-                                attendance_obj.float_time_convert(worked_hours),
-                            _('Bonus Hours'):
-                                attendance_obj.float_time_convert(bonus_hours),
-                            _('Night Shift'):
-                                attendance_obj.float_time_convert(
-                                    night_shift_hours),
-                            _('Difference'): self.sign_float_time_convert(diff),
-                            _('Running'): self.sign_float_time_convert(
-                                current_month_diff),
-                            _('Leaves'): leave_descr})
+                        if use_overtime:
+                            res['hours'].append({
+                                _('Date'): date_mark + date_line.strftime(date_format),
+                                _('Duty Hours'):
+                                    attendance_obj.float_time_convert(dh),
+                                _('Worked Hours'):
+                                    attendance_obj.float_time_convert(worked_hours),
+                                _('Bonus Hours'):
+                                    attendance_obj.float_time_convert(bonus_hours),
+                                _('Night Shift'):
+                                    attendance_obj.float_time_convert(
+                                        night_shift_hours),
+                                _('Difference'): self.sign_float_time_convert(diff),
+                                _('Running'): self.sign_float_time_convert(
+                                    current_month_diff),
+                                _('Leaves'): leave_descr})
+                        else:
+                            res['hours'].append({
+                                _('Date'): date_mark + date_line.strftime(
+                                    date_format),
+                                _('Duty Hours'):
+                                    attendance_obj.float_time_convert(dh),
+                                _('Worked Hours'):
+                                    attendance_obj.float_time_convert(
+                                        worked_hours),
+                                _('Difference'): self.sign_float_time_convert(
+                                    diff),
+                                _('Running'): self.sign_float_time_convert(
+                                    current_month_diff),
+                                _('Leaves'): leave_descr})
                     else:
-                        res['hours'].append({
-                            'name': date_line.strftime(date_format),
-                            'dh': attendance_obj.float_time_convert(dh),
-                            'worked_hours':
-                                attendance_obj.float_time_convert(worked_hours),
-                            'bonus_hours':
-                                attendance_obj.float_time_convert(bonus_hours),
-                            'night_shift':
-                                attendance_obj.float_time_convert(
-                                    night_shift_hours),
-                            'diff': self.sign_float_time_convert(diff),
-                            'running':
-                                self.sign_float_time_convert(current_month_diff),
-                            'leaves_descr': leave_descr
-                        })
+                        if use_overtime:
+                            res['hours'].append({
+                                'name': date_line.strftime(date_format),
+                                'dh': attendance_obj.float_time_convert(dh),
+                                'worked_hours':
+                                    attendance_obj.float_time_convert(worked_hours),
+                                'bonus_hours':
+                                    attendance_obj.float_time_convert(bonus_hours),
+                                'night_shift':
+                                    attendance_obj.float_time_convert(
+                                        night_shift_hours),
+                                'diff': self.sign_float_time_convert(diff),
+                                'running':
+                                    self.sign_float_time_convert(current_month_diff),
+                                'leaves_descr': leave_descr
+                            })
+                        else:
+                            res['hours'].append({
+                                'name': date_line.strftime(date_format),
+                                'dh': attendance_obj.float_time_convert(dh),
+                                'worked_hours':
+                                    attendance_obj.float_time_convert(
+                                        worked_hours),
+                                'diff': self.sign_float_time_convert(diff),
+                                'running':
+                                    self.sign_float_time_convert(
+                                        current_month_diff),
+                                'leaves_descr': leave_descr
+                            })
                     total['duty_hours'] += dh
                     total['worked_hours'] += worked_hours
-                    total['bonus_hours'] += bonus_hours
-                    total['night_shift'] += night_shift_hours
                     total['leaves_descr'] = ''
                     total['diff'] += diff
                     total['work_current_month_diff'] = work_current_month_diff
+                    if use_overtime:
+                        total['bonus_hours'] += bonus_hours
+                        total['night_shift'] += night_shift_hours
 
                     res['total'] = total
                 return res
@@ -243,6 +286,14 @@ class HrTimesheetDh(models.Model):
     @api.multi
     def _get_analysis(self):
         for sheet in self:
+            contract = self.check_contract(sheet.employee_id.id, sheet.date_from)
+            if contract:
+                resource_calendar_id = contract.resource_calendar_id
+            else:
+                resource_calendar_id = self.employee_id.resource_calendar_id
+
+            use_overtime = resource_calendar_id.use_overtime
+
             function_call = True
             ctx = self.env.context.copy()
             ctx['online_analysis'] = True
@@ -266,11 +317,18 @@ class HrTimesheetDh(models.Model):
                     output.append('<tr>')
                     prev_ts = _('Previous Attendance Sheet:')
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
-                    output.append('<td colspan="6">' + t + '</td>')
+                    if use_overtime:
+                        output.append('<td colspan="6">' + t + '</td>')
+                    else:
+                        output.append('<td colspan="4">' + t + '</td>')
                     output.append('</tr>')
-            keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
-                    _('Bonus Hours'), _('Night Shift'),
-                    _('Difference'), _('Running'), _('Leaves'))
+            if use_overtime:
+                keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
+                        _('Bonus Hours'), _('Night Shift'),
+                        _('Difference'), _('Running'), _('Leaves'))
+            else:
+                keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
+                        _('Difference'), _('Running'), _('Leaves'))
             a = ('previous_month_diff', 'hours', 'total')
             for k in a:
                 v = data.get(k)
@@ -310,11 +368,19 @@ class HrTimesheetDh(models.Model):
                     output.append('<tr>')
                     total_ts = _('Total:')
                     output.append('<th>' + total_ts + ' </th>')
-                    for td in ('duty_hours', 'worked_hours', 'bonus_hours',
-                               'night_shift',
-                               'work_current_month_diff',
-                               'diff',
-                               'leaves_descr'):
+                    if use_overtime:
+                        analysis_fields = (
+                            'duty_hours', 'worked_hours', 'bonus_hours',
+                            'night_shift', 'work_current_month_diff',
+                            'diff', 'leaves_descr')
+                    else:
+                        analysis_fields = (
+                            'duty_hours', 'worked_hours',
+                            'work_current_month_diff',
+                            'diff',
+                            'leaves_descr')
+
+                    for td in analysis_fields:
                         if type(v.get(td)) in [float, int]:
                             t = '{0:02.0f}:{1:02.0f}'.format(
                                 *divmod(float(round(v.get(td), 4)) * 60, 60))

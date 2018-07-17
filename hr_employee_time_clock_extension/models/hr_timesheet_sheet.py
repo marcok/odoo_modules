@@ -53,10 +53,17 @@ class HrTimesheetSheet(models.Model):
             ctx['online_analysis'] = True
             for sheet in self:
                 if sheet.id == res[0].get('id'):
-                    sheet.total_attendance = \
-                        self.with_context(ctx).attendance_analysis()[
-                        'total'].get('worked_hours') + self.with_context(ctx).attendance_analysis()[
-                        'total'].get('bonus_hours')
+                    if self.with_context(ctx).attendance_analysis()[
+                        'total'].get('bonus_hours'):
+                        sheet.total_attendance = \
+                            self.with_context(ctx).attendance_analysis()[
+                            'total'].get('worked_hours') + \
+                            self.with_context(ctx).attendance_analysis()[
+                            'total'].get('bonus_hours')
+                    else:
+                        sheet.total_attendance = \
+                            self.with_context(ctx).attendance_analysis()[
+                                'total'].get('worked_hours')
                     sheet.total_timesheet = res[0].get(
                         'total_timesheet')
                     sheet.total_difference = res[0].get(
