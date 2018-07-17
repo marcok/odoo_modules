@@ -45,7 +45,6 @@ class ResourceCalendar(models.Model):
 
     @api.constrains('two_days_shift')
     def _check_two_days_shift(self):
-        """Ensure that field min_overtime_count is >= 0"""
         if self.two_days_shift is False:
             for attendance_id in self.overtime_attendance_ids:
                 if attendance_id.hour_to < attendance_id.hour_from:
