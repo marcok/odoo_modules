@@ -20,6 +20,9 @@
                         <group>
                             <field name="min_overtime_count"/>
                         </group>
+                        <group>
+                            <field name="two_days_shift"/>
+                        </group>
                     </group>
                     <group>
                         <button name="initial_overtime" type="object" string="Initial Employee Overtime" class="btn-primary"/>

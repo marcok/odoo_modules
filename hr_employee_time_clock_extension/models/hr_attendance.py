@@ -95,9 +95,9 @@ class HrAttendance(models.Model):
     def _calculate_overtime(self, check_in, check_out, this_year_sheets):
         contract = self.get_contract(check_out)
         if contract:
-            resource_calendar_id =  contract.resource_calendar_id
+            resource_calendar_id = contract.resource_calendar_id
         else:
-            resource_calendar_id =  self.employee_id.resource_calendar_id
+            resource_calendar_id = self.employee_id.resource_calendar_id
         attendances = self.search([
             ('employee_id', '=', self.employee_id.id),
             ('sheet_id', 'in', this_year_sheets),
@@ -176,6 +176,7 @@ class HrAttendance(models.Model):
             resource_calendar_id = contract.resource_calendar_id
         else:
             resource_calendar_id = self.employee_id.resource_calendar_id
+        two_days_shift = resource_calendar_id.two_days_shift
 
         if check_out and resource_calendar_id \
                 and resource_calendar_id.use_overtime \
@@ -194,14 +195,21 @@ class HrAttendance(models.Model):
             check_in_local_date = check_in_local_date.replace(tzinfo=None)
 
             need_overtime = None
+            if two_days_shift:
+                str_check_in_local_date = (
+                        check_in_local_date -
+                        timedelta(days=1)).strftime('%Y-%m-%d')
 
-            str_check_in_local_date = (
-                    check_in_local_date -
-                    timedelta(days=1)).strftime('%Y-%m-%d')
+                str_check_out_local_date = (
+                        check_out_local_date +
+                        timedelta(days=1)).strftime('%Y-%m-%d')
+            else:
 
-            str_check_out_local_date = (
-                    check_out_local_date +
-                    timedelta(days=1)).strftime('%Y-%m-%d')
+                str_check_in_local_date = (
+                        check_in_local_date).strftime('%Y-%m-%d')
+
+                str_check_out_local_date = (
+                        check_out_local_date).strftime('%Y-%m-%d')
 
             dates = list(rrule.rrule(
                 rrule.DAILY,
@@ -211,7 +219,11 @@ class HrAttendance(models.Model):
             i = 0
             overtime_minutes = 0.0
             delta_minutes = 0.0
-            while i < date_len - 1:
+            if two_days_shift:
+                loop_count = date_len - 1
+            else:
+                loop_count = date_len
+            while i < loop_count:
                 day_of_week = calendar.weekday(dates[i].year,
                                                dates[i].month,
                                                dates[i].day)
@@ -227,12 +239,18 @@ class HrAttendance(models.Model):
                          dates[i].month,
                          dates[i].day),
                     float_to_time(overtime_calendar_attendances.hour_from))
-
-                finish_overtime = datetime.combine(
-                    date(dates[i + 1].year,
-                         dates[i + 1].month,
-                         dates[i + 1].day),
-                    float_to_time(overtime_calendar_attendances.hour_to))
+                if two_days_shift:
+                    finish_overtime = datetime.combine(
+                        date(dates[i + 1].year,
+                             dates[i + 1].month,
+                             dates[i + 1].day),
+                        float_to_time(overtime_calendar_attendances.hour_to))
+                else:
+                    finish_overtime = datetime.combine(
+                        date(dates[i].year,
+                             dates[i].month,
+                             dates[i].day),
+                        float_to_time(overtime_calendar_attendances.hour_to))
                 if finish_overtime.hour == 23 \
                         and finish_overtime.minute >= 55:
                     finish_overtime = finish_overtime.replace(

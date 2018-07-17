@@ -32,12 +32,26 @@ class ResourceCalendar(models.Model):
         'resource.calendar.attendance.overtime',
         'overtime_calendar_id',
         string='Overtime')
+    two_days_shift = fields.Boolean(string='Shift between two days',
+                                    default=True,
+                                    help='Use for night shift between '
+                                         'two days.')
 
     @api.constrains('min_overtime_count')
     def _check_min_overtime_count(self):
         """Ensure that field min_overtime_count is >= 0"""
         if self.min_overtime_count < 0:
             raise ValidationError("Minimum overtime days must be positive.")
+
+    @api.constrains('two_days_shift')
+    def _check_two_days_shift(self):
+        """Ensure that field min_overtime_count is >= 0"""
+        if self.two_days_shift is False:
+            for attendance_id in self.overtime_attendance_ids:
+                if attendance_id.hour_to < attendance_id.hour_from:
+                   raise ValidationError("Overtime to must be greater than "
+                                         "overtime from when two days "
+                                         "shift is not using.")
 
     @api.multi
     def _get_leave_intervals(self, resource_id=None,
