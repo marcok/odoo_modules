@@ -47,7 +47,7 @@ class ResourceCalendar(models.Model):
     def _check_two_days_shift(self):
         if self.two_days_shift is False:
             for attendance_id in self.overtime_attendance_ids:
-                if attendance_id.hour_to < attendance_id.hour_from:
+                if attendance_id.hour_to <= attendance_id.hour_from:
                    raise ValidationError("Overtime to must be greater than "
                                          "overtime from when two days "
                                          "shift is not using.")
