@@ -106,7 +106,6 @@ class ResourceCalendar(models.Model):
                                         "is not set.".format(user=user.name)))
 
         attendances = self.env['hr.attendance'].search([])
-        _logger.info(len(attendances))
         i = len(attendances)
         for attendance in attendances:
             _logger.info(i)
