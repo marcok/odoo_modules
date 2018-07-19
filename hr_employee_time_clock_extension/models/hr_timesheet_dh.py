@@ -150,11 +150,11 @@ class HrTimesheetDh(models.Model):
                 if contract:
                     resource_calendar_id = contract.resource_calendar_id
                 else:
-                    resource_calendar_id = self.employee_id.resource_calendar_id
+                    resource_calendar_id = sheet.employee_id.resource_calendar_id
 
                 use_overtime = resource_calendar_id.use_overtime
 
-                previous_month_diff = self.get_previous_month_diff(
+                previous_month_diff = sheet.get_previous_month_diff(
                     employee_id, start_date)
                 current_month_diff = previous_month_diff
                 res = {
