@@ -234,54 +234,55 @@ class HrAttendance(models.Model):
                         [('overtime_calendar_id', '=',
                           resource_calendar_id.id),
                          ('dayofweek', '=', day_of_week)])
-                start_overtime = datetime.combine(
-                    date(dates[i].year,
-                         dates[i].month,
-                         dates[i].day),
-                    float_to_time(overtime_calendar_attendances.hour_from))
-                if two_days_shift:
-                    finish_overtime = datetime.combine(
-                        date(dates[i + 1].year,
-                             dates[i + 1].month,
-                             dates[i + 1].day),
-                        float_to_time(overtime_calendar_attendances.hour_to))
-                else:
-                    finish_overtime = datetime.combine(
+                for overtime_calendar_attendance in overtime_calendar_attendances:
+                    start_overtime = datetime.combine(
                         date(dates[i].year,
                              dates[i].month,
                              dates[i].day),
-                        float_to_time(overtime_calendar_attendances.hour_to))
-                if finish_overtime.hour == 23 \
-                        and finish_overtime.minute >= 55:
-                    finish_overtime = finish_overtime.replace(
-                        minute=59, second=59, microsecond=9999)
-                if (check_in_local_date < start_overtime
-                    and (start_overtime < check_out_local_date < finish_overtime
-                         or check_out_local_date > finish_overtime)) \
-                        or (finish_overtime > check_in_local_date
-                            > start_overtime
-                            and (start_overtime < check_out_local_date
-                                 < finish_overtime
-                                 or check_out_local_date > finish_overtime)):
-                    need_overtime = overtime_calendar_attendances
-                    if check_in_local_date > start_overtime:
-                        if finish_overtime > check_out_local_date:
-                            overtime_minutes += \
-                                (check_out_local_date -
-                                 check_in_local_date).total_seconds() / 60
-                        else:
-                            overtime_minutes += \
-                                (finish_overtime -
-                                 check_in_local_date).total_seconds() / 60
-                    elif start_overtime > check_in_local_date:
-                        if finish_overtime > check_out_local_date:
-                            overtime_minutes += \
-                                (check_out_local_date -
-                                 start_overtime).total_seconds() / 60
-                        else:
-                            overtime_minutes += \
-                                (finish_overtime -
-                                 start_overtime).total_seconds() / 60
+                        float_to_time(overtime_calendar_attendance.hour_from))
+                    if two_days_shift:
+                        finish_overtime = datetime.combine(
+                            date(dates[i + 1].year,
+                                 dates[i + 1].month,
+                                 dates[i + 1].day),
+                            float_to_time(overtime_calendar_attendance.hour_to))
+                    else:
+                        finish_overtime = datetime.combine(
+                            date(dates[i].year,
+                                 dates[i].month,
+                                 dates[i].day),
+                            float_to_time(overtime_calendar_attendance.hour_to))
+                    if finish_overtime.hour == 23 \
+                            and finish_overtime.minute >= 55:
+                        finish_overtime = finish_overtime.replace(
+                            minute=59, second=59, microsecond=9999)
+                    if (check_in_local_date < start_overtime
+                        and (start_overtime < check_out_local_date < finish_overtime
+                             or check_out_local_date > finish_overtime)) \
+                            or (finish_overtime > check_in_local_date
+                                > start_overtime
+                                and (start_overtime < check_out_local_date
+                                     < finish_overtime
+                                     or check_out_local_date > finish_overtime)):
+                        need_overtime = overtime_calendar_attendance
+                        if check_in_local_date > start_overtime:
+                            if finish_overtime > check_out_local_date:
+                                overtime_minutes += \
+                                    (check_out_local_date -
+                                     check_in_local_date).total_seconds() / 60
+                            else:
+                                overtime_minutes += \
+                                    (finish_overtime -
+                                     check_in_local_date).total_seconds() / 60
+                        elif start_overtime > check_in_local_date:
+                            if finish_overtime > check_out_local_date:
+                                overtime_minutes += \
+                                    (check_out_local_date -
+                                     start_overtime).total_seconds() / 60
+                            else:
+                                overtime_minutes += \
+                                    (finish_overtime -
+                                     start_overtime).total_seconds() / 60
                 i += 1
 
                 delta_minutes = \
