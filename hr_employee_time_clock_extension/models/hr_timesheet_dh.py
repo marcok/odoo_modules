@@ -90,7 +90,7 @@ class HrTimesheetDh(models.Model):
         if values[0][0].find('* ') != -1:
             values[0][0] = values[0][0].replace('* ', '')
         splitter = '.'
-        for symbol in ['-', '/', '.']:
+        for symbol in ['-', '/', '.', '']:
             find_splitter = values[0][0].find(symbol)
             if find_splitter != -1:
                 splitter = symbol
@@ -128,7 +128,6 @@ class HrTimesheetDh(models.Model):
         date_format = '%' + format_unsorted.get(0) + splitter + '%'\
                       + format_unsorted.get(1) + splitter + '%' \
                       + format_unsorted.get(2)
-
         return date_format
 
     @api.multi
@@ -341,7 +340,9 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
                     for res in v:
                         values.append([res.get(key) for key in keys])
-                    date_format = self.get_date_format(values)
+                    # date_format = self.get_date_format(values)
+                    date_format, time_format = \
+                        self._get_user_datetime_format()
                     for tr in values:
                         formatted_tr = tr[0]
                         if formatted_tr.find('* ') != -1:
