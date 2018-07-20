@@ -31,6 +31,8 @@
     'data': [
         'views/hr_employee_views.xml',
         'views/resource_calendar_view.xml',
+        
+        'security/ir.model.access.csv',
     ],
 
     'images': ['static/description/icon.png'],
