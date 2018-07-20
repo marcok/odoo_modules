@@ -355,8 +355,5 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, values):
-        if values.get('check_out'):
-            attendance = super(HrAttendance, self).create(values)
-            return attendance
         attendance = super(HrAttendance, self).create(values)
         return attendance

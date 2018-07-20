@@ -2,7 +2,7 @@
 
 ##############################################################################
 #
-#    Clear Groups for Odoo
+#    OpenERP, Open Source Management Solution
 #    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,8 @@
     'data': [
         'views/hr_employee_views.xml',
         'views/resource_calendar_view.xml',
+
+        'security/ir.model.access.csv',
     ],
 
     'images': ['static/description/icon.png'],
