@@ -67,6 +67,38 @@ class HrTimesheetSheet(models.Model):
             [('user_id', '=', self.env.uid)])
         return emp_ids and emp_ids[0] or False
 
+    # @api.multi
+    # def _total(self):
+    #     """ Compute the attendances, analytic lines timesheets
+    #     and differences between them
+    #         for all the days of a timesheet and the current day
+    #     """
+    #     ids = [i.id for i in self]
+    #
+    #     self.env.cr.execute("""
+    #         SELECT sheet_id as id,
+    #                sum(total_attendance) as total_attendance,
+    #                sum(total_timesheet) as total_timesheet,
+    #                sum(total_difference) as  total_difference
+    #         FROM hr_timesheet_sheet_sheet_day
+    #         WHERE sheet_id IN %s
+    #         GROUP BY sheet_id
+    #     """, (tuple(ids),))
+    #
+    #     res = self.env.cr.dictfetchall()
+    #     if res:
+    #         ctx = self.env.context.copy()
+    #         ctx['online_analysis'] = True
+    #         for sheet in self:
+    #             if sheet.id == res[0].get('id'):
+    #                 sheet.total_attendance = \
+    #                     self.with_context(ctx).attendance_analysis()[
+    #                     'total'].get('worked_hours')
+    #                 sheet.total_timesheet = res[0].get(
+    #                     'total_timesheet')
+    #                 sheet.total_difference = res[0].get(
+    #                     'total_difference')
+
     @api.multi
     def _total(self):
         """ Compute the attendances, analytic lines timesheets
@@ -76,14 +108,14 @@ class HrTimesheetSheet(models.Model):
         ids = [i.id for i in self]
 
         self.env.cr.execute("""
-            SELECT sheet_id as id,
-                   sum(total_attendance) as total_attendance,
-                   sum(total_timesheet) as total_timesheet,
-                   sum(total_difference) as  total_difference
-            FROM hr_timesheet_sheet_sheet_day
-            WHERE sheet_id IN %s
-            GROUP BY sheet_id
-        """, (tuple(ids),))
+                SELECT sheet_id as id,
+                       sum(total_attendance) as total_attendance,
+                       sum(total_timesheet) as total_timesheet,
+                       sum(total_difference) as  total_difference
+                FROM hr_timesheet_sheet_sheet_day
+                WHERE sheet_id IN %s
+                GROUP BY sheet_id
+            """, (tuple(ids),))
 
         res = self.env.cr.dictfetchall()
         if res:
@@ -91,9 +123,17 @@ class HrTimesheetSheet(models.Model):
             ctx['online_analysis'] = True
             for sheet in self:
                 if sheet.id == res[0].get('id'):
-                    sheet.total_attendance = \
-                        self.with_context(ctx).attendance_analysis()[
-                        'total'].get('worked_hours')
+                    if self.with_context(ctx).attendance_analysis()[
+                        'total'].get('bonus_hours'):
+                        sheet.total_attendance = \
+                            self.with_context(ctx).attendance_analysis()[
+                                'total'].get('worked_hours') + \
+                            self.with_context(ctx).attendance_analysis()[
+                                'total'].get('bonus_hours')
+                    else:
+                        sheet.total_attendance = \
+                            self.with_context(ctx).attendance_analysis()[
+                                'total'].get('worked_hours')
                     sheet.total_timesheet = res[0].get(
                         'total_timesheet')
                     sheet.total_difference = res[0].get(

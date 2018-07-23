@@ -2,27 +2,27 @@
 <odoo>
     <data>
 
-        <record id="res_config_settings_view_form" model="ir.ui.view">
-            <field name="name">res.config.settings.view.form.inherit.hr.employee.time.clock</field>
-            <field name="model">res.config.settings</field>
-            <field name="priority" eval="40"/>
-            <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[@data-string='Employees']/div[@class='row mt16 o_settings_container']" position="inside">
-                        <div class="col-xs-12 col-md-6 o_setting_box" title="Employee Time Clock Extention">
-                            <div class="o_setting_left_pane">
-                                <field name="module_hr_employee_time_clock_extension"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="module_hr_employee_time_clock_extension"/>
-                                <div class="text-muted">
-                                    Use Overtime Settings
-                                </div>
-                            </div>
-                        </div>
-                </xpath>
-            </field>
-        </record>
+        <!--<record id="res_config_settings_view_form" model="ir.ui.view">-->
+            <!--<field name="name">res.config.settings.view.form.inherit.hr.employee.time.clock</field>-->
+            <!--<field name="model">res.config.settings</field>-->
+            <!--<field name="priority" eval="40"/>-->
+            <!--<field name="inherit_id" ref="hr.res_config_settings_view_form"/>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<xpath expr="//div[@data-string='Employees']/div[@class='row mt16 o_settings_container']" position="inside">-->
+                        <!--<div class="col-xs-12 col-md-6 o_setting_box" title="Employee Time Clock Extention">-->
+                            <!--<div class="o_setting_left_pane">-->
+                                <!--<field name="module_hr_employee_time_clock_extension"/>-->
+                            <!--</div>-->
+                            <!--<div class="o_setting_right_pane">-->
+                                <!--<label for="module_hr_employee_time_clock_extension"/>-->
+                                <!--<div class="text-muted">-->
+                                    <!--Use Overtime Settings-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                <!--</xpath>-->
+            <!--</field>-->
+        <!--</record>-->
 
     </data>
 </odoo>
