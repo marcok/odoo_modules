@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 #
-#    Clear Groups for Odoo
-#    Copyright (C) 2016 Bytebrand GmbH (<http://www.bytebrand.net>).
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as
@@ -20,7 +21,6 @@
 ##############################################################################
 
 from . import hr_attendance_analysis
-# from . import time_clock_resource_calendar
 from . import resource_calendar
 from . import hr_holidays
 
@@ -32,6 +32,7 @@ from . import hr_timesheet_dh
 from . import hr_timesheet_sheet_account
 # from . import hr_timesheet_sheet_config_settings
 from . import res_company
+from . import hr_attendance
 
 from . import res_config_settings
 

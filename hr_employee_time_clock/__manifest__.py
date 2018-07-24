@@ -2,8 +2,8 @@
 
 ##############################################################################
 #
-#    Clear Groups for Odoo
-#    Copyright (C) 2016 Bytebrand GmbH (<http://www.bytebrand.net>).
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as
@@ -32,7 +32,9 @@
                 'hr_timesheet',
                 'hr_attendance',
                 'hr_contract',
-                'hr_holidays'],
+                'hr_holidays',
+                'hr_public_holidays',
+                'hr_public_calendar_holiday'],
     'images': ['images/overundertime.png'],
     'installable': True,
     'data': [
@@ -60,6 +62,8 @@
 
         # Extension
         'views/res_config_settings_views.xml',
+        'views/hr_employee_views.xml',
+        'views/resource_calendar_view.xml',
     ],
     'qweb': ['static/src/xml/timesheet.xml', ],
 }

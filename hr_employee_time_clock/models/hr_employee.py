@@ -2,8 +2,8 @@
 
 ##############################################################################
 #
-#    Clear Groups for Odoo
-#    Copyright (C) 2016 Bytebrand GmbH (<http://www.bytebrand.net>).
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2016 - now Bytebrand Outsourcing AG (<http://www.bytebrand.net>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as
@@ -88,6 +88,9 @@ class HrEmployee(models.Model):
     _sql_constraints = [('barcode_uniq', 'unique (barcode)',
                          "The Badge ID must be unique, this one is "
                          "already assigned to another employee.")]
+
+    start_overtime_different = fields.Integer(string='Start Overtime Count',
+                                              default=0.00)
 
     @api.multi
     def _compute_manual_attendance(self):
