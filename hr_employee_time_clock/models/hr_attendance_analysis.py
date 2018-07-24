@@ -136,7 +136,8 @@ class HrAttendance(models.Model):
         'hr_timesheet_sheet.sheet',
         compute='_sheet',
         string='Sheet',
-        store=True)
+        store=True,
+        index=True)
 
     def float_time_convert(self, float_val):
         hours = math.floor(abs(float_val))
@@ -151,7 +152,6 @@ class HrAttendance(models.Model):
     @api.model
     def create(self, values):
         check_in = fields.Datetime.from_string(values.get('check_in'))
-        # check_in = check_in.replace(tzinfo=None)
         sheet_id = self.env['hr_timesheet_sheet.sheet'].search([
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
