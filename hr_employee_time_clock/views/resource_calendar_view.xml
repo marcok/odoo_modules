@@ -57,9 +57,12 @@
             <xpath expr="//group[1]" position="inside">
                 <field name="have_overtime" invisible="True"/>
                 <field name="overtime_change" invisible="True"/>
-                <field name="bonus_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}" widget="float_time"/>
-                <field name="worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>
-                <field name="night_shift_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>
+                <!--<field name="bonus_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}" widget="float_time"/>-->
+                <!--<field name="worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/>-->
+                <!--<field name="night_shift_worked_hours" attrs="{'invisible':[('overtime_change','!=',True)]}"  widget="float_time"/> -->
+                <field name="bonus_worked_hours" attrs="{'invisible':[('bonus_worked_hours','=',0)]}" widget="float_time"/>
+                <field name="worked_hours" attrs="{'invisible':[('worked_hours','=',0)]}" widget="float_time"/>
+                <field name="night_shift_worked_hours" attrs="{'invisible':[('night_shift_worked_hours','=',0)]}" widget="float_time"/>
             </xpath>
         </field>
     </record>
