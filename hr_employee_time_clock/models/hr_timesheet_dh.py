@@ -203,39 +203,39 @@ class HrTimesheetDh(models.Model):
             leave_descr = descr[0].name
         return leave_descr
 
-    def get_date_format(self, values):
-        if values[0][0].find('* ') != -1:
-            values[0][0] = values[0][0].replace('* ', '')
-        splitter = '.'
-        for symbol in ['-', '/', '.']:
-            find_splitter = values[0][0].find(symbol)
-            if find_splitter != -1:
-                splitter = symbol
-                break
-        year = str(datetime.today().year)
-        year_index_find = values[0][0].find(year)
-        if year_index_find == 6:
-            year_index = 2
-            find_month_index = [0, 1]
-        else:
-            year_index = 0
-            find_month_index = [1, 2]
-        month_index = 0
-        for i in range(len(values) - 1):
-            if values[i][0].find('* ') != -1:
-                values[i][0] = values[i][0].replace('* ', '')
-            if values[i + 1][0].find('* ') != -1:
-                values[i + 1][0] = values[i + 1][0].replace('* ', '')
-            value_lst_1 = values[i][0].split(splitter)
-            value_lst_2 = values[i + 1][0].split(splitter)
-            if value_lst_1[find_month_index[0]] == value_lst_2[
-                find_month_index[0]]:
-                month_index = find_month_index[0]
-                break
-            if value_lst_1[find_month_index[1]] == value_lst_2[
-                find_month_index[1]]:
-                month_index = find_month_index[1]
-                break
+    # def get_date_format(self, values):
+    #     if values[0][0].find('* ') != -1:
+    #         values[0][0] = values[0][0].replace('* ', '')
+    #     splitter = '.'
+    #     for symbol in ['-', '/', '.']:
+    #         find_splitter = values[0][0].find(symbol)
+    #         if find_splitter != -1:
+    #             splitter = symbol
+    #             break
+    #     year = str(datetime.today().year)
+    #     year_index_find = values[0][0].find(year)
+    #     if year_index_find == 6:
+    #         year_index = 2
+    #         find_month_index = [0, 1]
+    #     else:
+    #         year_index = 0
+    #         find_month_index = [1, 2]
+    #     month_index = 0
+    #     for i in range(len(values) - 1):
+    #         if values[i][0].find('* ') != -1:
+    #             values[i][0] = values[i][0].replace('* ', '')
+    #         if values[i + 1][0].find('* ') != -1:
+    #             values[i + 1][0] = values[i + 1][0].replace('* ', '')
+    #         value_lst_1 = values[i][0].split(splitter)
+    #         value_lst_2 = values[i + 1][0].split(splitter)
+    #         if value_lst_1[find_month_index[0]] == value_lst_2[
+    #             find_month_index[0]]:
+    #             month_index = find_month_index[0]
+    #             break
+    #         if value_lst_1[find_month_index[1]] == value_lst_2[
+    #             find_month_index[1]]:
+    #             month_index = find_month_index[1]
+    #             break
 
         indexes = [0, 1, 2]
         for number in [month_index, year_index]:
@@ -307,7 +307,9 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
                     for res in v:
                         values.append([res.get(key) for key in keys])
-                    date_format = self.get_date_format(values)
+                    # date_format = self.get_date_format(values)
+                    date_format, time_format = \
+                        self._get_user_datetime_format()
                     for tr in values:
                         formatted_tr = tr[0]
                         if formatted_tr.find('* ') != -1:
