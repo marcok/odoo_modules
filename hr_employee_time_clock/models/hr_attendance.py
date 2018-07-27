@@ -77,8 +77,9 @@ class HrAttendance(models.Model):
     overtime_change = fields.Boolean(string="Change Overtime",
                                      default=False)
     bonus_worked_hours = fields.Float(string='Bonus Worked Hours',
-                                      readonly=True)
-    night_shift_worked_hours = fields.Float(string='Night Shift', readonly=True)
+                                      readonly=True, default=0.0)
+    night_shift_worked_hours = fields.Float(string='Night Shift',
+                                            readonly=True, default=0.0)
 
     @api.multi
     def get_employee_sheets(self, employee, check_in):
