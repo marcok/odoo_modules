@@ -254,6 +254,12 @@ class ResourceCalendar(models.Model):
                                         "is not set.".format(user=user.name)))
 
         attendances = self.env['hr.attendance'].search([])
+        # for attendance in attendances:
+        #     attendance.write({'calculate_overtime': False,
+        #                       'have_overtime': False,
+        #                       'overtime_change': False,
+        #                       'bonus_worked_hours': 0.0,
+        #                       'night_shift_worked_hours': 0.0})
 
         for attendance in attendances:
             attendance.write({'check_out': attendance.check_out})
