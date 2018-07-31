@@ -543,8 +543,7 @@ class HrTimesheetDh(models.Model):
                                 _('Difference'): self.sign_float_time_convert(
                                     diff),
                                 _('Running'): self.sign_float_time_convert(
-                                    current_month_diff),
-                                _('Leaves'): leave_descr})
+                                    current_month_diff)})
                     else:
                         if use_overtime:
                             res['hours'].append({
