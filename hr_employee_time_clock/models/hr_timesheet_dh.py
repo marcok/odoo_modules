@@ -476,6 +476,11 @@ class HrTimesheetDh(models.Model):
                                   'night_shift': 0.0,
                                   'leaves_descr': ''})
 
+                last_date = dates[-1]
+                today_worked_hours = 0.0
+                today_diff = 0
+                today_current_month_diff = 0
+
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
@@ -508,6 +513,23 @@ class HrTimesheetDh(models.Model):
                         diff = worked_hours - dh
                     current_month_diff += diff
                     work_current_month_diff += diff
+
+                    if date_line.date() == date.today():
+                        today_worked_hours = worked_hours
+                        today_diff = diff
+                        today_current_month_diff = current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = work_current_month_diff
+                    if date_line == last_date:
+                        if not self.env.context.get('online_analysis'):
+                            worked_hours = today_worked_hours
+                            diff = today_diff
+                            current_month_diff = today_current_month_diff
+
+
                     date_mark = sheet.get_date_mark(date_line, period)
                     leave_descr = sheet.get_leave_descr(date_line, employee_id)
                     if function_call:
