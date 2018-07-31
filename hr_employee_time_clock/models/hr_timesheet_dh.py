@@ -358,6 +358,7 @@ class HrTimesheetDh(models.Model):
         res = super(HrTimesheetDh, self.sudo()).search_read(
             domain=domain, fields=fields, offset=offset, limit=limit,
             order=order)
+        _logger.info(res)
         return res
 
     @api.multi
