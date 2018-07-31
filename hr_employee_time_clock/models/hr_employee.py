@@ -256,6 +256,7 @@ class HrEmployee(models.Model):
                           'Your attendances have probably been modified'
                           ' manually by human resources.') % {
                             'empl_name': self.name, })
+        print('\n self.env.context >>>>>>>> ', self.env.context)
         if not self.env.context.get('attendance_manual'):
             return True
         return attendance
