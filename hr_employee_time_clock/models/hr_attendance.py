@@ -296,7 +296,7 @@ class HrAttendance(models.Model):
                               calculate_overtime=self._calculate_overtime(
                                   check_in, check_out, this_year_sheets),
                               night_shift_worked_hours=overtime_minutes / 60)
-                # res = super(HrAttendance, self).write(values)
+                res = super(HrAttendance, self).write(values)
                 overtime_attendance = self.search([
                     ('calculate_overtime', '=', True),
                     ('employee_id', '=', self.employee_id.id),
@@ -337,21 +337,21 @@ class HrAttendance(models.Model):
                               bonus_worked_hours=0.0,
                               calculate_overtime=False,
                               night_shift_worked_hours=0.0)
-                # res = super(HrAttendance, self).write(values)
+                res = super(HrAttendance, self).write(values)
         elif not self.env.context.get('bonus_time'):
             values.update(have_overtime=False,
                           bonus_worked_hours=0.0,
                           calculate_overtime=False,
                           night_shift_worked_hours=0.0)
-            # res = super(HrAttendance, self).write(values)
-        return values
+            res = super(HrAttendance, self).write(values)
+        # return values
         # return res
 
     @api.multi
     def write(self, values):
         if not self.env.context.get('check_overtime'):
-            values = self.check_overtime(values)
-            # self.check_overtime(values)
+            # values = self.check_overtime(values)
+            self.check_overtime(values)
         return super(HrAttendance, self).write(values)
 
     @api.model
