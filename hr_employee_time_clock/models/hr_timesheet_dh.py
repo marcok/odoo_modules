@@ -247,7 +247,7 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
 
             keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
-                    _('Difference'), _('Running'), _('Leaves'))
+                    _('Difference'), _('Running'))
             if use_overtime:
                 keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
                         _('Bonus Hours'), _('Night Shift'),
@@ -302,8 +302,7 @@ class HrTimesheetDh(models.Model):
                         analysis_fields = (
                             'duty_hours', 'worked_hours',
                             'work_current_month_diff',
-                            'diff',
-                            'leaves_descr')
+                            'diff')
 
                     for td in analysis_fields:
                         if type(v.get(td)) in [float, int]:
@@ -470,10 +469,11 @@ class HrTimesheetDh(models.Model):
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff': current_month_diff,
                          'work_current_month_diff': '',
-                         'leaves_descr': ''}
+                         }
                 if use_overtime:
                     total.update({'bonus_hours': 0.0,
-                                  'night_shift': 0.0})
+                                  'night_shift': 0.0,
+                                  'leaves_descr': ''})
 
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
@@ -575,16 +575,16 @@ class HrTimesheetDh(models.Model):
                                 'running':
                                     self.sign_float_time_convert(
                                         current_month_diff),
-                                'leaves_descr': leave_descr
                             })
                     total['duty_hours'] += dh
                     total['worked_hours'] += worked_hours
-                    total['leaves_descr'] = ''
+
                     total['diff'] += diff
                     total['work_current_month_diff'] = work_current_month_diff
                     if use_overtime:
                         total['bonus_hours'] += bonus_hours
                         total['night_shift'] += night_shift_hours
+                        total['leaves_descr'] = ''
 
                     res['total'] = total
                 return res
