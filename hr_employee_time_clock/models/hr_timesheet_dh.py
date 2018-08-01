@@ -156,7 +156,7 @@ class HrTimesheetDh(models.Model):
             old_timesheet_start_from = parser.parse(
                 sheet.date_from) - timedelta(days=1)
             prev_timesheet_diff = \
-                self.get_previous_month_diff(
+                sheet.get_previous_month_diff(
                     sheet.employee_id.id,
                     old_timesheet_start_from.strftime('%Y-%m-%d')
                 )
