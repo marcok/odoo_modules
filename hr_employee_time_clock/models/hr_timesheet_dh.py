@@ -282,7 +282,7 @@ class HrTimesheetDh(models.Model):
                                 td = '-'
                             if td == tr[-1]:
                                 output.append(
-                                    '<td style="text-align: center;">' + td +
+                                    '<td style="text-align: right;">' + td +
                                     '</td>')
                             else:
                                 output.append(
