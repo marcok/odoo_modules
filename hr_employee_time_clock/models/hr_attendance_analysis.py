@@ -156,6 +156,9 @@ class HrAttendance(models.Model):
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
             ('date_to', '>=', check_in.date())], limit=1)
+        print('\n sheet_id.state>>>>>>>> ', sheet_id.state)
+        print('\n sheet_id>>>>>>>> ', sheet_id)
+        print('\n self.user_has_groups(hr.group_hr_manager) >>>>>>>> ', self.user_has_groups('hr.group_hr_manager'))
         if sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
@@ -181,7 +184,10 @@ class HrAttendance(models.Model):
                 raise ValidationError(
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
-
+        print('\n sheet_id.state>>>>>>>> ', self.sheet_id.state)
+        print('\n sheet_id>>>>>>>> ', self.sheet_id)
+        print('\n self.user_has_groups(hr.group_hr_manager) >>>>>>>> ',
+              self.user_has_groups('hr.group_hr_manager'))
         if self.sheet_id.state == 'done' and not \
                 self.user_has_groups('hr.group_hr_manager'):
             raise AccessError(
