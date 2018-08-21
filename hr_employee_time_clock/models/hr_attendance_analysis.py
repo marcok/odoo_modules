@@ -160,7 +160,7 @@ class HrAttendance(models.Model):
         _logger.info(sheet_id)
         _logger.info(self.user_has_groups('hr.group_hr_manager'))
         if sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
+                self.user_has_groups('hr.group_hr_user'):
             raise AccessError(
                 _(
                     "Sorry, only manager is allowed to create attendance"
@@ -188,7 +188,7 @@ class HrAttendance(models.Model):
         _logger.info(self.sheet_id)
         _logger.info(self.user_has_groups('hr.group_hr_manager'))
         if self.sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
+                self.user_has_groups('hr.group_hr_user'):
             raise AccessError(
                 _(
                     "Sorry, only manager is allowed to edit attendance"
