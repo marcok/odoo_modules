@@ -82,40 +82,93 @@ class HrTimesheetDh(models.Model):
             [('take_into_attendance', '=', True)])
 
     @api.multi
-    def count_leaves(self, date_from, employee_id, period):
+    def count_leaves(self, date_line, employee_id, period):
         holiday_obj = self.env['hr.holidays']
-        start_leave_period = end_leave_period = False
-        if period.get('date_from') and period.get('date_to'):
-            start_leave_period = period.get('date_from')
-            end_leave_period = period.get('date_to')
+        holiday_ids = holiday_obj.search([
+            ('employee_id', '=', employee_id),
+            ('state', '=', 'validate'),
+            ('type', '=', 'remove'),
+            ('holiday_status_id', 'in', self.take_holiday_status().ids),
+            ('date_from', '<', str(date_line + timedelta(days=1))),
+            ('date_to', '>', str(date_line))])
+        number_of_days = 0
+        if holiday_ids:
+            for holiday_id in holiday_ids:
+                date_from = fields.Datetime.from_string(holiday_id.date_from)
+                date_to = fields.Datetime.from_string(holiday_id.date_to)
 
-        holiday_ids = holiday_obj.search(
-            ['|', '&',
-             ('date_from', '>=', start_leave_period),
-             ('date_from', '<=', end_leave_period),
-             '&', ('date_to', '<=', end_leave_period),
-             ('date_to', '>=', start_leave_period),
-             ('employee_id', '=', employee_id),
-             ('state', '=', 'validate'),
-             ('type', '=', 'remove'),
-             ('holiday_status_id', 'in', self.take_holiday_status().ids)])
-        leaves = []
-        for leave in holiday_ids:
-            leave_date_from = datetime.strptime(leave.date_from,
-                                                '%Y-%m-%d %H:%M:%S')
-            leave_date_to = datetime.strptime(leave.date_to,
-                                              '%Y-%m-%d %H:%M:%S')
-            leave_dates = list(rrule.rrule(rrule.DAILY,
-                                           dtstart=parser.parse(
-                                               leave.date_from),
-                                           until=parser.parse(
-                                               leave.date_to)))
-            for date in leave_dates:
-                if date.strftime('%Y-%m-%d') == date_from.strftime('%Y-%m-%d'):
-                    leaves.append((leave_date_from, leave_date_to,
-                                   leave.number_of_days))
-                    break
-        return leaves
+                contracts = self.env['hr.contract'].search([
+                    ('employee_id', '=', employee_id),
+                    ('date_start', '<=', holiday_id.date_from),
+                    ('state', '!=', 'cancel')])
+                if contracts:
+                    contract = contracts[-1]
+                    day_of_week = calendar.weekday(date_line.year,
+                                                   date_line.month,
+                                                   date_line.day)
+                    calendar_attendance_ids = \
+                        self.env['resource.calendar.attendance'].search([
+                            ('calendar_id', '=',
+                             contract.resource_calendar_id.id),
+                            ('dayofweek', '=', day_of_week)])
+
+                    default_duty_hours = 0
+                    real_duty_hours = 0
+                    if calendar_attendance_ids:
+                        local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+
+                        for calendar_attendance_id in calendar_attendance_ids:
+                            default_duty_hours += \
+                                calendar_attendance_id.hour_to - \
+                                calendar_attendance_id.hour_from
+                            temp_duty_hours = calendar_attendance_id.hour_to - \
+                                              calendar_attendance_id.hour_from
+
+                            default_date_from_without_tzinfo = datetime.combine(
+                                date_line.date(), datetime.strptime(
+                                    str(int(calendar_attendance_id.hour_from)) +
+                                    ':00:00', '%H:%M:%S').time())
+                            default_date_from = local_tz.localize(
+                                default_date_from_without_tzinfo).astimezone(
+                                pytz.utc)
+                            default_date_from = default_date_from.replace(
+                                tzinfo=None)
+
+                            default_date_to_without_tzinfo = datetime.combine(
+                                date_line.date(), datetime.strptime(
+                                    str(int(calendar_attendance_id.hour_to)) +
+                                    ':00:00', '%H:%M:%S').time())
+                            default_date_to = local_tz.localize(
+                                default_date_to_without_tzinfo).astimezone(
+                                pytz.utc)
+                            default_date_to = default_date_to.replace(
+                                tzinfo=None)
+
+                            date_from_calc = default_date_from
+                            date_to_calc = default_date_to
+
+                            if date_line.date() == date_from.date():
+                                if date_from.time() > default_date_from.time():
+                                    date_from_calc = default_date_from.replace(
+                                        hour=date_from.hour,
+                                        minute=date_from.minute,
+                                        second=date_from.second)
+
+                            if date_line.date() == date_to.date():
+                                if date_to.time() < default_date_to.time():
+                                    date_to_calc = default_date_to.replace(
+                                        hour=date_to.hour,
+                                        minute=date_to.minute,
+                                        second=date_to.second)
+                            if date_to_calc < date_from_calc:
+                                date_from_calc = date_to_calc
+                            real_duty_hours += \
+                                (date_to_calc - date_from_calc) \
+                                / timedelta(days=temp_duty_hours / 24) \
+                                * temp_duty_hours
+                        number_of_days += real_duty_hours / default_duty_hours
+
+        return [holiday_ids, number_of_days]
 
     @api.model
     def count_public_holiday(self, date_from, period):
@@ -247,11 +300,11 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
 
             keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
-                    _('Difference'), _('Running'))
+                    _('Difference'), _('Running'), _('Leaves'))
             if use_overtime:
                 keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
                         _('Bonus Hours'), _('Night Shift'),
-                        _('Difference'), _('Running'), _('Leaves'))
+                        _('Difference'), _('Running'))
 
             a = ('previous_month_diff', 'hours', 'total')
             for k in a:
@@ -381,20 +434,19 @@ class HrTimesheetDh(models.Model):
                 start_dt=date_from,
                 resource_id=self.employee_id.id,
                 context=ctx)
-            leaves = self.count_leaves(date_from, self.employee_id.id, period)
+            leave = self.count_leaves(date_from, self.employee_id.id, period)
             public_holiday = self.count_public_holiday(date_from, period)
             if contract.state != 'cancel':
-                if not leaves and not public_holiday:
+                if leave[1] == 0 and not public_holiday:
                     if not dh:
                         dh = 0.00
                     duty_hours += dh
-                elif not leaves and public_holiday:
+                elif public_holiday:
                     dh = 0.00
                     duty_hours += dh
                 else:
-                    if leaves[-1] and leaves[-1][-1]:
-                        if float(leaves[-1][-1]) == (-0.5):
-                            duty_hours += dh / 2
+                    if not public_holiday and leave[1] != 0:
+                        duty_hours += dh * (1 - leave[1])
             else:
                 dh = 0.00
                 duty_hours += dh
@@ -468,11 +520,11 @@ class HrTimesheetDh(models.Model):
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff': current_month_diff,
                          'work_current_month_diff': '',
-                         }
+                         'leaves_descr': ''}
                 if use_overtime:
                     total.update({'bonus_hours': 0.0,
                                   'night_shift': 0.0,
-                                  'leaves_descr': ''})
+                                  })
 
                 last_date = dates[-1]
                 today_worked_hours = 0.0
@@ -527,7 +579,6 @@ class HrTimesheetDh(models.Model):
                             diff = today_diff
                             current_month_diff = today_current_month_diff
 
-
                     date_mark = sheet.get_date_mark(date_line, period)
                     leave_descr = sheet.get_leave_descr(date_line, employee_id)
                     if function_call:
@@ -549,8 +600,8 @@ class HrTimesheetDh(models.Model):
                                 _('Difference'): self.sign_float_time_convert(
                                     diff),
                                 _('Running'): self.sign_float_time_convert(
-                                    current_month_diff),
-                                _('Leaves'): leave_descr})
+                                    current_month_diff)})
+
                         else:
                             res['hours'].append({
                                 _('Date'): date_mark + date_line.strftime(
@@ -563,7 +614,8 @@ class HrTimesheetDh(models.Model):
                                 _('Difference'): self.sign_float_time_convert(
                                     diff),
                                 _('Running'): self.sign_float_time_convert(
-                                    current_month_diff)})
+                                    current_month_diff),
+                                _('Leaves'): leave_descr})
                     else:
                         if use_overtime:
                             res['hours'].append({
@@ -581,8 +633,7 @@ class HrTimesheetDh(models.Model):
                                 'diff': self.sign_float_time_convert(diff),
                                 'running':
                                     self.sign_float_time_convert(
-                                        current_month_diff),
-                                'leaves_descr': leave_descr
+                                        current_month_diff)
                             })
                         else:
                             res['hours'].append({
@@ -595,16 +646,17 @@ class HrTimesheetDh(models.Model):
                                 'running':
                                     self.sign_float_time_convert(
                                         current_month_diff),
+                                'leaves_descr': leave_descr
                             })
                     total['duty_hours'] += dh
                     total['worked_hours'] += worked_hours
 
                     total['diff'] += diff
                     total['work_current_month_diff'] = work_current_month_diff
+                    total['leaves_descr'] = ''
                     if use_overtime:
                         total['bonus_hours'] += bonus_hours
                         total['night_shift'] += night_shift_hours
-                        total['leaves_descr'] = ''
 
                     res['total'] = total
                 return res

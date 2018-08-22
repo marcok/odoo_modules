@@ -156,8 +156,11 @@ class HrAttendance(models.Model):
             ('employee_id', '=', values.get('employee_id')),
             ('date_from', '<=', check_in.date()),
             ('date_to', '>=', check_in.date())], limit=1)
+        _logger.info(sheet_id.state)
+        _logger.info(sheet_id)
+        _logger.info(self.user_has_groups('hr.group_hr_manager'))
         if sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
+                self.user_has_groups('hr.group_hr_user'):
             raise AccessError(
                 _(
                     "Sorry, only manager is allowed to create attendance"
@@ -181,9 +184,11 @@ class HrAttendance(models.Model):
                 raise ValidationError(
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
-
+        _logger.info(self.sheet_id.state)
+        _logger.info(self.sheet_id)
+        _logger.info(self.user_has_groups('hr.group_hr_manager'))
         if self.sheet_id.state == 'done' and not \
-                self.user_has_groups('hr.group_hr_manager'):
+                self.user_has_groups('hr.group_hr_user'):
             raise AccessError(
                 _(
                     "Sorry, only manager is allowed to edit attendance"
