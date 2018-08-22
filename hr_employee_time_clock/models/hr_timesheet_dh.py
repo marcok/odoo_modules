@@ -300,11 +300,11 @@ class HrTimesheetDh(models.Model):
                     output.append('</tr>')
 
             keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
-                    _('Difference'), _('Running'), _('Leaves'))
+                    _('Difference'), _('Running'))
             if use_overtime:
                 keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
                         _('Bonus Hours'), _('Night Shift'),
-                        _('Difference'), _('Running'))
+                        _('Difference'), _('Running'), _('Leaves'))
 
             a = ('previous_month_diff', 'hours', 'total')
             for k in a:
@@ -519,12 +519,11 @@ class HrTimesheetDh(models.Model):
                 work_current_month_diff = 0.0
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff': current_month_diff,
-                         'work_current_month_diff': '',
-                         'leaves_descr': ''}
+                         'work_current_month_diff': ''}
                 if use_overtime:
                     total.update({'bonus_hours': 0.0,
                                   'night_shift': 0.0,
-                                  })
+                                 'leaves_descr': ''})
 
                 last_date = dates[-1]
                 today_worked_hours = 0.0
@@ -600,7 +599,8 @@ class HrTimesheetDh(models.Model):
                                 _('Difference'): self.sign_float_time_convert(
                                     diff),
                                 _('Running'): self.sign_float_time_convert(
-                                    current_month_diff)})
+                                    current_month_diff),
+                                _('Leaves'): leave_descr})
 
                         else:
                             res['hours'].append({
@@ -614,8 +614,7 @@ class HrTimesheetDh(models.Model):
                                 _('Difference'): self.sign_float_time_convert(
                                     diff),
                                 _('Running'): self.sign_float_time_convert(
-                                    current_month_diff),
-                                _('Leaves'): leave_descr})
+                                    current_month_diff)})
                     else:
                         if use_overtime:
                             res['hours'].append({
@@ -633,7 +632,8 @@ class HrTimesheetDh(models.Model):
                                 'diff': self.sign_float_time_convert(diff),
                                 'running':
                                     self.sign_float_time_convert(
-                                        current_month_diff)
+                                        current_month_diff),
+                                'leaves_descr': leave_descr
                             })
                         else:
                             res['hours'].append({
@@ -645,8 +645,7 @@ class HrTimesheetDh(models.Model):
                                 'diff': self.sign_float_time_convert(diff),
                                 'running':
                                     self.sign_float_time_convert(
-                                        current_month_diff),
-                                'leaves_descr': leave_descr
+                                        current_month_diff)
                             })
                     total['duty_hours'] += dh
                     total['worked_hours'] += worked_hours
