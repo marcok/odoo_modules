@@ -471,12 +471,17 @@ class HrTimesheetDh(models.Model):
             date_format = '%m/%d/%Y'
         _logger.info(self.env.context)
         if not self.env.context.get('online_analysis'):
-            return {'hours': [
-                {'dh': '00:00',
-                 'diff': '-00:00',
-                 'running': '-09:23',
-                 'name': 'Name',
-                 'worked_hours': '00:00'}]}
+            return {'previous_month_diff': -1.4133333333333513,
+                    'hours': [
+                        {'dh': '00:00',
+                         'diff': '-00:00',
+                         'running': '-09:23',
+                         'name': str(date.today()),
+                         'worked_hours': '00:00'}],
+                    'total': {'diff': -160.76694444444448,
+                              'duty_hours': 176.0,
+                              'worked_hours': 16.646388888888893,
+                              'work_current_month_diff': -159.44694444444445}}
 
         for sheet in self.sudo():
             if not timesheet_id:
