@@ -353,8 +353,3 @@ class HrAttendance(models.Model):
             values = self.check_overtime(values)
             # self.check_overtime(values)
         return super(HrAttendance, self).write(values)
-
-    @api.model
-    def create(self, values):
-        attendance = super(HrAttendance, self).create(values)
-        return attendance
