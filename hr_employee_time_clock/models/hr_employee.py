@@ -119,6 +119,19 @@ class HrEmployee(models.Model):
                                           and employee.attendance_ids[
                                               0] or False
 
+    @api.one
+    def initial_overtime(self):
+        if not self.user_id:
+            raise ValidationError(_("Employee must have related user."))
+        if not self.user_id.tz:
+            raise ValidationError(_("Timezone for {user} is not set.".format(
+                user=self.user_id.name)))
+        attendances = self.env['hr.attendance'].search(
+            [('employee_id', '=', self.id)])
+
+        for attendance in attendances:
+            attendance.write({'check_out': attendance.check_out})
+
     @api.depends('last_attendance_id.check_in',
                  'last_attendance_id.check_out',
                  'last_attendance_id')

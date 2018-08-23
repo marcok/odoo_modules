@@ -245,24 +245,6 @@ class ResourceCalendar(models.Model):
             to_tz(fields.Datetime.from_string(leave.date_to), leave.tz),
             {'leaves': leave}) for leave in filtered_leaves]
 
-    @api.one
-    def initial_overtime(self):
-        users = self.env['res.users'].search([])
-        for user in users:
-            if not user.tz:
-                raise ValidationError(_("Timezone for {user} "
-                                        "is not set.".format(user=user.name)))
-
-        attendances = self.env['hr.attendance'].search([])
-        # for attendance in attendances:
-        #     attendance.write({'calculate_overtime': False,
-        #                       'have_overtime': False,
-        #                       'overtime_change': False,
-        #                       'bonus_worked_hours': 0.0,
-        #                       'night_shift_worked_hours': 0.0})
-
-        for attendance in attendances:
-            attendance.write({'check_out': attendance.check_out})
 
 class ResourceCalendarAttendanceOvertime(models.Model):
     _name = "resource.calendar.attendance.overtime"

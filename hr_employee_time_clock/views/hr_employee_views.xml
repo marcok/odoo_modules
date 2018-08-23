@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_employee_form_inherit" model="ir.ui.view">
-        <field name="name">view.employee.form.inherit</field>
+    <record id="hr_timesheet_sheet_employee_extd_form" model="ir.ui.view">
+        <field name="name">hr.timesheet.sheet.employee.extd_form</field>
         <field name="model">hr.employee</field>
         <field name="type">form</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="%(act_hr_employee_2_hr_timesheet)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-clock-o"
+                        groups="hr_timesheet.group_hr_timesheet_user">
+                    <field name="timesheet_count" widget="statinfo"
+                           string="Attendance sheets"/>
+                </button>
+            </div>
             <xpath expr="//field[@name='user_id']" position="after">
+                <field name="start_time_different"/>
                 <field name="start_overtime_different"/>
+                <button name="initial_overtime" type="object"
+                        string="Initial Employee Overtime"
+                        class="btn-primary"/>
             </xpath>
         </field>
     </record>
