@@ -470,7 +470,7 @@ class HrTimesheetDh(models.Model):
                 and date_format != '%m/%d/%Y':
             date_format = '%m/%d/%Y'
         _logger.info(self.env.context)
-        if not self.env.context.get('online_analysis'):
+        if not self.env.context.get('online_analysis') and function_call:
             return {'previous_month_diff': -1.4133333333333513,
                     'hours': [
                         {'dh': '00:00',
