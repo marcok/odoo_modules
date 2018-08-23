@@ -197,21 +197,6 @@ class HrTimesheetDh(models.Model):
                     old_timesheet_start_from.strftime('%Y-%m-%d')
                 )
             sheet['calculate_diff_hours'] = (
-                    self.get_overtime(datetime.today().strftime('%Y-%m-%d'), ) +
-                    prev_timesheet_diff)
-            sheet['prev_timesheet_diff'] = prev_timesheet_diff
-
-    @api.multi
-    def _overtime_diff(self):
-        for sheet in self:
-            old_timesheet_start_from = parser.parse(
-                sheet.date_from) - timedelta(days=1)
-            prev_timesheet_diff = \
-                sheet.get_previous_month_diff(
-                    sheet.employee_id.id,
-                    old_timesheet_start_from.strftime('%Y-%m-%d')
-                )
-            sheet['calculate_diff_hours'] = (
                     sheet.get_overtime(
                         datetime.today().strftime('%Y-%m-%d'), ) +
                     prev_timesheet_diff)
@@ -252,7 +237,6 @@ class HrTimesheetDh(models.Model):
             descr = holiday_ids.filtered(lambda holiday: holiday.name != False)
         if descr:
             leave_descr = descr[0].name
-        print('\n leave_descr >>>>>>>> ', leave_descr)
         return leave_descr
 
 
@@ -485,6 +469,15 @@ class HrTimesheetDh(models.Model):
         if not self.env.context.get('online_analysis') \
                 and date_format != '%m/%d/%Y':
             date_format = '%m/%d/%Y'
+
+        if not self.env.context.get('online_analysis'):
+            return {'hours': [
+                {'dh': '00:00',
+                 'diff': '-00:00',
+                 'running': '-09:23',
+                 'name': 'Name',
+                 'worked_hours': '00:00'}]}
+
         for sheet in self.sudo():
             if not timesheet_id:
                 timesheet_id = self[-1].id
