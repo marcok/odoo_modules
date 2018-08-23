@@ -27,6 +27,7 @@ from odoo import api, fields, models, _
 from dateutil import rrule, parser
 from odoo.tools.translate import _
 import calendar
+import math
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -81,6 +82,20 @@ class HrTimesheetDh(models.Model):
         return self.env['hr.holidays.status'].search(
             [('take_into_attendance', '=', True)])
 
+    def get_timezone_time(self, time_without_tz, date_line):
+        fl_part, int_part = math.modf(time_without_tz)
+        local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+        default_date_without_tzinfo = datetime.combine(
+            date_line.date(), datetime.strptime(
+                str(int(int_part)) + ':' + str(int(fl_part * 60)) +
+                ':00', '%H:%M:%S').time())
+        default_date = local_tz.localize(
+            default_date_without_tzinfo).astimezone(
+            pytz.utc)
+        default_date = default_date.replace(
+            tzinfo=None)
+        return default_date
+
     @api.multi
     def count_leaves(self, date_line, employee_id, period):
         holiday_obj = self.env['hr.holidays']
@@ -115,8 +130,6 @@ class HrTimesheetDh(models.Model):
                     default_duty_hours = 0
                     real_duty_hours = 0
                     if calendar_attendance_ids:
-                        local_tz = pytz.timezone(self.env.user.tz or 'UTC')
-
                         for calendar_attendance_id in calendar_attendance_ids:
                             default_duty_hours += \
                                 calendar_attendance_id.hour_to - \
@@ -124,26 +137,11 @@ class HrTimesheetDh(models.Model):
                             temp_duty_hours = calendar_attendance_id.hour_to - \
                                               calendar_attendance_id.hour_from
 
-                            default_date_from_without_tzinfo = datetime.combine(
-                                date_line.date(), datetime.strptime(
-                                    str(int(calendar_attendance_id.hour_from)) +
-                                    ':00:00', '%H:%M:%S').time())
-                            default_date_from = local_tz.localize(
-                                default_date_from_without_tzinfo).astimezone(
-                                pytz.utc)
-                            default_date_from = default_date_from.replace(
-                                tzinfo=None)
+                            default_date_from = self.get_timezone_time(
+                                calendar_attendance_id.hour_from, date_line)
 
-                            default_date_to_without_tzinfo = datetime.combine(
-                                date_line.date(), datetime.strptime(
-                                    str(int(calendar_attendance_id.hour_to)) +
-                                    ':00:00', '%H:%M:%S').time())
-                            default_date_to = local_tz.localize(
-                                default_date_to_without_tzinfo).astimezone(
-                                pytz.utc)
-                            default_date_to = default_date_to.replace(
-                                tzinfo=None)
-
+                            default_date_to = self.get_timezone_time(
+                                calendar_attendance_id.hour_to, date_line)
                             date_from_calc = default_date_from
                             date_to_calc = default_date_to
 
