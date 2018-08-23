@@ -469,7 +469,7 @@ class HrTimesheetDh(models.Model):
         if not self.env.context.get('online_analysis') \
                 and date_format != '%m/%d/%Y':
             date_format = '%m/%d/%Y'
-
+        _logger.info(self.env.context)
         if not self.env.context.get('online_analysis'):
             return {'hours': [
                 {'dh': '00:00',
