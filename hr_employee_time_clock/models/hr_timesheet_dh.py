@@ -462,6 +462,13 @@ class HrTimesheetDh(models.Model):
             time_format = lang.time_format
         return date_format, time_format
 
+    def get_previous_attendance(self, employee_id):
+        previous_attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', employee_id),
+            ('check_out', '!=', False)], limit=1).sorted(
+            key=lambda v: v.check_out)
+        return previous_attendance
+
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
@@ -470,18 +477,22 @@ class HrTimesheetDh(models.Model):
                 and date_format != '%m/%d/%Y':
             date_format = '%m/%d/%Y'
         _logger.info(self.env.context)
-        if not self.env.context.get('online_analysis'):
-            return {'previous_month_diff': -1.4133333333333513,
+        if timesheet_id and not self.env.context.get('online_analysis'):
+            attendance_sheet = self.env['hr_timesheet_sheet.sheet'].browse(
+                timesheet_id)
+            last_attendance = self.get_previous_attendance(attendance_sheet.employee_id.id)
+            return {'previous_month_diff': 0.0,
                     'hours': [
                         {'dh': '00:00',
                          'diff': '-00:00',
-                         'running': '-09:23',
+                         'running': str(self.sign_float_time_convert(
+                             last_attendance.running)),
                          'name': str(date.today()),
                          'worked_hours': '00:00'}],
-                    'total': {'diff': -160.76694444444448,
-                              'duty_hours': 176.0,
-                              'worked_hours': 16.646388888888893,
-                              'work_current_month_diff': -159.44694444444445}}
+                    'total': {'diff': 0.0,
+                              'duty_hours': 0.0,
+                              'worked_hours': 0.0,
+                              'work_current_month_diff': 0.0}}
 
         for sheet in self.sudo():
             if not timesheet_id:
@@ -565,6 +576,14 @@ class HrTimesheetDh(models.Model):
                         today_worked_hours = worked_hours
                         today_diff = diff
                         today_current_month_diff = current_month_diff
+
+                        last_attendance = sheet.get_previous_attendance(
+                            employee_id)
+                        if last_attendance and last_attendance.running == 0:
+                            last_attendance.write({
+                                'running': today_current_month_diff,
+                            })
+
                     if date_line == last_date:
                         if not self.env.context.get('online_analysis'):
                             worked_hours = today_worked_hours
