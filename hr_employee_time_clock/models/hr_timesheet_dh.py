@@ -471,6 +471,7 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
+        print('\n\n >>>>>>>>>>>>>>>>>>> attendance_analysis')
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
         if not self.env.context.get('online_analysis') \
@@ -579,10 +580,11 @@ class HrTimesheetDh(models.Model):
 
                         last_attendance = sheet.get_previous_attendance(
                             employee_id)
-                        if last_attendance and last_attendance.running == 0:
+                        if last_attendance and last_attendance.running == 0.0:
                             last_attendance.write({
                                 'running': today_current_month_diff,
                             })
+                            print('\n\nOLOLO\n\n')
 
                     if date_line == last_date:
                         if not self.env.context.get('online_analysis'):
