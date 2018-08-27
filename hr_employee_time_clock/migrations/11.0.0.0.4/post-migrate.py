@@ -27,6 +27,7 @@ from datetime import datetime, date, timedelta
 import calendar
 import math
 
+
 def migrate(cr, version):
     cr.execute(
         """UPDATE hr_attendance  SET running = 0.0""")
@@ -114,17 +115,20 @@ def migrate(cr, version):
                         })
                         break
 
+
 def get_previous_month_diff(cr, employee_id, prev_timesheet_date_from,
                             current_timesheet_id):
     env = api.Environment(cr, SUPERUSER_ID, {})
     total_diff = employee_id.start_time_different
     prev_timesheet_ids = env['hr_timesheet_sheet.sheet'].search(
         [('employee_id', '=', employee_id.id)
-         ]).filtered(lambda sheet: sheet.date_to < current_timesheet_id.date_from).sorted(
+         ]).filtered(
+        lambda sheet: sheet.date_to < current_timesheet_id.date_from).sorted(
         key=lambda v: v.date_from)
     if prev_timesheet_ids:
         total_diff = prev_timesheet_ids[-1].calculate_diff_hours
     return total_diff
+
 
 def calculate_duty_hours(cr, date_from, period, employee_id):
     env = api.Environment(cr, SUPERUSER_ID, {})
@@ -164,11 +168,13 @@ def calculate_duty_hours(cr, date_from, period, employee_id):
             duty_hours += dh
     return duty_hours
 
+
 def take_holiday_status(cr):
     env = api.Environment(cr, SUPERUSER_ID, {})
     holiday_status_ids = env['hr.holidays.status'].search(
         [('take_into_attendance', '=', True)])
     return holiday_status_ids
+
 
 def count_leaves(cr, date_line, employee_id, period):
     env = api.Environment(cr, SUPERUSER_ID, {})
@@ -242,6 +248,7 @@ def count_leaves(cr, date_line, employee_id, period):
 
     return [holiday_ids, number_of_days]
 
+
 def count_public_holiday(cr, date_from, period):
     env = api.Environment(cr, SUPERUSER_ID, {})
     public_holidays = []
@@ -252,6 +259,7 @@ def count_public_holiday(cr, date_from, period):
         public_holidays = holiday_obj.search(
             [('date', '=', date_from)])
     return public_holidays
+
 
 def get_timezone_time(cr, time_without_tz, date_line):
     env = api.Environment(cr, SUPERUSER_ID, {})
