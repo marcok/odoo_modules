@@ -471,7 +471,6 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
-        print('\n\n >>>>>>>>>>>>>>>>>>> attendance_analysis')
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
         if not self.env.context.get('online_analysis') \
