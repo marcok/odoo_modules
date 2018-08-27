@@ -583,7 +583,6 @@ class HrTimesheetDh(models.Model):
                             last_attendance.write({
                                 'running': today_current_month_diff,
                             })
-                            print('\n\nOLOLO\n\n')
 
                     if date_line == last_date:
                         if not self.env.context.get('online_analysis'):
