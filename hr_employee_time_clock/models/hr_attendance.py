@@ -81,6 +81,7 @@ class HrAttendance(models.Model):
     night_shift_worked_hours = fields.Float(string='Night Shift',
                                             readonly=True, default=0.0)
     running = fields.Float(string="Running",
+                           readonly=True,
                            default=0.0)
 
     @api.multi
