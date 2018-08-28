@@ -62,8 +62,8 @@ def migrate(cr, version):
 
             use_overtime = resource_calendar_id.use_overtime
 
-            previous_month_diff = get_previous_month_diff(
-                cr, employee_id, start_date, current_timesheet_id)
+            previous_month_diff = get_previous_month_diff(cr, employee_id,
+                                                          current_timesheet_id)
 
             current_month_diff = previous_month_diff
             period = {'date_from': start_date,
@@ -120,10 +120,12 @@ def migrate(cr, version):
                         break
 
 
-def get_previous_month_diff(cr, employee_id, prev_timesheet_date_from,
-                            current_timesheet_id):
+def get_previous_month_diff(cr, employee_id, current_timesheet_id):
     """
     Calculates total hours of previous timesheet.
+    :param employee_id: hr.employee object
+    :param current_timesheet_id: hr_timesheet_sheet.sheet object
+    :return: float
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     total_diff = employee_id.start_time_different
@@ -139,6 +141,12 @@ def get_previous_month_diff(cr, employee_id, prev_timesheet_date_from,
 def calculate_duty_hours(cr, date_from, period, employee_id):
     """
     Calculates duty hours for employee on current date.
+    :param date_from: datetime string
+    :param period: {'date_from': hr_timesheet_sheet.sheet date_from,
+                  'date_to': hr_timesheet_sheet.sheet date_to
+                  }
+    :param employee_id: hr.employee object
+    :return: float
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     contract_obj = env['hr.contract']

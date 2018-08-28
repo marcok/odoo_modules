@@ -80,6 +80,12 @@ class HrAttendance(models.Model):
 
     @api.multi
     def _get_current_sheet(self, employee_id, date=False):
+        """
+        Returns current timesheet (depends on date)
+        :param employee_id: hr.employee object's id
+        :param date: datetime object
+        :return: hr_timesheet_sheet.sheet object or False
+        """
         sheet_obj = self.env['hr_timesheet_sheet.sheet']
         if not date:
             date = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
@@ -140,6 +146,11 @@ class HrAttendance(models.Model):
         index=True)
 
     def float_time_convert(self, float_val):
+        """
+        Converts float value of hours into time value
+        :param float_val: hours/minutes in float type
+        :return: string
+        """
         hours = math.floor(abs(float_val))
         mins = abs(float_val) - hours
         mins = round(mins * 60)
