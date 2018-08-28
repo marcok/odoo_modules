@@ -61,7 +61,7 @@
                 <field name="bonus_worked_hours" attrs="{'invisible':[('bonus_worked_hours','=',0)]}" widget="float_time"/>
                 <field name="worked_hours" attrs="{'invisible':[('worked_hours','=',0)]}" widget="float_time"/>
                 <field name="night_shift_worked_hours" attrs="{'invisible':[('night_shift_worked_hours','=',0)]}" widget="float_time"/>
-                <field name="running" string="Running" invisible="1"/>
+                <field name="running" string="Running" invisible="0"/>
             </xpath>
         </field>
     </record>
