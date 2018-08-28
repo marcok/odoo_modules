@@ -79,10 +79,21 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def take_holiday_status(self):
+        """
+        Takes holiday types, which must change duty hours.
+        :return: hr.holidays.status objects
+        """
         return self.env['hr.holidays.status'].search(
             [('take_into_attendance', '=', True)])
 
     def get_timezone_time(self, time_without_tz, date_line):
+        """
+        Is used to transform hours/minutes, wrote in database in int/float type, into
+        datetime object without timezone info. For example 8.5 -> 2018-08-28 05:30:00
+        (including user timezone).
+        :param time_without_tz: float
+        :return: datetime
+        """
         fl_part, int_part = math.modf(time_without_tz)
         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
         default_date_without_tzinfo = datetime.combine(
@@ -98,6 +109,12 @@ class HrTimesheetDh(models.Model):
 
     @api.multi
     def count_leaves(self, date_line, employee_id, period):
+        """
+        Checks if employee has any leave on current date.
+        :param date_line: datetime
+        :param employee_id: hr.employee object's id
+        :return: list [hr.holidays objects, float]
+        """
         holiday_obj = self.env['hr.holidays']
         holiday_ids = holiday_obj.search([
             ('employee_id', '=', employee_id),
@@ -170,6 +187,11 @@ class HrTimesheetDh(models.Model):
 
     @api.model
     def count_public_holiday(self, date_from, period):
+        """
+        Checks if there is any public holiday on current date.
+        :param date_from: datetime string
+        :return: hr.holidays.public.line objects
+        """
         public_holidays = []
         model = self.env['ir.model'].search(
             [('model', '=', 'hr.holidays.public.line')])
