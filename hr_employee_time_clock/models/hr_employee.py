@@ -121,6 +121,12 @@ class HrEmployee(models.Model):
 
     @api.one
     def initial_overtime(self):
+        """
+        Checks if timezone is set for each user.
+        Checks if each employee has related user.
+        Rewrites all attendances of current employee to initialise
+        recalculation of bonus, night shift worked hours.
+        """
         if not self.user_id:
             raise ValidationError(_("Employee must have related user."))
         if not self.user_id.tz:
