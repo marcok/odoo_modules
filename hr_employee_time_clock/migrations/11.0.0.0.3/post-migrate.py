@@ -167,8 +167,8 @@ def calculate_duty_hours(cr, date_from, period, employee_id):
             start_dt=date_from,
             resource_id=employee_id.id,
             context=ctx)
-        leave = count_leaves(cr, date_from, employee_id.id, period)
-        public_holiday = count_public_holiday(cr, date_from, period)
+        leave = count_leaves(cr, date_from, employee_id.id)
+        public_holiday = count_public_holiday(cr, date_from)
         if contract.state != 'cancel':
             if leave[1] == 0 and not public_holiday:
                 if not dh:
@@ -189,6 +189,7 @@ def calculate_duty_hours(cr, date_from, period, employee_id):
 def take_holiday_status(cr):
     """
     Takes holiday types, which must change duty hours.
+    :return: hr.holidays.status objects
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     holiday_status_ids = env['hr.holidays.status'].search(
@@ -196,9 +197,12 @@ def take_holiday_status(cr):
     return holiday_status_ids
 
 
-def count_leaves(cr, date_line, employee_id, period):
+def count_leaves(cr, date_line, employee_id):
     """
     Checks if employee has any leave on current date.
+    :param date_line: datetime
+    :param employee_id: hr.employee object's id
+    :return: list [hr.holidays objects, float]
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     holiday_obj = env['hr.holidays']
@@ -272,9 +276,11 @@ def count_leaves(cr, date_line, employee_id, period):
     return [holiday_ids, number_of_days]
 
 
-def count_public_holiday(cr, date_from, period):
+def count_public_holiday(cr, date_from):
     """
     Checks if there is any public holiday on current date.
+    :param date_from: datetime string
+    :return: hr.holidays.public.line objects
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     public_holidays = []
@@ -292,6 +298,8 @@ def get_timezone_time(cr, time_without_tz, date_line):
     Is used to transform hours/minutes, wrote in database in int/float type, into
     datetime object without timezone info. For example 8.5 -> 2018-08-28 05:30:00
     (including user timezone).
+    :param time_without_tz: float
+    :return: datetime
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     fl_part, int_part = math.modf(time_without_tz)
