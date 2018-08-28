@@ -27,12 +27,12 @@ from datetime import datetime, date, timedelta
 import calendar
 import math
 
-"""
-This migration is made to calculate running time for each active employee and 
-write it into last attendance, which has check out. It is important to 
-companies that already use Employee Time Clock module.
-"""
 def migrate(cr, version):
+    """
+    This migration is made to calculate running time for each active employee and
+    write it into last attendance, which has check out. It is important to
+    companies that already use Employee Time Clock module.
+    """
     cr.execute(
         """UPDATE hr_attendance  SET running = 0.0""")
     env = api.Environment(cr, SUPERUSER_ID, {})
@@ -120,11 +120,11 @@ def migrate(cr, version):
                         break
 
 
-"""
-Calculates total hours of previous timesheet.
-"""
 def get_previous_month_diff(cr, employee_id, prev_timesheet_date_from,
                             current_timesheet_id):
+    """
+    Calculates total hours of previous timesheet.
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     total_diff = employee_id.start_time_different
     prev_timesheet_ids = env['hr_timesheet_sheet.sheet'].search(
@@ -136,10 +136,10 @@ def get_previous_month_diff(cr, employee_id, prev_timesheet_date_from,
         total_diff = prev_timesheet_ids[-1].calculate_diff_hours
     return total_diff
 
-"""
-Calculates duty hours for employee on current date.
-"""
 def calculate_duty_hours(cr, date_from, period, employee_id):
+    """
+    Calculates duty hours for employee on current date.
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     contract_obj = env['hr.contract']
     calendar_obj = env['resource.calendar']
@@ -178,20 +178,20 @@ def calculate_duty_hours(cr, date_from, period, employee_id):
     return duty_hours
 
 
-"""
-Takes holiday types, which must change duty hours.
-"""
 def take_holiday_status(cr):
+    """
+    Takes holiday types, which must change duty hours.
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     holiday_status_ids = env['hr.holidays.status'].search(
         [('take_into_attendance', '=', True)])
     return holiday_status_ids
 
 
-"""
-Checks if employee has any leave on current date.
-"""
 def count_leaves(cr, date_line, employee_id, period):
+    """
+    Checks if employee has any leave on current date.
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     holiday_obj = env['hr.holidays']
     holiday_ids = holiday_obj.search([
@@ -264,10 +264,10 @@ def count_leaves(cr, date_line, employee_id, period):
     return [holiday_ids, number_of_days]
 
 
-"""
-Checks if there is any public holiday on current date.
-"""
 def count_public_holiday(cr, date_from, period):
+    """
+    Checks if there is any public holiday on current date.
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     public_holidays = []
     model = env['ir.model'].search(
@@ -279,12 +279,12 @@ def count_public_holiday(cr, date_from, period):
     return public_holidays
 
 
-"""
-Is used to transform hours/minutes, wrote in database in int/float type, into 
-datetime object without timezone info. For example 8.5 -> 2018-08-28 05:30:00 
-(including user timezone).
-"""
 def get_timezone_time(cr, time_without_tz, date_line):
+    """
+    Is used to transform hours/minutes, wrote in database in int/float type, into
+    datetime object without timezone info. For example 8.5 -> 2018-08-28 05:30:00
+    (including user timezone).
+    """
     env = api.Environment(cr, SUPERUSER_ID, {})
     fl_part, int_part = math.modf(time_without_tz)
     local_tz = pytz.timezone(env.user.tz or 'UTC')
