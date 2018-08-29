@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data>
 
     <record id="view_hr_attendance_analysis_report_tree" model="ir.ui.view">
@@ -23,6 +23,7 @@
                 <field name="name" type="row"/>
                 <field name="total_duty_hours_running" type="measure"/>
                 <field name="total_duty_hours_done" type="measure"/>
+                <field name="current_hours_running" type="measure"/>
                 <field name="timesheet_id" type="col"/>
             </graph>
         </field>
@@ -50,4 +51,4 @@
                   action="hr_attendance.hr_attendance_action_my_attendances"/>
 
     </data>
-</openerp>
+</odoo>
