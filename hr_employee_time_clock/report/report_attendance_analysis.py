@@ -47,35 +47,36 @@ class HrAttendanceAnalysisReport(models.Model):
     def init(self):
         tools.drop_view_if_exists(self.env.cr, 'hr_attendance_analysis_report')
         self.env.cr.execute("""
-            CREATE or REPLACE view hr_attendance_analysis_report as (
-                 select
-                     min(sheet.id) as id,
-                     sheet.id as timesheet_id,
-                     sheet.employee_id as name,
-                     emp.department_id as department_id,
-                     res.user_id as user_id,
-                     (select r.user_id
-                     from resource_resource r, hr_employee e
-                     where r.id = e.resource_id and e.id=emp.parent_id) as parent_user_id,
-                     sheet.total_diff_hours as total_duty_hours_running,
-                     sheet.total_duty_hours_done as total_duty_hours_done,
-                     (select a.running 
-                        from hr_attendance a
-                        where a.check_in=(select max(check_in) 
-                        from hr_attendance att 
-                        where att.employee_id=sheet.employee_id) and a.check_out is not null 
-                        and a.employee_id=sheet.employee_id) as current_hours_running
-                from
+            CREATE OR REPLACE VIEW hr_attendance_analysis_report AS (
+                 SELECT 
+                     MIN(sheet.id) AS id,
+                     sheet.id AS timesheet_id,
+                     sheet.employee_id AS name,
+                     emp.department_id AS department_id,
+                     res.user_id AS user_id,
+                     (SELECT r.user_id
+                     FROM resource_resource r, hr_employee e
+                     WHERE r.id = e.resource_id AND e.id=emp.parent_id) AS parent_user_id,
+                     sheet.total_diff_hours AS total_duty_hours_running,
+                     sheet.total_duty_hours_done AS total_duty_hours_done,
+                     (SELECT a.running 
+                        FROM hr_attendance a
+                        WHERE a.check_in=(SELECT MAX(check_in) 
+                            FROM hr_attendance att 
+                            WHERE att.employee_id=sheet.employee_id) 
+                            AND a.check_out IS NOT NULL 
+                            AND a.employee_id=sheet.employee_id) AS current_hours_running
+                FROM
                     hr_timesheet_sheet_sheet sheet,
                     hr_employee emp,
                    resource_resource res,
                     hr_department dp
-                where
+                WHERE
                     sheet.employee_id=emp.id AND
                     emp.resource_id=res.id AND
                     emp.department_id=dp.id AND
                     emp.active=TRUE
-                group by
+                GROUP BY
                     sheet.id, emp.department_id, res.user_id, emp.parent_id)
         """)
 
