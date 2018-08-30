@@ -23,7 +23,7 @@
                 <field name="name" type="row"/>
                 <field name="total_duty_hours_running" type="measure"/>
                 <field name="total_duty_hours_done" type="measure"/>
-                <field name="current_hours_running" type="measure"/>
+                <!--<field name="current_hours_running" type="measure"/>-->
                 <field name="timesheet_id" type="col"/>
             </graph>
         </field>

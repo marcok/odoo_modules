@@ -37,15 +37,14 @@ class HrAttendanceAnalysisReport(models.Model):
                                    string='Timesheet')
     total_duty_hours_running = fields.Float(string='Running Hours')
     total_duty_hours_done = fields.Float(string='Duty Hours')
-    current_hours_running = fields.Float(string='Today Running Hours', default=0.0)
-                                         # compute='_compute_current_hours_running')
+    current_hours_running = fields.Float(string='Today Running Hours',
+                                         default=0.0)
     user_id = fields.Many2one('res.users',
                               string='User of Employee')
     parent_user_id = fields.Many2one('res.users',
                                      string='User of Manager')
 
     def init(self):
-        print('\n\n OLOLO INIT OLOLO\n\n')
         tools.drop_view_if_exists(self.env.cr, 'hr_attendance_analysis_report')
         self.env.cr.execute("""
             CREATE or REPLACE view hr_attendance_analysis_report as (
@@ -60,31 +59,24 @@ class HrAttendanceAnalysisReport(models.Model):
                      where r.id = e.resource_id and e.id=emp.parent_id) as parent_user_id,
                      sheet.total_diff_hours as total_duty_hours_running,
                      sheet.total_duty_hours_done as total_duty_hours_done,
-                     (SELECT running FROM hr_attendance 
-                      WHERE employee_id=sheet.employee_id AND check_out IS NOT NULL 
-                      AND check_in=(SELECT MAX(check_in) 
-                      FROM public.hr_attendance 
-                      WHERE employee_id=sheet.employee_id)) as current_hours_running 
+                     (select a.running 
+                        from hr_attendance a
+                        where a.check_in=(select max(check_in) 
+                        from hr_attendance att 
+                        where att.employee_id=sheet.employee_id) and a.check_out is not null 
+                        and a.employee_id=sheet.employee_id) as current_hours_running
                 from
                     hr_timesheet_sheet_sheet sheet,
                     hr_employee emp,
-                    resource_resource res,
-                    hr_department dp,
-                    hr_attendance att
+                   resource_resource res,
+                    hr_department dp
                 where
                     sheet.employee_id=emp.id AND
                     emp.resource_id=res.id AND
                     emp.department_id=dp.id AND
-                    sheet.employee_id=att.employee_id
+                    emp.active=TRUE
                 group by
-                    sheet.id, emp.department_id, res.user_id, emp.parent_id
-            )
+                    sheet.id, emp.department_id, res.user_id, emp.parent_id)
         """)
-
-    def _compute_current_hours_running(self):
-        for record in self:
-            pass
-
-
 
         # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
