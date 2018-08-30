@@ -135,7 +135,7 @@ def get_previous_month_diff(cr, employee_id, current_timesheet_id):
         lambda sheet: sheet.date_to < current_timesheet_id.date_from).sorted(
         key=lambda v: v.date_from)
     if prev_timesheet_ids:
-        total_diff = prev_timesheet_ids[-1].calculate_diff_hours
+        total_diff += prev_timesheet_ids[-1].calculate_diff_hours
     return total_diff
 
 def calculate_duty_hours(cr, date_from, period, employee_id):
