@@ -602,9 +602,13 @@ class HrTimesheetDh(models.Model):
                         last_attendance = sheet.get_previous_attendance(
                             employee_id)
                         if last_attendance and last_attendance.running == 0.0:
-                            last_attendance.write({
-                                'running': today_current_month_diff,
-                            })
+                            self._cr.execute("""
+                                        UPDATE hr_attendance
+                                        SET running=%s
+                                        WHERE id=%s""", (today_current_month_diff, last_attendance.id,))
+                            # last_attendance.write({
+                            #     'running': today_current_month_diff,
+                            # })
 
                     if date_line == last_date:
                         if not self.env.context.get('online_analysis'):
