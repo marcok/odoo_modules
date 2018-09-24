@@ -95,6 +95,8 @@ class HrTimesheetDh(models.Model):
         :return: datetime
         """
         fl_part, int_part = math.modf(time_without_tz)
+        if fl_part:
+            fl_part = round(fl_part, 2)
         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
         default_date_without_tzinfo = datetime.combine(
             date_line.date(), datetime.strptime(
@@ -161,7 +163,6 @@ class HrTimesheetDh(models.Model):
                                 calendar_attendance_id.hour_to, date_line)
                             date_from_calc = default_date_from
                             date_to_calc = default_date_to
-
                             if date_line.date() == date_from.date():
                                 if date_from.time() > default_date_from.time():
                                     date_from_calc = default_date_from.replace(
@@ -455,7 +456,6 @@ class HrTimesheetDh(models.Model):
             else:
                 dh = 0.00
                 duty_hours += dh
-
         return duty_hours
 
     @api.multi
