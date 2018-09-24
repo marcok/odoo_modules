@@ -467,7 +467,7 @@ class HrTimesheetDh(models.Model):
              ]).filtered(lambda sheet: sheet.date_to < self.date_from).sorted(
             key=lambda v: v.date_from)
         if prev_timesheet_ids:
-            total_diff += prev_timesheet_ids[-1].calculate_diff_hours
+            total_diff = prev_timesheet_ids[-1].calculate_diff_hours
         return total_diff
 
     @api.multi
