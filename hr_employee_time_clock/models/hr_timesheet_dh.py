@@ -380,27 +380,6 @@ class HrTimesheetDh(models.Model):
             output.append('</table>')
             sheet['analysis'] = '\n'.join(output)
 
-
-    total_duty_hours = fields.Float(compute='_duty_hours',
-                                    string='Total Duty Hours',
-                                    multi="_duty_hours")
-    total_duty_hours_done = fields.Float(string='Total Duty Hours',
-                                         readonly=True,
-                                         default=0.0)
-    total_diff_hours = fields.Float(string='Total Diff Hours',
-                                    readonly=True,
-                                    default=0.0)
-    calculate_diff_hours = fields.Float(compute='_overtime_diff',
-                                       string="Diff (worked-duty)",
-                                       multi="_diff")
-    prev_timesheet_diff = fields.Float(compute='_overtime_diff',
-                                       method=True,
-                                       string="Diff from old",
-                                       multi="_diff")
-    analysis = fields.Text(compute='_get_analysis',
-                           type="text",
-                           string="Attendance Analysis")
-
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None,
                     order=None):

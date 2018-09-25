@@ -67,38 +67,6 @@ class HrTimesheetSheet(models.Model):
             [('user_id', '=', self.env.uid)])
         return emp_ids and emp_ids[0] or False
 
-    # @api.multi
-    # def _total(self):
-    #     """ Compute the attendances, analytic lines timesheets
-    #     and differences between them
-    #         for all the days of a timesheet and the current day
-    #     """
-    #     ids = [i.id for i in self]
-    #
-    #     self.env.cr.execute("""
-    #         SELECT sheet_id as id,
-    #                sum(total_attendance) as total_attendance,
-    #                sum(total_timesheet) as total_timesheet,
-    #                sum(total_difference) as  total_difference
-    #         FROM hr_timesheet_sheet_sheet_day
-    #         WHERE sheet_id IN %s
-    #         GROUP BY sheet_id
-    #     """, (tuple(ids),))
-    #
-    #     res = self.env.cr.dictfetchall()
-    #     if res:
-    #         ctx = self.env.context.copy()
-    #         ctx['online_analysis'] = True
-    #         for sheet in self:
-    #             if sheet.id == res[0].get('id'):
-    #                 sheet.total_attendance = \
-    #                     self.with_context(ctx).attendance_analysis()[
-    #                     'total'].get('worked_hours')
-    #                 sheet.total_timesheet = res[0].get(
-    #                     'total_timesheet')
-    #                 sheet.total_difference = res[0].get(
-    #                     'total_difference')
-
     @api.multi
     def _total(self):
         """ Compute the attendances, analytic lines timesheets
@@ -192,6 +160,8 @@ class HrTimesheetSheet(models.Model):
                                     states={
                                         'draft': [('readonly', False)],
                                         'new': [('readonly', False)]})
+
+    note = fields.Text(string="Note")
     state = fields.Selection([('new', 'New'),
                               ('draft', 'Open'),
                               ('confirm', 'Waiting Approval'),
@@ -232,6 +202,26 @@ class HrTimesheetSheet(models.Model):
                                  string='Period', readonly=True)
     attendance_count = fields.Integer(compute='_compute_attendances',
                                       string="Attendances")
+
+    total_duty_hours = fields.Float(compute='_duty_hours',
+                                    string='Total Duty Hours',
+                                    multi="_duty_hours")
+    total_duty_hours_done = fields.Float(string='Total Duty Hours',
+                                         readonly=True,
+                                         default=0.0)
+    total_diff_hours = fields.Float(string='Total Diff Hours',
+                                    readonly=True,
+                                    default=0.0)
+    calculate_diff_hours = fields.Float(compute='_overtime_diff',
+                                        string="Diff (worked-duty)",
+                                        multi="_diff")
+    prev_timesheet_diff = fields.Float(compute='_overtime_diff',
+                                       method=True,
+                                       string="Diff from old",
+                                       multi="_diff")
+    analysis = fields.Text(compute='_get_analysis',
+                           type="text",
+                           string="Attendance Analysis")
 
     @api.model
     def create(self, values):
