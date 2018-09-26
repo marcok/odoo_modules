@@ -49,6 +49,9 @@ class HrTimesheetDh(models.Model):
                 dates = list(rrule.rrule(rrule.DAILY,
                                          dtstart=parser.parse(sheet.date_from),
                                          until=parser.parse(sheet.date_to)))
+
+
+
                 period = {'date_from': sheet.date_from,
                           'date_to': sheet.date_to}
 
@@ -212,6 +215,10 @@ class HrTimesheetDh(models.Model):
     @api.multi
     def _overtime_diff(self):
         for sheet in self:
+            employee_id = sheet.employee_id.id
+            start_date = sheet.date_from
+            contract = self.check_contract(employee_id, start_date)
+
             old_timesheet_start_from = parser.parse(
                 sheet.date_from) - timedelta(days=1)
             prev_timesheet_diff = \
@@ -219,11 +226,16 @@ class HrTimesheetDh(models.Model):
                     sheet.employee_id.id,
                     old_timesheet_start_from.strftime('%Y-%m-%d')
                 )
-            sheet['calculate_diff_hours'] = (
-                    sheet.get_overtime(
-                        datetime.today().strftime('%Y-%m-%d'), ) +
-                    prev_timesheet_diff)
-            sheet['prev_timesheet_diff'] = prev_timesheet_diff
+            if not contract or not contract.rate_per_hour:
+                sheet['calculate_diff_hours'] = (
+                        sheet.get_overtime(
+                            datetime.today().strftime('%Y-%m-%d'), ) +
+                        prev_timesheet_diff)
+                sheet['prev_timesheet_diff'] = prev_timesheet_diff
+            elif contract and contract.rate_per_hour:
+                sheet['calculate_diff_hours'] = (sheet.get_overtime(
+                    datetime.today().strftime('%Y-%m-%d'), ))
+                sheet['prev_timesheet_diff'] = 0.00
 
     def check_contract(self, employee, date_line):
         contract = self.env['hr.contract'].search([
@@ -410,6 +422,8 @@ class HrTimesheetDh(models.Model):
              ('date_end', '>=', date_from),
              ('date_end', '=', None)])
         for contract in contract_ids:
+            if contract and contract.rate_per_hour:
+                return 0.00
             ctx = dict(self.env.context).copy()
             ctx.update(period)
             dh = calendar_obj.get_working_hours_of_date(
@@ -513,6 +527,8 @@ class HrTimesheetDh(models.Model):
 
                 previous_month_diff = sheet.get_previous_month_diff(
                     employee_id, start_date)
+                if contract and contract.rate_per_hour:
+                    previous_month_diff = 0.0
                 current_month_diff = previous_month_diff
                 res = {
                     'previous_month_diff': previous_month_diff,
@@ -543,6 +559,8 @@ class HrTimesheetDh(models.Model):
                 for date_line in dates:
                     dh = sheet.calculate_duty_hours(date_from=date_line,
                                                     period=period)
+                    if contract and contract.rate_per_hour:
+                        dh = 0.0
 
                     worked_hours = 0.0
                     bonus_hours = 0.0

@@ -20,20 +20,23 @@
 #
 ##############################################################################
 
-from . import hr_attendance_analysis
-from . import resource_calendar
-from . import hr_holidays
 
-from . import account_analytic_line
-from . import hr_department
-from . import hr_employee
-from . import hr_timesheet_sheet
-from . import hr_timesheet_dh
-from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
-from . import res_company
-from . import hr_attendance
-from . import hr_contract
-from . import res_config_settings
+import pytz
+from datetime import datetime, timedelta, date
+from odoo import api, fields, models, _
+from dateutil import rrule, parser
+from odoo.tools.translate import _
+import calendar
+import math
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
+class HrContract(models.Model):
+    """
+        Addition plugin for HR timesheet for work with duty hours
+    """
+    _inherit = 'hr.contract'
+
+    rate_per_hour = fields.Boolean(string="Use hour rate")

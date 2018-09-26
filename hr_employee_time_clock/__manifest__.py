@@ -63,6 +63,7 @@
         # Extension
         'views/res_config_settings_views.xml',
         'views/hr_employee_views.xml',
+        'views/hr_contract_views.xml',
         'views/resource_calendar_view.xml',
     ],
     'qweb': ['static/src/xml/timesheet.xml', ],
