@@ -50,8 +50,6 @@ class HrTimesheetDh(models.Model):
                                          dtstart=parser.parse(sheet.date_from),
                                          until=parser.parse(sheet.date_to)))
 
-
-
                 period = {'date_from': sheet.date_from,
                           'date_to': sheet.date_to}
 
@@ -101,10 +99,11 @@ class HrTimesheetDh(models.Model):
         if fl_part:
             fl_part = round(fl_part, 2)
         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
+        datetime_str = '{}:{}:00'.format(str(int(int_part)),
+                                         str(round(fl_part * 60, 0)))
         default_date_without_tzinfo = datetime.combine(
             date_line.date(), datetime.strptime(
-                str(int(int_part)) + ':' + str(int(fl_part * 60)) +
-                ':00', '%H:%M:%S').time())
+                datetime_str, '%H:%M:%S').time())
         default_date = local_tz.localize(
             default_date_without_tzinfo).astimezone(
             pytz.utc)
@@ -133,7 +132,6 @@ class HrTimesheetDh(models.Model):
             for holiday_id in holiday_ids:
                 date_from = fields.Datetime.from_string(holiday_id.date_from)
                 date_to = fields.Datetime.from_string(holiday_id.date_to)
-
                 contracts = self.env['hr.contract'].search([
                     ('employee_id', '=', employee_id),
                     ('date_start', '<=', holiday_id.date_from),
@@ -164,6 +162,7 @@ class HrTimesheetDh(models.Model):
 
                             default_date_to = self.get_timezone_time(
                                 calendar_attendance_id.hour_to, date_line)
+
                             date_from_calc = default_date_from
                             date_to_calc = default_date_to
                             if date_line.date() == date_from.date():
@@ -179,6 +178,7 @@ class HrTimesheetDh(models.Model):
                                         hour=date_to.hour,
                                         minute=date_to.minute,
                                         second=date_to.second)
+
                             if date_to_calc < date_from_calc:
                                 date_from_calc = date_to_calc
                             real_duty_hours += \
@@ -228,9 +228,9 @@ class HrTimesheetDh(models.Model):
                 )
             if not contract or not contract.rate_per_hour:
                 sheet['calculate_diff_hours'] = (
-                        sheet.get_overtime(
-                            datetime.today().strftime('%Y-%m-%d'), ) +
-                        prev_timesheet_diff)
+                    sheet.get_overtime(
+                        datetime.today().strftime('%Y-%m-%d'), ) +
+                    prev_timesheet_diff)
                 sheet['prev_timesheet_diff'] = prev_timesheet_diff
             elif contract and contract.rate_per_hour:
                 sheet['calculate_diff_hours'] = (sheet.get_overtime(
@@ -273,7 +273,6 @@ class HrTimesheetDh(models.Model):
         if descr:
             leave_descr = descr[0].name
         return leave_descr
-
 
     @api.multi
     def _get_analysis(self):
@@ -322,7 +321,7 @@ class HrTimesheetDh(models.Model):
             if use_overtime:
                 keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
                         _('Bonus Hours'), _('Night Shift'),
-                        _('Difference'), _('Running'),_('Leaves'))
+                        _('Difference'), _('Running'), _('Leaves'))
 
             a = ('previous_month_diff', 'hours', 'total')
             for k in a:
@@ -444,6 +443,7 @@ class HrTimesheetDh(models.Model):
                     dh = 0.00
                     duty_hours += dh
                 else:
+
                     if not public_holiday and leave[1] != 0:
                         duty_hours += dh * (1 - leave[1])
             else:
@@ -495,7 +495,8 @@ class HrTimesheetDh(models.Model):
         if timesheet_id and not self.env.context.get('online_analysis'):
             attendance_sheet = self.env['hr_timesheet_sheet.sheet'].browse(
                 timesheet_id)
-            last_attendance = self.get_previous_attendance(attendance_sheet.employee_id.id)
+            last_attendance = self.get_previous_attendance(
+                attendance_sheet.employee_id.id)
             return {'previous_month_diff': 0.0,
                     'hours': [
                         {'dh': '00:00',
@@ -548,8 +549,7 @@ class HrTimesheetDh(models.Model):
                          'leaves_descr': ''}
                 if use_overtime:
                     total.update({'bonus_hours': 0.0,
-                                  'night_shift': 0.0,
-                                 })
+                                  'night_shift': 0.0})
 
                 last_date = dates[-1]
                 today_worked_hours = 0.0
@@ -642,7 +642,7 @@ class HrTimesheetDh(models.Model):
                                 _('Running'): self.sign_float_time_convert(
                                     current_month_diff),
                                 _('Leaves'): leave_descr
-                                })
+                            })
 
                         else:
                             res['hours'].append({
