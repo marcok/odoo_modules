@@ -100,7 +100,7 @@ class HrTimesheetDh(models.Model):
             fl_part = round(fl_part, 2)
         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
         datetime_str = '{}:{}:00'.format(str(int(int_part)),
-                                         str(round(fl_part * 60, 0)))
+                                         str(int(round(fl_part * 60, 0))))
         default_date_without_tzinfo = datetime.combine(
             date_line.date(), datetime.strptime(
                 datetime_str, '%H:%M:%S').time())
