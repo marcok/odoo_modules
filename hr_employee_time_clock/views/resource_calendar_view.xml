@@ -23,6 +23,12 @@
                         <group>
                             <field name="two_days_shift"/>
                         </group>
+
+                        <group>
+                            <button name="initial_overtime" type="object"
+                                    string="Initial Overtime"
+                                    class="btn-primary"/>
+                        </group>
                     </group>
 
                     <field name="overtime_attendance_ids"/>

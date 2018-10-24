@@ -245,6 +245,14 @@ class ResourceCalendar(models.Model):
             to_tz(fields.Datetime.from_string(leave.date_to), leave.tz),
             {'leaves': leave}) for leave in filtered_leaves]
 
+    @api.multi
+    def initial_overtime(self):
+        contracts = self.env['hr.contract'].search(
+            [('resource_calendar_id', '=', self.id)])
+        employee_ids = [contract.employee_id.id for contract in contracts]
+        for employee in self.env['hr.employee'].browse(set(employee_ids)):
+            employee.initial_overtime()
+
 
 class ResourceCalendarAttendanceOvertime(models.Model):
     _name = "resource.calendar.attendance.overtime"
@@ -282,7 +290,8 @@ def seconds(td):
     assert isinstance(td, dtime.timedelta)
 
     return (td.microseconds + (
-            td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10. ** 6
+        td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10. ** 6
+
 
 def to_tz(datetime, tz_name):
     tz = pytz.timezone(tz_name)

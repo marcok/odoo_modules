@@ -308,8 +308,8 @@ class HrAttendance(models.Model):
                               bonus_worked_hours=delta_minutes / 60,
                               calculate_overtime=self._calculate_overtime(
                                   check_in, check_out, this_year_sheets),
-                              night_shift_worked_hours=overtime_minutes / 60)
-                # res = super(HrAttendance, self).write(values)
+                              night_shift_worked_hours=overtime_minutes / 60,
+                              overtime_change=True)
                 overtime_attendance = self.search([
                     ('calculate_overtime', '=', True),
                     ('employee_id', '=', self.employee_id.id),
@@ -320,6 +320,7 @@ class HrAttendance(models.Model):
                 real_overtime_count = (len(overtime_attendance) +
                                        self.employee_id.start_overtime_different)
                 if real_overtime_count >= min_overtime_count:
+
                     change_overtime_attendance = \
                         overtime_attendance.filtered(
                             lambda
@@ -340,6 +341,7 @@ class HrAttendance(models.Model):
                             ctx['bonus_time'] = True
                             val.update(overtime_change=True)
                             over.with_context(ctx).write(val)
+
                 else:
                     for over in overtime_attendance:
                         over.with_context(overtime_context).write(
@@ -366,3 +368,14 @@ class HrAttendance(models.Model):
             values = self.check_overtime(values)
             # self.check_overtime(values)
         return super(HrAttendance, self).write(values)
+
+    @api.model
+    def create(self, values):
+        if values.get('check_out'):
+            attendance = super(HrAttendance, self).create(values)
+            val = {'check_out': values.get('check_out')}
+            values = attendance.check_overtime(val)
+            attendance.write(values)
+            return attendance
+        else:
+            return super(HrAttendance, self).create(values)
