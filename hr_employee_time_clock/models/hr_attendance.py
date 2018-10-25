@@ -334,13 +334,13 @@ class HrAttendance(models.Model):
                             ctx = self.env.context.copy()
                             ctx['bonus_time'] = True
                             val.update(overtime_change=True)
-                            over.with_context(ctx).write(val)
+                            over.sudo().with_context(ctx).write(val)
                     elif no_change_overtime_attendance:
                         for over in no_change_overtime_attendance:
                             ctx = self.env.context.copy()
                             ctx['bonus_time'] = True
                             val.update(overtime_change=True)
-                            over.with_context(ctx).write(val)
+                            over.sudo().with_context(ctx).write(val)
 
                 else:
                     for over in overtime_attendance:
