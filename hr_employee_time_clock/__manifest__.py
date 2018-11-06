@@ -33,7 +33,7 @@
                 'hr_attendance',
                 'hr_contract',
                 'hr_holidays',
-                'hr_public_holidays',
+                'hr_holidays_public',
                 'hr_public_calendar_holiday'],
     'images': ['images/overundertime.png'],
     'installable': True,
@@ -45,14 +45,10 @@
         'views/hr_attendance_subtypes.xml',
         'views/hr_holidays_views.xml',
         'views/hr_department_views.xml',
-        # 'views/hr_timesheet_sheet_config_settings_views.xml',
 
         # Report
         'report/report_attendance_analysis_view.xml',
 
-        # 'security/ir_rule.xml',
-        # 'security/ir_rule_contract.xml',
-        # 'security/hr_timesheet_sheet_security.xml',
         'security/hr_timesheet_security.xml',
         'security/ir.model.access.csv',
 
