@@ -161,7 +161,7 @@ class HrTimesheetSheet(models.Model):
                                         'draft': [('readonly', False)],
                                         'new': [('readonly', False)]})
 
-    note = fields.Text(string="Note")
+
     state = fields.Selection([('new', 'New'),
                               ('draft', 'Open'),
                               ('confirm', 'Waiting Approval'),
