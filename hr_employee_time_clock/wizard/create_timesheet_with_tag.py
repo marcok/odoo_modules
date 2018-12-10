@@ -91,6 +91,10 @@ class CreateTimesheetWithTag(models.TransientModel):
                             'date_to': date_to})
                     ts_id = ts.create(values)
 
+                    self.env['attendance.line.analytic'].create_line(
+                        ts_id, date_from, date_to)
+
+
                 ts_ids.append(ts_id.id)
 
         # Third: Add it to dictionary to be returned

@@ -12,7 +12,7 @@
                 </group>
             </xpath>
             <xpath expr="//notebook//page[1]" position="after">
-                <page string="Overtime settings" attrs="{'invisible':[('use_overtime','!=',True)]}">
+                    <page string="Night Shift" attrs="{'invisible':[('use_overtime','!=',True)]}">
                     <group>
                         <group>
                             <field name="count"/>
@@ -26,7 +26,7 @@
 
                         <group>
                             <button name="initial_overtime" type="object"
-                                    string="Initial Overtime"
+                                    string="Night Shift"
                                     class="btn-primary"/>
                         </group>
                     </group>
@@ -41,7 +41,7 @@
         <field name="name">resource.calendar.attendance.overtime.tree</field>
         <field name="model">resource.calendar.attendance.overtime</field>
         <field name="arch" type="xml">
-            <tree string="Overtime" editable="top">
+            <tree string="Night Shift" editable="top">
                 <field name="name"/>
                 <field name="dayofweek"/>
                 <field name="hour_from" widget="float_time"/>

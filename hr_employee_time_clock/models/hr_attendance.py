@@ -35,8 +35,6 @@ import logging
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 
-
-
 _logger = logging.getLogger(__name__)
 
 USER_PRIVATE_FIELDS = ['password']
@@ -69,6 +67,10 @@ def to_tz(datetime, tz_name):
 
 class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
+
+    attendance_line_analytic_id = fields.Many2one(
+        'attendance.line.analytic',
+        string='Attendance Line Analytic')
 
     have_overtime = fields.Boolean(string="Have Overtime",
                                    default=False)
@@ -144,7 +146,7 @@ class HrAttendance(models.Model):
                 fields.Datetime.from_string(cl_attendance.check_out),
                 fields.Datetime.from_string(check_out))
             if self_overtime_calendar == closest_overtime_calendar and \
-                    delta.days < 1:
+                            delta.days < 1:
                 calculate_overtime = False
         return calculate_overtime
 
@@ -158,7 +160,7 @@ class HrAttendance(models.Model):
         if not time_info:
             time_info = self.check_in
         user_tz = pytz.timezone(
-                self.employee_id.user_id.tz or 'UTC')
+            self.employee_id.user_id.tz or 'UTC')
         local_date = fields.Datetime.from_string(
             time_info).replace(tzinfo=pytz.utc).astimezone(user_tz)
         local_date = local_date.replace(tzinfo=None)
@@ -210,19 +212,19 @@ class HrAttendance(models.Model):
             need_overtime = None
             if two_days_shift:
                 str_check_in_local_date = (
-                        check_in_local_date -
-                        timedelta(days=1)).strftime('%Y-%m-%d')
+                    check_in_local_date -
+                    timedelta(days=1)).strftime('%Y-%m-%d')
 
                 str_check_out_local_date = (
-                        check_out_local_date +
-                        timedelta(days=1)).strftime('%Y-%m-%d')
+                    check_out_local_date +
+                    timedelta(days=1)).strftime('%Y-%m-%d')
             else:
 
                 str_check_in_local_date = (
-                        check_in_local_date).strftime('%Y-%m-%d')
+                    check_in_local_date).strftime('%Y-%m-%d')
 
                 str_check_out_local_date = (
-                        check_out_local_date).strftime('%Y-%m-%d')
+                    check_out_local_date).strftime('%Y-%m-%d')
 
             dates = list(rrule.rrule(
                 rrule.DAILY,
@@ -270,12 +272,13 @@ class HrAttendance(models.Model):
                         finish_overtime = finish_overtime.replace(
                             minute=59, second=59, microsecond=9999)
                     if (check_in_local_date < start_overtime
-                        and (start_overtime < check_out_local_date < finish_overtime
-                             or check_out_local_date > finish_overtime)) \
+                        and (
+                                    start_overtime < check_out_local_date < finish_overtime
+                        or check_out_local_date > finish_overtime)) \
                             or (finish_overtime > check_in_local_date
-                                > start_overtime
+                                    > start_overtime
                                 and (start_overtime < check_out_local_date
-                                     < finish_overtime
+                                         < finish_overtime
                                      or check_out_local_date > finish_overtime)):
                         need_overtime = overtime_calendar_attendance
                         if check_in_local_date > start_overtime:

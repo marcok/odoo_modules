@@ -24,10 +24,11 @@ from random import choice
 from string import digits
 import logging
 from odoo import exceptions, SUPERUSER_ID
-_logger = logging.getLogger(__name__)
 from datetime import date
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class HrEmployee(models.Model):
@@ -316,3 +317,63 @@ class HrEmployee(models.Model):
                     r['state'] = 'present'
             new_result.append(r)
         return new_result
+
+    @api.model
+    def check_in_out_action(self, values):
+        employee = self.sudo().browse(values.get('employee_id'))
+        hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
+        hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
+            [('employee_id', '=', employee.id),
+             ('date_from', '<=', date.today()),
+             ('date_to', '>=', date.today())])
+        if not hr_timesheet_ids:
+            return [
+                {'error': _(
+                    'Please contact your manager to create '
+                    'timesheet for you.')}]
+
+        """ Check In/Check Out action
+            Check In: create a new attendance record
+            Check Out: modify check_out field of appropriate attendance record
+        """
+        if len(self) > 1:
+            raise exceptions.UserError(
+                _('Cannot perform check in or '
+                  'check out on multiple employees.'))
+        action_date = fields.Datetime.now()
+        if employee.attendance_state != 'checked_in':
+            vals = {
+                'employee_id': employee.id,
+                'check_in': action_date,
+            }
+            self.env['hr.attendance'].sudo().create(vals)
+        else:
+            attendance = self.env['hr.attendance'].sudo().search(
+                [('employee_id', '=', employee.id),
+                 ('check_out', '=', False)], limit=1).exists()
+            if attendance:
+                attendance.sudo().check_out = action_date
+            else:
+                return [
+                    {'error': _('Cannot perform check out on %s, '
+                                'could not find corresponding check in. '
+                                'Your attendances have probably been modified '
+                                'manually by human resources.') % self.name}]
+
+        employee = self.sudo().browse(employee.id)
+        ctx = self.env.context.copy()
+        ctx.update(online_analysis=True)
+        res = hr_timesheet_ids.with_context(
+            ctx).attendance_analysis(hr_timesheet_ids.id)
+        running = 0
+        date_line = values.get('date').split(' ')[0]
+        dddd = (fields.Datetime.from_string(date_line + ' 00:00:00'))
+        date_line = dddd.strftime("%d/%m/%Y %H:%M:%S").split(' ')[0]
+        for d in res.get('hours'):
+            if d.get('name') == date_line:
+                running = d.get('running')
+
+        return [{'log': employee.attendance_state,
+                 'name': employee.name,
+                 'image': employee.image_medium,
+                 'running': running}]

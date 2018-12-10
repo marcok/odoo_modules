@@ -32,8 +32,10 @@ from . import hr_timesheet_dh
 from . import hr_timesheet_sheet_account
 # from . import hr_timesheet_sheet_config_settings
 from . import res_company
+from . import attendance_line_analytic
 from . import hr_attendance
 from . import hr_contract
 from . import res_config_settings
+from . import hr_holidays_public
 
 

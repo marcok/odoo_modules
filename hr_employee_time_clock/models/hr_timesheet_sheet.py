@@ -91,21 +91,18 @@ class HrTimesheetSheet(models.Model):
             ctx['online_analysis'] = True
             for sheet in self:
                 if sheet.id == res[0].get('id'):
-                    if self.with_context(ctx).attendance_analysis()[
-                        'total'].get('bonus_hours'):
+                    attendance_analysis = \
+                        self.with_context(ctx).attendance_analysis()
+
+                    if attendance_analysis['total'].get('bonus_hours'):
                         sheet.total_attendance = \
-                            self.with_context(ctx).attendance_analysis()[
-                                'total'].get('worked_hours') + \
-                            self.with_context(ctx).attendance_analysis()[
-                                'total'].get('bonus_hours')
+                            attendance_analysis['total'].get('worked_hours') \
+                            + attendance_analysis['total'].get('bonus_hours')
                     else:
                         sheet.total_attendance = \
-                            self.with_context(ctx).attendance_analysis()[
-                                'total'].get('worked_hours')
-                    sheet.total_timesheet = res[0].get(
-                        'total_timesheet')
-                    sheet.total_difference = res[0].get(
-                        'total_difference')
+                            attendance_analysis['total'].get('worked_hours')
+                    sheet.total_timesheet = res[0].get('total_timesheet')
+                    sheet.total_difference = res[0].get('total_difference')
 
     @api.depends('attendances_ids')
     def _compute_attendances(self):

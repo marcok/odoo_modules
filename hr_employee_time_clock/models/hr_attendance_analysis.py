@@ -55,6 +55,17 @@ class HrAttendance(models.Model):
                                required=True, track_visibility='always')
     check_out = fields.Datetime(string="Check Out", track_visibility='always')
 
+    name = fields.Datetime(string='Date',
+                           required=True,
+                           select=1,
+                           default=datetime.now())
+
+    sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
+                               compute='_sheet',
+                               string='Sheet',
+                               store=True,
+                               index=True)
+
     @api.multi
     def _get_attendance_employee_tz(self, employee_id, date):
         """ Simulate timesheet in employee timezone
@@ -133,18 +144,6 @@ class HrAttendance(models.Model):
             if sheet:
                 attendance.sheet_id = sheet.id
 
-    name = fields.Datetime(string='Date',
-                           required=True,
-                           select=1,
-                           default=datetime.now())
-
-    sheet_id = fields.Many2one(
-        'hr_timesheet_sheet.sheet',
-        compute='_sheet',
-        string='Sheet',
-        store=True,
-        index=True)
-
     def float_time_convert(self, float_val):
         """
         Converts float value of hours into time value
@@ -181,7 +180,10 @@ class HrAttendance(models.Model):
                 raise ValidationError(
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
-        return super(HrAttendance, self).create(values)
+        attendance = super(HrAttendance, self).create(values)
+        self.env['attendance.line.analytic'].recalculate_line(attendance,
+                                                              values)
+        return attendance
 
     @api.multi
     def write(self, values):
@@ -198,44 +200,9 @@ class HrAttendance(models.Model):
                 _(
                     "Sorry, only manager is allowed to edit attendance"
                     " of approved attendance sheet."))
-    ##################################################
-    # Attendance separating
-    ##################################################
-    #
-    #     if values.get('check_out'):
-    #         local_tz = pytz.timezone(self.env.user.tz or 'UTC')
-    #
-    #         if values.get('check_in'):
-    #             check_in = fields.Datetime.from_string(values.get('check_in'))
-    #         else:
-    #             check_in = fields.Datetime.from_string(self.check_in).replace(
-    #                 tzinfo=pytz.utc).astimezone(local_tz)
-    #         check_in = check_in.replace(tzinfo=None)
-    #
-    #         if values.get('check_out'):
-    #             check_out = fields.Datetime.from_string(values.get('check_out'))
-    #         else:
-    #             check_out = fields.Datetime.from_string(
-    #                 self.check_out).replace(tzinfo=pytz.utc).astimezone(
-    #                 local_tz)
-    #         check_out = check_out.replace(tzinfo=None)
-    #
-    #         midnight_without_tzinfo = datetime.combine(check_out.date(), time())
-    #         midnight = local_tz.localize(midnight_without_tzinfo).astimezone(
-    #             pytz.utc)
-    #         midnight = midnight.replace(tzinfo=None)
-    #
-    #         if check_in < midnight < check_out:
-    #             check_out_old = check_out
-    #             check_out_new = midnight - timedelta(seconds=1)
-    #             values.update(check_out=str(check_out_new))
-    #             res = super(HrAttendance, self).write(values)
-    #             att = self.env['hr.attendance'].create({
-    #                 'employee_id': self.employee_id.id,
-    #                 'check_in': str(midnight),
-    #
-    #                 'name': str(midnight)})
-    #             att.write({'check_out': str(check_out_old)})
-    #             return res
+        check_in = values.get('check_in') or self.check_in
+        check_out = values.get('check_out') or self.check_out
+        if check_out and check_in:
+            self.env['attendance.line.analytic'].recalculate_line(self, values)
         return super(HrAttendance, self).write(values)
 

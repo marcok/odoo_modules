@@ -112,7 +112,7 @@ class HrTimesheetDh(models.Model):
         return default_date
 
     @api.multi
-    def count_leaves(self, date_line, employee_id, period):
+    def count_leaves(self, date_line, employee_id):
         """
         Checks if employee has any leave on current date.
         :param date_line: datetime
@@ -190,7 +190,7 @@ class HrTimesheetDh(models.Model):
         return [holiday_ids, number_of_days]
 
     @api.model
-    def count_public_holiday(self, date_from, period):
+    def count_public_holiday(self, date_from):
         """
         Checks if there is any public holiday on current date.
         :param date_from: datetime string
@@ -249,7 +249,7 @@ class HrTimesheetDh(models.Model):
 
     def get_date_mark(self, date_line, period):
         date_mark = ''
-        public_holidays = self.count_public_holiday(date_line, period)
+        public_holidays = self.count_public_holiday(date_line)
         date_line_day_of_week = calendar.weekday(date_line.year,
                                                  date_line.month,
                                                  date_line.day)
@@ -432,8 +432,8 @@ class HrTimesheetDh(models.Model):
                 start_dt=date_from,
                 resource_id=self.employee_id.id,
                 context=ctx)
-            leave = self.count_leaves(date_from, self.employee_id.id, period)
-            public_holiday = self.count_public_holiday(date_from, period)
+            leave = self.count_leaves(date_from, self.employee_id.id)
+            public_holiday = self.count_public_holiday(date_from)
             if contract.state != 'cancel':
                 if leave[1] == 0 and not public_holiday:
                     if not dh:

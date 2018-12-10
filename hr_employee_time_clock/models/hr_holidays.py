@@ -23,6 +23,7 @@
 import logging
 
 from odoo import api, fields, models
+from dateutil import rrule, parser
 
 _logger = logging.getLogger(__name__)
 
@@ -32,3 +33,26 @@ class HolidaysType(models.Model):
 
     take_into_attendance = fields.Boolean(default=True,
                                           string='Take Into Attendance')
+
+
+class HrHolidays(models.Model):
+    _inherit = "hr.holidays"
+
+    @api.multi
+    def write(self, values):
+        state = self.state
+        res = super(HrHolidays, self).write(values)
+        if (values.get('state') == 'validate' and state == 'confirm') \
+                or (values.get('state') == 'refuse'
+                    and state == 'validate'):
+
+            date_from = self.date_from.split(' ')[0] + ' 00:00:00'
+            date_to = self.date_to.split(' ')[0] + ' 00:00:00'
+
+            dates = list(rrule.rrule(rrule.DAILY,
+                                     dtstart=parser.parse(date_from),
+                                     until=parser.parse(date_to)))
+            for date_line in dates:
+                self.env['attendance.line.analytic'].recalculate_line(
+                    line_date=date_line, employee_id=self.employee_id)
+        return res
