@@ -574,8 +574,14 @@ class HrTimesheetDh(models.Model):
                     work_current_month_diff += diff
                     date_line = fields.Datetime.from_string(line.name)
                     date_mark = sheet.get_date_mark(date_line, period)
+                    _logger.info(line)
 
-                    leave_descr = line.leave_description
+                    leave_descr = '-'
+                    try:
+                        leave_descr = line.leave_description
+                    except:
+                        pass
+
                     if function_call:
                         if use_overtime:
                             res['hours'].append(
