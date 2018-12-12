@@ -20,31 +20,39 @@
 #
 ##############################################################################
 
-
-import pytz
-from datetime import datetime, timedelta, date
-from odoo import api, fields, models, _
+from odoo import api, fields, models, SUPERUSER_ID, _
 from dateutil import rrule, parser
-from odoo.tools.translate import _
+import pytz
+from datetime import datetime, date, timedelta
 import calendar
 import math
+
 import logging
 
 _logger = logging.getLogger(__name__)
 
 
-class HrContract(models.Model):
+def migrate(cr, version):
     """
-        Addition plugin for HR timesheet for work with duty hours
+    This migration is made to calculate running time for each active employee and
+    write it into last attendance, which has check out. It is important to
+    companies that already use Employee Time Clock module.
     """
-    _inherit = 'hr.contract'
+    env = api.Environment(cr, SUPERUSER_ID, {})
 
-    rate_per_hour = fields.Boolean(string="Use hour rate")
+    employee_ids = env['hr.employee'].search([('active', '=', True)])
+    i = len(employee_ids)
+    for employee in employee_ids:
+        _logger.info('\n')
+        _logger.info(i)
+        sheets = env['hr_timesheet_sheet.sheet'].search(
+            [('employee_id','=',employee.id)])
+        for sheet in sheets:
+            env['attendance.line.analytic'].create_line(
+                sheet, sheet.date_from, sheet.date_to)
+            attendances = env['hr.attendance'].search(
+                [('sheet_id','=',sheet.id)])
+            for attendance in attendances:
+                attendance.write({'check_out':attendance.check_out})
+        i -= 1
 
-    @api.multi
-    def write(self, values):
-
-        res = super(HrContract, self).write(values)
-        if values.get('date_end'):
-            pass
-        return res

@@ -181,8 +181,8 @@ class HrAttendance(models.Model):
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
         attendance = super(HrAttendance, self).create(values)
-        self.env['attendance.line.analytic'].recalculate_line(attendance,
-                                                              values)
+        self.env['attendance.line.analytic'].recalculate_line_worktime(
+            attendance, values)
         return attendance
 
     @api.multi
@@ -203,6 +203,7 @@ class HrAttendance(models.Model):
         check_in = values.get('check_in') or self.check_in
         check_out = values.get('check_out') or self.check_out
         if check_out and check_in:
-            self.env['attendance.line.analytic'].recalculate_line(self, values)
+            self.env['attendance.line.analytic'].recalculate_line_worktime(
+                self, values)
         return super(HrAttendance, self).write(values)
 

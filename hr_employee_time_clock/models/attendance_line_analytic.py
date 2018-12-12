@@ -110,8 +110,6 @@ class AttendanceLineAnalytic(models.Model):
                 values.update(leave_description=leave[0].name)
             line.write(values)
 
-        pass
-
     @api.multi
     def _get_difference(self):
         self.difference = self.worked_hours - self.duty_hours
@@ -144,9 +142,15 @@ class AttendanceLineAnalytic(models.Model):
 
             if check_out:
                 worked_hours = 0
+                bonus_worked_hours = 0
+                night_shift_worked_hours = 0
                 for attendance in line.attendance_ids:
+                    bonus_worked_hours += attendance.bonus_worked_hours
+                    night_shift_worked_hours \
+                        += attendance.night_shift_worked_hours
                     if attendance.id != new_attendance.id:
                         worked_hours += attendance.worked_hours
+
                     else:
                         delta = datetime.strptime(
                             check_out, DEFAULT_SERVER_DATETIME_FORMAT) - \
@@ -157,7 +161,9 @@ class AttendanceLineAnalytic(models.Model):
                 line.write({
                     'duty_hours': duty_hours,
                     'worked_hours': worked_hours,
-                    'day_checked': False
+                    'day_checked': False,
+                    'bonus_worked_hours': bonus_worked_hours,
+                    'night_shift_worked_hours': night_shift_worked_hours,
                 })
 
     @api.multi
@@ -165,19 +171,31 @@ class AttendanceLineAnalytic(models.Model):
         dates = list(rrule.rrule(rrule.DAILY,
                                  dtstart=parser.parse(date_from),
                                  until=parser.parse(date_to)))
+
         for date_line in dates:
-            duty_hours, contract, leave, public_holiday = \
-                self.calculate_duty_hours(sheet=sheet,
-                                          date_from=date_line)
-            if leave[0]:
-                duty_hours -= duty_hours*leave[1]
-            if contract and contract.rate_per_hour:
-                duty_hours = 0.0
             name = str(date_line).split(' ')[0]
-            self.create({'name': name,
-                         'sheet_id': sheet.id,
-                         'duty_hours': duty_hours,
-                         'contract_id': contract.id})
+            line = self.search(
+                [('name', '=', name),
+                 ('sheet_id', '=', sheet.id)])
+            if not line:
+
+                duty_hours, contract, leave, public_holiday = \
+                    self.calculate_duty_hours(sheet=sheet,
+                                              date_from=date_line)
+                print('\n duty_hours, contract, leave, public_holiday >>>>>> %s' % duty_hours, contract, leave, public_holiday)
+                if leave[0]:
+                    duty_hours -= duty_hours * leave[1]
+                if contract and contract.rate_per_hour:
+                    duty_hours = 0.0
+                values = {'name': name,
+                          'sheet_id': sheet.id,
+                          'duty_hours': duty_hours,
+                          'contract_id': contract.id}
+                if public_holiday:
+                    values.update(leave_description=public_holiday.name)
+                if leave and leave[0]:
+                    values.update(leave_description=leave[0].name)
+                self.create(values)
 
     @api.multi
     def calculate_duty_hours(self, sheet, date_from):

@@ -27,6 +27,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError, AccessError
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
@@ -158,7 +159,6 @@ class HrTimesheetSheet(models.Model):
                                         'draft': [('readonly', False)],
                                         'new': [('readonly', False)]})
 
-
     state = fields.Selection([('new', 'New'),
                               ('draft', 'Open'),
                               ('confirm', 'Waiting Approval'),
@@ -234,15 +234,18 @@ class HrTimesheetSheet(models.Model):
                     'In order to create a timesheet for this employee,'
                     ' you must link him/her to a department.'))
             else:
-                values['department_id']= self.env['hr.employee'].browse(
+                values['department_id'] = self.env['hr.employee'].browse(
                     values['employee_id']).department_id.id
         if values.get('date_to') and values.get('date_from') \
                 and values.get('date_from') > values.get('date_to'):
             raise ValidationError(
                 _('You added wrong date period.'))
-        res = super(HrTimesheetSheet, self).create(values)
-        res.write({'state': 'draft'})
-        return res
+        hr_timesheet_sheet = super(HrTimesheetSheet, self).create(values)
+        self.env['attendance.line.analytic'].create_line(
+            hr_timesheet_sheet, hr_timesheet_sheet.date_from,
+            hr_timesheet_sheet.date_to)
+        hr_timesheet_sheet.write({'state': 'draft'})
+        return hr_timesheet_sheet
 
     @api.constrains('date_to', 'date_from', 'employee_id')
     def _check_sheet_date(self, forced_user_id=False):
@@ -416,7 +419,6 @@ class HrTimesheetSheet(models.Model):
             'view_mode': 'pivot',
             'context': {'search_default_user_id': self.user_id.id, }
         }
-
 
     @api.multi
     def check_employee_attendance_state(self):

@@ -491,7 +491,6 @@ class HrTimesheetDh(models.Model):
         if not self.env.context.get('online_analysis') \
                 and date_format != '%m/%d/%Y':
             date_format = '%m/%d/%Y'
-        _logger.info(self.env.context)
         if timesheet_id and not self.env.context.get('online_analysis'):
             attendance_sheet = self.env['hr_timesheet_sheet.sheet'].browse(
                 timesheet_id)
@@ -531,17 +530,10 @@ class HrTimesheetDh(models.Model):
                 if contract and contract.rate_per_hour:
                     previous_month_diff = 0.0
                 current_month_diff = previous_month_diff
-                res = {
-                    'previous_month_diff': previous_month_diff,
-                    'hours': []
-                }
 
                 period = {'date_from': start_date,
                           'date_to': end_date
                           }
-                dates = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(start_date),
-                                         until=parser.parse(end_date)))
                 work_current_month_diff = 0.0
                 total = {'worked_hours': 0.0, 'duty_hours': 0.0,
                          'diff': current_month_diff,
@@ -550,100 +542,51 @@ class HrTimesheetDh(models.Model):
                 if use_overtime:
                     total.update({'bonus_hours': 0.0,
                                   'night_shift': 0.0})
-
-                last_date = dates[-1]
-                today_worked_hours = 0.0
-                today_diff = 0
-                today_current_month_diff = 0
-
-                for date_line in dates:
-                    dh = sheet.calculate_duty_hours(date_from=date_line,
-                                                    period=period)
-                    if contract and contract.rate_per_hour:
-                        dh = 0.0
-
-                    worked_hours = 0.0
-                    bonus_hours = 0.0
-                    night_shift_hours = 0.0
-                    for att in sheet.attendances_ids:
-                        user_tz = pytz.timezone(
-                            att.employee_id.user_id.tz or 'UTC')
-                        att_name = fields.Datetime.from_string(
-                            att.name).replace(
-                            tzinfo=pytz.utc).astimezone(user_tz)
-                        name = att_name.replace(tzinfo=None)
-                        if name.strftime('%Y-%m-%d') == \
-                                date_line.strftime('%Y-%m-%d'):
-                            worked_hours += att.worked_hours
-                            if not att.check_out:
-                                tz = pytz.timezone('UTC')
-                                t = datetime.now(tz=tz)
-                                d = t - att_name
-                                worked_hours += (d.total_seconds() / 3600)
-                            if att.overtime_change:
-                                bonus_hours += att.bonus_worked_hours
-                                night_shift_hours += \
-                                    att.night_shift_worked_hours
+                res = {
+                    'previous_month_diff': previous_month_diff,
+                    'hours': [],
+                    'total':total
+                }
+                lines = self.env['attendance.line.analytic'].search(
+                    [('sheet_id','=',timesheet_id)])
+                for line in lines:
+                    dh = line.duty_hours
+                    worked_hours = line.worked_hours
+                    bonus_hours = line.bonus_worked_hours
+                    night_shift_hours = line.night_shift_worked_hours
                     if use_overtime:
                         diff = (worked_hours + bonus_hours) - dh
                     else:
                         diff = worked_hours - dh
+
                     current_month_diff += diff
                     work_current_month_diff += diff
-
-                    if date_line.date() == date.today():
-                        today_worked_hours = worked_hours
-                        today_diff = diff
-                        today_current_month_diff = current_month_diff
-
-                        last_attendance = sheet.get_previous_attendance(
-                            employee_id)
-                        if last_attendance and last_attendance.running == 0.0:
-                            self._cr.execute("""UPDATE hr_attendance
-                                                SET running=%s
-                                                WHERE id=%s""",
-                                             (today_current_month_diff,
-                                              last_attendance.id,))
-                            # last_attendance.write({
-                            #     'running': today_current_month_diff,
-                            # })
-
-                    if date_line == last_date:
-                        if not self.env.context.get('online_analysis'):
-                            worked_hours = today_worked_hours
-                            diff = today_diff
-                            current_month_diff = work_current_month_diff
-                    if date_line == last_date:
-                        if not self.env.context.get('online_analysis'):
-                            worked_hours = today_worked_hours
-                            diff = today_diff
-                            current_month_diff = today_current_month_diff
-
+                    date_line = fields.Datetime.from_string(line.name)
                     date_mark = sheet.get_date_mark(date_line, period)
-                    leave_descr = sheet.get_leave_descr(date_line, employee_id)
+
+                    leave_descr = line.leave_description
                     if function_call:
                         if use_overtime:
-                            res['hours'].append({
-                                _('Date'): date_mark + date_line.strftime(
+                            res['hours'].append(
+                                {_('Date'): date_mark + date_line.strftime(
                                     date_format),
-                                _('Duty Hours'):
-                                    attendance_obj.float_time_convert(dh),
-                                _('Worked Hours'):
-                                    attendance_obj.float_time_convert(
-                                        worked_hours),
-                                _('Bonus Hours'):
-                                    attendance_obj.float_time_convert(
-                                        bonus_hours),
-                                _('Night Shift'):
-                                    attendance_obj.float_time_convert(
-                                        night_shift_hours),
-                                _('Difference'): self.sign_float_time_convert(
-                                    diff),
-                                _('Running'): self.sign_float_time_convert(
-                                    current_month_diff),
-                                _('Leaves'): leave_descr
-                            })
-
+                                 _('Duty Hours'):
+                                     attendance_obj.float_time_convert(dh),
+                                 _('Worked Hours'):
+                                     attendance_obj.float_time_convert(
+                                         worked_hours),
+                                 _('Bonus Hours'):
+                                     attendance_obj.float_time_convert(
+                                         bonus_hours),
+                                 _('Night Shift'):
+                                     attendance_obj.float_time_convert(
+                                         night_shift_hours),
+                                 _('Difference'): self.sign_float_time_convert(
+                                     diff),
+                                 _('Running'): self.sign_float_time_convert(
+                                     current_month_diff),
+                                 _('Leaves'): leave_descr
+                                 })
                         else:
                             res['hours'].append({
                                 _('Date'): date_mark + date_line.strftime(
@@ -661,7 +604,8 @@ class HrTimesheetDh(models.Model):
                     else:
                         if use_overtime:
                             res['hours'].append({
-                                'name': date_line.strftime(date_format),
+                                'name': fields.Datetime.from_string(
+                                    line.name).strftime(date_format),
                                 'dh': attendance_obj.float_time_convert(dh),
                                 'worked_hours':
                                     attendance_obj.float_time_convert(
@@ -680,7 +624,8 @@ class HrTimesheetDh(models.Model):
                             })
                         else:
                             res['hours'].append({
-                                'name': date_line.strftime(date_format),
+                                'name': fields.Datetime.from_string(
+                                    line.name).strftime(date_format),
                                 'dh': attendance_obj.float_time_convert(dh),
                                 'worked_hours':
                                     attendance_obj.float_time_convert(
