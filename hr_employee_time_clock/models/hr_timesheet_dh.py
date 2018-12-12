@@ -545,10 +545,10 @@ class HrTimesheetDh(models.Model):
                 res = {
                     'previous_month_diff': previous_month_diff,
                     'hours': [],
-                    'total':total
+                    'total': total
                 }
                 lines = self.env['attendance.line.analytic'].search(
-                    [('sheet_id','=',timesheet_id)])
+                    [('sheet_id', '=', timesheet_id)])
                 for line in lines:
                     dh = line.duty_hours
                     worked_hours = line.worked_hours

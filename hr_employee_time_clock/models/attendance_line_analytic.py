@@ -33,11 +33,9 @@ class AttendanceLineAnalytic(models.Model):
     _name = "attendance.line.analytic"
     _order = "name"
 
-    name = fields.Date(string='Date',
-                       readonly=True)
+    name = fields.Date(string='Date')
     sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
                                string='Sheet',
-                               readonly=True,
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
                                      'attendance_line_analytic_id',
@@ -46,24 +44,20 @@ class AttendanceLineAnalytic(models.Model):
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
-                              readonly=True,
                               default=0.0)
     worked_hours = fields.Float(string='Worked Hours',
-                                readonly=True,
                                 default=0.0)
     bonus_worked_hours = fields.Float(string='Bonus Worked Hours',
-                                      readonly=True, default=0.0)
+                                      default=0.0)
     night_shift_worked_hours = fields.Float(string='Night Shift',
-                                            readonly=True, default=0.0)
+                                            default=0.0)
     difference = fields.Float(compute='_get_difference',
                               string='Difference',
-                              readonly=True,
                               default=0.0)
     running = fields.Float(string='Running',
-                                readonly=True,
-                                default=0.0)
+                           default=0.0)
     leave_description = fields.Char(string='Leave Description',
-                                    default='-',)
+                                    default='-', )
     day_checked = fields.Boolean(string='Checked',
                                  default=False)
 
@@ -138,7 +132,7 @@ class AttendanceLineAnalytic(models.Model):
                 new_attendance.attendance_line_analytic_id = line.id
             else:
                 if not new_attendance.attendance_line_analytic_id:
-                    new_attendance.attendance_line_analytic_id=line.id
+                    new_attendance.attendance_line_analytic_id = line.id
 
             if check_out:
                 worked_hours = 0
@@ -182,7 +176,9 @@ class AttendanceLineAnalytic(models.Model):
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
-                print('\n duty_hours, contract, leave, public_holiday >>>>>> %s' % duty_hours, contract, leave, public_holiday)
+                print(
+                    '\n duty_hours, contract, leave, public_holiday >>>>>> %s' % duty_hours,
+                    contract, leave, public_holiday)
                 if leave[0]:
                     duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
