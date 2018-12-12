@@ -551,9 +551,20 @@ class HrTimesheetDh(models.Model):
                     [('sheet_id', '=', timesheet_id)])
                 for line in lines:
                     dh = line.duty_hours
+
                     worked_hours = line.worked_hours
-                    bonus_hours = line.bonus_worked_hours
-                    night_shift_hours = line.night_shift_worked_hours
+                    bonus_hours = 0.0
+                    try:
+                        bonus_hours = line.bonus_worked_hours
+                    except:
+                        pass
+
+                    night_shift_hours = 0.0
+                    try:
+                        night_shift_hours = line.night_shift_worked_hours
+                    except:
+                        pass
+
                     if use_overtime:
                         diff = (worked_hours + bonus_hours) - dh
                     else:
