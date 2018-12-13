@@ -407,7 +407,6 @@ class HrTimesheetDh(models.Model):
         res = super(HrTimesheetDh, self.sudo()).search_read(
             domain=domain, fields=fields, offset=offset, limit=limit,
             order=order)
-        _logger.info(res)
         return res
 
     @api.multi
@@ -568,17 +567,9 @@ class HrTimesheetDh(models.Model):
                                             attendance.check_in,
                                             DEFAULT_SERVER_DATETIME_FORMAT)
                                 worked_hours += delta.total_seconds() / 3600.0
-                    bonus_hours = 0.0
-                    try:
-                        bonus_hours = line.bonus_worked_hours
-                    except:
-                        pass
+                    bonus_hours = line.bonus_worked_hours
 
-                    night_shift_hours = 0.0
-                    try:
-                        night_shift_hours = line.night_shift_worked_hours
-                    except:
-                        pass
+                    night_shift_hours = line.night_shift_worked_hours
 
                     if use_overtime:
                         diff = (worked_hours + bonus_hours) - dh
@@ -589,13 +580,8 @@ class HrTimesheetDh(models.Model):
                     work_current_month_diff += diff
                     date_line = fields.Datetime.from_string(line.name)
                     date_mark = sheet.get_date_mark(date_line, period)
-                    _logger.info(line)
 
-                    leave_descr = '-'
-                    try:
-                        leave_descr = line.leave_description
-                    except:
-                        pass
+                    leave_descr = line.leave_description
 
                     if function_call:
                         if use_overtime:
