@@ -187,8 +187,9 @@ class HrAttendance(models.Model):
 
     @api.multi
     def write(self, values):
-        if values.get('check_in'):
-            values['name'] = values.get('check_in')
+        check_in = values.get('check_in') or self.check_in
+        if check_in:
+            values['name'] = check_in
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:
                 raise ValidationError(
@@ -200,7 +201,7 @@ class HrAttendance(models.Model):
                 _(
                     "Sorry, only manager is allowed to edit attendance"
                     " of approved attendance sheet."))
-        check_in = values.get('check_in') or self.check_in
+
         check_out = values.get('check_out') or self.check_out
         if check_out and check_in:
             self.env['attendance.line.analytic'].recalculate_line_worktime(

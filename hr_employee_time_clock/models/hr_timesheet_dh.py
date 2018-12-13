@@ -25,7 +25,7 @@ import pytz
 from datetime import datetime, timedelta, date
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
-from odoo.tools.translate import _
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import calendar
 import math
 import logging
@@ -553,6 +553,21 @@ class HrTimesheetDh(models.Model):
                     dh = line.duty_hours
 
                     worked_hours = line.worked_hours
+                    recalculate_worked_hours = False
+                    for attendance in line.attendance_ids:
+                        if not attendance.check_out:
+                            recalculate_worked_hours = True
+                    if recalculate_worked_hours:
+                        worked_hours = 0.00
+                        for attendance in line.attendance_ids:
+                            if attendance.check_out:
+                                worked_hours += attendance.worked_hours
+                            else:
+                                delta = datetime.today() - \
+                                        datetime.strptime(
+                                            attendance.check_in,
+                                            DEFAULT_SERVER_DATETIME_FORMAT)
+                                worked_hours += delta.total_seconds() / 3600.0
                     bonus_hours = 0.0
                     try:
                         bonus_hours = line.bonus_worked_hours
@@ -670,7 +685,6 @@ class HrTimesheetDh(models.Model):
     def sign_float_time_convert(self, float_time):
         sign = '-' if float_time < 0 else ''
         attendance_obj = self.env['hr.attendance']
-        # attendance_obj = self.pool.get('hr.attendance')
         return sign + attendance_obj.float_time_convert(float_time)
 
     @api.multi

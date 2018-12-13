@@ -46,13 +46,12 @@ def migrate(cr, version):
         _logger.info('\n')
         _logger.info(i)
         sheets = env['hr_timesheet_sheet.sheet'].search(
-            [('employee_id','=',employee.id)])
+            [('employee_id', '=', employee.id)])
         for sheet in sheets:
             env['attendance.line.analytic'].create_line(
                 sheet, sheet.date_from, sheet.date_to)
             attendances = env['hr.attendance'].search(
-                [('sheet_id','=',sheet.id)])
+                [('sheet_id', '=', sheet.id)])
             for attendance in attendances:
-                attendance.write({'check_out':attendance.check_out})
+                attendance.write({'check_out': attendance.check_out})
         i -= 1
-

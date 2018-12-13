@@ -34,6 +34,7 @@ class AttendanceLineAnalytic(models.Model):
     _order = "name"
 
     name = fields.Date(string='Date')
+    attendance_date = fields.Date(string='Attendance Date')
     sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
                                string='Sheet',
                                index=True)
@@ -58,27 +59,6 @@ class AttendanceLineAnalytic(models.Model):
                            default=0.0)
     leave_description = fields.Char(string='Leave Description',
                                     default='-', )
-    day_checked = fields.Boolean(string='Checked',
-                                 default=False)
-
-    @api.model
-    def calculate_wrong_date(self):
-        analytic_lines = self.search([('day_checked', '=', False)])
-        for line in analytic_lines:
-            time1 = '{} 00:00:00'.format(line.name)
-            t1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S").date()
-            if (line.difference < -4.0 or line.difference > 4.0) \
-                    and date.today() > t1:
-                ir_model_data = self.env['ir.model.data']
-                template_id = ir_model_data.get_object_reference(
-                    'hr_employee_time_clock_notification',
-                    'email_template_fail_check_out_'
-                    'notification')
-                if template_id:
-                    mail_template = self.env['mail.template'].browse(
-                        template_id[1])
-                    mail_template.send_mail(res_id=line.id, force_send=True)
-            line.day_checked = True
 
     @api.multi
     def recalculate_line(self, line_date, employee_id=None):
@@ -155,7 +135,6 @@ class AttendanceLineAnalytic(models.Model):
                 line.write({
                     'duty_hours': duty_hours,
                     'worked_hours': worked_hours,
-                    'day_checked': False,
                     'bonus_worked_hours': bonus_worked_hours,
                     'night_shift_worked_hours': night_shift_worked_hours,
                 })
@@ -176,14 +155,13 @@ class AttendanceLineAnalytic(models.Model):
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
-                print(
-                    '\n duty_hours, contract, leave, public_holiday >>>>>> %s' % duty_hours,
-                    contract, leave, public_holiday)
                 if leave[0]:
                     duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
                     duty_hours = 0.0
+
                 values = {'name': name,
+                          'attendance_date': name,
                           'sheet_id': sheet.id,
                           'duty_hours': duty_hours,
                           'contract_id': contract.id}
@@ -191,6 +169,7 @@ class AttendanceLineAnalytic(models.Model):
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
                     values.update(leave_description=leave[0].name)
+                print('\n values >>>>>> %s' % values)
                 self.create(values)
 
     @api.multi
