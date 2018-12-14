@@ -42,12 +42,13 @@ def migrate(cr, version):
 
     employee_ids = env['hr.employee'].search([('active', '=', True)])
     i = len(employee_ids)
+    env['attendance.line.analytic'].search([]).unlink()
     for employee in employee_ids:
         _logger.info('\n')
         _logger.info(i)
         sheets = env['hr_timesheet_sheet.sheet'].search(
             [('employee_id', '=', employee.id)])
-        env['attendance.line.analytic'].search([]).unlink()
+
         for sheet in sheets:
             env['attendance.line.analytic'].create_line(
                 sheet, sheet.date_from, sheet.date_to)
