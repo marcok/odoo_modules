@@ -35,6 +35,7 @@ from odoo import models, api, _, fields
 from datetime import datetime, time, timedelta
 from odoo.exceptions import ValidationError, AccessError
 import logging
+from dateutil import rrule, parser
 
 _logger = logging.getLogger(__name__)
 
@@ -210,9 +211,13 @@ class HrAttendance(models.Model):
 
     @api.multi
     def unlink(self):
-        employee = self.sheet_id.employee_id
-        name = self.check_in.split(' ')[0]
-        res = super(HrAttendance, self).unlink()
-        self.env['attendance.line.analytic'].recalculate_line(
-            line_date=name, employee_id=employee)
+        for attendance in self:
+            name = attendance.check_in.split(' ')[0]
+
+            analytic = self.env['attendance.line.analytic'].search(
+                [('name', '=', name),
+                 ('sheet_id', '=', attendance.sheet_id.id)])
+            res = super(HrAttendance, attendance).unlink()
+
+            analytic.unlink_attendance()
         return res

@@ -73,8 +73,8 @@ class HrTimesheetDh(models.Model):
                             dates.remove(public_holiday_date)
 
                 for date_line in dates:
-                    duty_hours = sheet.calculate_duty_hours(date_from=date_line,
-                                                            period=period)
+                    duty_hours = sheet.calculate_duty_hours(
+                        date_from=str(date_line), period=period)
                     sheet['total_duty_hours'] += duty_hours
                 sheet['total_duty_hours'] = (sheet.total_duty_hours -
                                              sheet.total_attendance)
@@ -120,6 +120,8 @@ class HrTimesheetDh(models.Model):
         :param employee_id: hr.employee object's id
         :return: list [hr.holidays objects, float]
         """
+
+        date_line = fields.Datetime.from_string(date_line)
         holiday_obj = self.env['hr.holidays']
         holiday_ids = holiday_obj.search([
             ('employee_id', '=', employee_id),
@@ -431,9 +433,10 @@ class HrTimesheetDh(models.Model):
                 cr=self._cr,
                 uid=self.env.user.id,
                 ids=contract.resource_calendar_id.id,
-                start_dt=date_from,
+                start_dt=fields.Datetime.from_string(date_from),
                 resource_id=self.employee_id.id,
                 context=ctx)
+
             leave = self.count_leaves(date_from, self.employee_id.id)
             public_holiday = self.count_public_holiday(date_from)
             if contract.state != 'cancel':

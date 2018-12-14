@@ -25,6 +25,7 @@ from odoo import api, fields, models, _
 import logging
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from dateutil import rrule, parser
+from odoo.exceptions import UserError, ValidationError, AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -89,22 +90,56 @@ class AttendanceLineAnalytic(models.Model):
         self.difference = self.worked_hours - self.duty_hours
 
     @api.multi
+    def unlink_attendance(self):
+        worked_hours = 0
+        bonus_worked_hours = 0
+        night_shift_worked_hours = 0
+        for attendance in self.attendance_ids:
+            bonus_worked_hours += attendance.bonus_worked_hours
+            night_shift_worked_hours \
+                += attendance.night_shift_worked_hours
+            worked_hours += attendance.worked_hours
+        self.write({
+            'worked_hours': worked_hours,
+            'bonus_worked_hours': bonus_worked_hours,
+            'night_shift_worked_hours': night_shift_worked_hours,
+        })
+
+    @api.multi
     def recalculate_line_worktime(self, new_attendance, values):
         if values.get('check_in') or values.get('check_out'):
+            line_new = False
+            if values.get('check_in'):
+                value_check_in = values.get('check_in').split(' ')[0]
+                attendance_check_in = new_attendance.check_in.split(' ')[0]
+                if value_check_in != attendance_check_in:
+                    line_new = self.search(
+                        [('name', '=', value_check_in),
+                         ('sheet_id', '=', new_attendance.sheet_id.id)])
+                    new_attendance.attendance_line_analytic_id = line_new.id
+
+                    line = self.search(
+                        [('name', '=', attendance_check_in),
+                         ('sheet_id', '=', new_attendance.sheet_id.id)])
+
+                    line.unlink_attendance()
+
             check_in = values.get('check_in') or new_attendance.check_in
             check_out = values.get('check_out') or new_attendance.check_out
             name = new_attendance.check_in.split(' ')[0]
-
-            line = self.search([('name', '=', name),
-                                ('sheet_id', '=', new_attendance.sheet_id.id)])
+            if not line_new:
+                line = self.search([('name', '=', name),
+                                    ('sheet_id', '=', new_attendance.sheet_id.id)])
+            else:
+                line = line_new
 
             time1 = '{} 00:00:00'.format(name)
 
-            t1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S")
+            # t1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S")
             duty_hours = new_attendance.sheet_id.calculate_duty_hours(
-                t1,
-                {'date_to': new_attendance.sheet_id.date_to,
-                 'date_from': new_attendance.sheet_id.date_from, })
+                time1,
+                {'date_to': str(new_attendance.sheet_id.date_to),
+                 'date_from': str(new_attendance.sheet_id.date_from), })
             if not line:
                 line = self.create({'name': name,
                                     'sheet_id': new_attendance.sheet_id.id,
@@ -131,7 +166,6 @@ class AttendanceLineAnalytic(models.Model):
                                 datetime.strptime(
                                     check_in, DEFAULT_SERVER_DATETIME_FORMAT)
                         worked_hours += delta.total_seconds() / 3600.0
-
                 line.write({
                     'duty_hours': duty_hours,
                     'worked_hours': worked_hours,
@@ -169,7 +203,6 @@ class AttendanceLineAnalytic(models.Model):
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
                     values.update(leave_description=leave[0].name)
-                print('\n values >>>>>> %s' % values)
                 self.create(values)
 
     @api.multi
@@ -185,9 +218,10 @@ class AttendanceLineAnalytic(models.Model):
              ('date_end', '=', None)])
 
         if len(contract) > 1:
-            raise
-        leave = sheet.count_leaves(date_from, sheet.employee_id.id)
-        public_holiday = sheet.count_public_holiday(date_from)
+            raise UserError(_(
+                'You have more than one active contract'))
+        leave = sheet.count_leaves(str(date_from), sheet.employee_id.id)
+        public_holiday = sheet.count_public_holiday(str(date_from))
         if contract and contract.rate_per_hour:
             return 0.00, contract, leave, public_holiday
         ctx = dict(self.env.context).copy()
@@ -196,7 +230,7 @@ class AttendanceLineAnalytic(models.Model):
             cr=self._cr,
             uid=self.env.user.id,
             ids=contract.resource_calendar_id.id,
-            start_dt=date_from,
+            start_dt=fields.Datetime.from_string(str(date_from)),
             resource_id=sheet.employee_id.id,
             context=ctx)
 

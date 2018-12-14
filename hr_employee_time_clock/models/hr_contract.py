@@ -56,7 +56,8 @@ class HrContract(models.Model):
                         until=parser.parse(date_from)))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
-                            line_date=date_line, employee_id=self.employee_id)
+                            line_date=str(date_line),
+                            employee_id=self.employee_id)
 
         if values.get('date_end'):
             if old_date_end:
@@ -64,7 +65,7 @@ class HrContract(models.Model):
 
                 for date_line in dates:
                     analytic_pool.recalculate_line(
-                        line_date=date_line, employee_id=self.employee_id)
+                        line_date=str(date_line), employee_id=self.employee_id)
             else:
                 lines = analytic_pool.search(
                     [('contract_id', '=', self.id),
@@ -76,7 +77,8 @@ class HrContract(models.Model):
                         until=parser.parse(lines[-1].name)))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
-                            line_date=date_line, employee_id=self.employee_id)
+                            line_date=str(date_line),
+                            employee_id=self.employee_id)
         elif 'date_end' in values.keys():
             line = analytic_pool.search(
                 [('contract_id', '=', self.id),
@@ -91,13 +93,13 @@ class HrContract(models.Model):
                     until=parser.parse(lines[-1].name)))
                 for date_line in dates:
                     analytic_pool.recalculate_line(
-                        line_date=date_line, employee_id=self.employee_id)
+                        line_date=str(date_line), employee_id=self.employee_id)
         if values.get('date_start'):
 
             dates = calculate_days(old_date_start, values.get('date_start'))
             for date_line in dates:
                 analytic_pool.recalculate_line(
-                    line_date=date_line, employee_id=self.employee_id)
+                    line_date=str(date_line), employee_id=self.employee_id)
         return res
 
     @api.model
@@ -152,7 +154,7 @@ class HrContract(models.Model):
                     until=parser.parse(date_from)))
                 for date_line in dates:
                     analytic_pool.recalculate_line(
-                        line_date=date_line, employee_id=employee)
+                        line_date=str(date_line), employee_id=employee)
         return res
 
 

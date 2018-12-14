@@ -54,5 +54,5 @@ class HrHolidays(models.Model):
                                      until=parser.parse(date_to)))
             for date_line in dates:
                 self.env['attendance.line.analytic'].recalculate_line(
-                    line_date=date_line, employee_id=self.employee_id)
+                    line_date=str(date_line), employee_id=self.employee_id)
         return res
