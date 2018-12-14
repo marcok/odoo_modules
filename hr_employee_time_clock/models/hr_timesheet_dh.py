@@ -29,6 +29,7 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import calendar
 import math
 import logging
+from odoo.exceptions import UserError, ValidationError, AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -224,8 +225,10 @@ class HrTimesheetDh(models.Model):
             prev_timesheet_diff = \
                 sheet.get_previous_month_diff(
                     sheet.employee_id.id,
-                    old_timesheet_start_from.strftime('%Y-%m-%d')
-                )
+                    old_timesheet_start_from.strftime('%Y-%m-%d'))
+            if len(contract) > 1:
+                raise UserError(_(
+                    'You have more than one active contract'))
             if not contract or not contract.rate_per_hour:
                 sheet['calculate_diff_hours'] = (
                     sheet.get_overtime(
@@ -520,7 +523,8 @@ class HrTimesheetDh(models.Model):
                 if contract:
                     resource_calendar_id = contract.resource_calendar_id
                 else:
-                    resource_calendar_id = self.employee_id.resource_calendar_id
+                    resource_calendar_id = \
+                        sheet.employee_id.resource_calendar_id
 
                 use_overtime = resource_calendar_id.use_overtime
 

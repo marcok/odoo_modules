@@ -47,6 +47,7 @@ def migrate(cr, version):
         _logger.info(i)
         sheets = env['hr_timesheet_sheet.sheet'].search(
             [('employee_id', '=', employee.id)])
+        env['attendance.line.analytic'].search([]).unlink()
         for sheet in sheets:
             env['attendance.line.analytic'].create_line(
                 sheet, sheet.date_from, sheet.date_to)

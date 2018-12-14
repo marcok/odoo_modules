@@ -24,7 +24,7 @@
     'name': "Employee time clock",
     'author': "Bytebrand GmbH",
     'summary': 'Track over- and under-time, generate timesheets, upload public holidays',
-    'website': "http://www.bytebrand.net",
+    'website': "https://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '11.0.0.0.13',
     'depends': ['mail',
