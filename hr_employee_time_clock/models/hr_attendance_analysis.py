@@ -208,3 +208,11 @@ class HrAttendance(models.Model):
                 self, values)
         return super(HrAttendance, self).write(values)
 
+    @api.multi
+    def unlink(self):
+        employee = self.sheet_id.employee_id
+        name = self.check_in.split(' ')[0]
+        res = super(HrAttendance, self).unlink()
+        self.env['attendance.line.analytic'].recalculate_line(
+            line_date=name, employee_id=employee)
+        return res

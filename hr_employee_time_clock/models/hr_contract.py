@@ -21,13 +21,8 @@
 ##############################################################################
 
 
-import pytz
-from datetime import datetime, timedelta, date
 from odoo import api, fields, models, _
 from dateutil import rrule, parser
-from odoo.tools.translate import _
-import calendar
-import math
 import logging
 
 _logger = logging.getLogger(__name__)
