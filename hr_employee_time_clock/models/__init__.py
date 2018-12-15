@@ -23,14 +23,12 @@
 from . import hr_attendance_analysis
 from . import resource_calendar
 from . import hr_holidays
-
 from . import account_analytic_line
 from . import hr_department
 from . import hr_employee
 from . import hr_timesheet_sheet
 from . import hr_timesheet_dh
 from . import hr_timesheet_sheet_account
-# from . import hr_timesheet_sheet_config_settings
 from . import res_company
 from . import attendance_line_analytic
 from . import hr_attendance

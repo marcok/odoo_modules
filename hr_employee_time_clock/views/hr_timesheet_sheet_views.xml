@@ -193,18 +193,18 @@
                                            widget="float_time"/>
                                 </group>
                             </group>
-                            <field name="period_ids">
-                                <tree decoration-danger="total_difference&lt;0.1"
-                                      decoration-info="total_difference&gt;=0.1"
+                            <field name="period_ids" domain="[('worked_hours','&gt;', 0.0)]">
+                                <tree decoration-danger="difference&lt;0.1"
+                                      decoration-info="difference&gt;=0.1"
                                       string="Period">
                                     <field name="name"/>
-                                    <field name="total_attendance"
+                                    <field name="duty_hours"
                                            widget="float_time"
                                            sum="Attendances"/>
-                                    <field name="total_timesheet"
+                                    <field name="worked_hours"
                                            widget="float_time"
                                            sum="Timesheets"/>
-                                    <field name="total_difference"
+                                    <field name="difference"
                                            widget="float_time"
                                            sum="Differences"/>
                                 </tree>

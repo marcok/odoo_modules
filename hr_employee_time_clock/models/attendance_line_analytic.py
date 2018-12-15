@@ -87,7 +87,8 @@ class AttendanceLineAnalytic(models.Model):
 
     @api.multi
     def _get_difference(self):
-        self.difference = self.worked_hours - self.duty_hours
+        for line in self:
+            line.difference = line.worked_hours - line.duty_hours
 
     @api.multi
     def unlink_attendance(self):

@@ -70,6 +70,7 @@ class HrTimesheetSheet(models.Model):
 
     @api.multi
     def _total(self):
+
         """ Compute the attendances, analytic lines timesheets
         and differences between them
             for all the days of a timesheet and the current day
@@ -78,10 +79,10 @@ class HrTimesheetSheet(models.Model):
 
         self.env.cr.execute("""
                 SELECT sheet_id as id,
-                       sum(total_attendance) as total_attendance,
-                       sum(total_timesheet) as total_timesheet,
-                       sum(total_difference) as  total_difference
-                FROM hr_timesheet_sheet_sheet_day
+                       sum(worked_hours) as total_attendance,
+                       sum(running) as total_timesheet,
+                       sum(difference) as  total_difference
+                FROM attendance_line_analytic
                 WHERE sheet_id IN %s
                 GROUP BY sheet_id
             """, (tuple(ids),))
@@ -195,7 +196,7 @@ class HrTimesheetSheet(models.Model):
                                     string='Difference')
     attendances_ids = fields.One2many('hr.attendance', 'sheet_id',
                                       'Attendances')
-    period_ids = fields.One2many('hr_timesheet_sheet.sheet.day', 'sheet_id',
+    period_ids = fields.One2many('attendance.line.analytic', 'sheet_id',
                                  string='Period', readonly=True)
     attendance_count = fields.Integer(compute='_compute_attendances',
                                       string="Attendances")
@@ -381,31 +382,6 @@ class HrTimesheetSheet(models.Model):
             return False
         return ['&', ('state', '=', 'confirm'),
                 ('employee_id', 'in', empids.ids)]
-
-    @api.depends('period_ids.total_attendance', 'period_ids.total_timesheet',
-                 'period_ids.total_difference')
-    def _compute_total(self):
-        """ Compute the attendances, analytic lines timesheets and differences
-            between them for all the days of a timesheet and the current day
-        """
-        if len(self.ids) == 0:
-            return
-
-        self.env.cr.execute("""
-                SELECT sheet_id as id,
-                       sum(total_attendance) as total_attendance,
-                       sum(total_timesheet) as total_timesheet,
-                       sum(total_difference) as  total_difference
-                FROM hr_timesheet_sheet_sheet_day
-                WHERE sheet_id IN %s
-                GROUP BY sheet_id
-            """, (tuple(self.ids),))
-
-        for x in self.env.cr.dictfetchall():
-            sheet = self.browse(x.pop('id'))
-            sheet.total_attendance = x.pop('total_attendance')
-            sheet.total_timesheet = x.pop('total_timesheet')
-            sheet.total_difference = x.pop('total_difference')
 
     @api.multi
     def action_sheet_report(self):

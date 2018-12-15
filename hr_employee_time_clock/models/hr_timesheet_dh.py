@@ -47,35 +47,8 @@ class HrTimesheetDh(models.Model):
             if sheet.state == 'done':
                 sheet['total_duty_hours'] = sheet.total_duty_hours_done
             else:
-                dates = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(sheet.date_from),
-                                         until=parser.parse(sheet.date_to)))
-
-                period = {'date_from': sheet.date_from,
-                          'date_to': sheet.date_to}
-
-                try:
-                    model = self.env['ir.model'].search(
-                        [('model', '=', 'hr.holidays.public.line')])
-                except:
-                    model = None
-                if model:
-                    holiday_obj = self.env['hr.holidays']
-                    public_holidays = holiday_obj.search(
-                        [('date_from', '>=', sheet.date_from),
-                         ('date_from', '<=', sheet.date_to),
-                         ('holiday_type', '=', 'public_holiday')])
-                    for public_holiday in public_holidays:
-                        public_holiday_date = datetime.strptime(
-                            '%s' % public_holiday.date_from.split(' ')[0],
-                            '%Y-%m-%d')
-                        if public_holiday_date in dates:
-                            dates.remove(public_holiday_date)
-
-                for date_line in dates:
-                    duty_hours = sheet.calculate_duty_hours(
-                        date_from=str(date_line), period=period)
-                    sheet['total_duty_hours'] += duty_hours
+                for line in sheet.period_ids:
+                    sheet['total_duty_hours'] += line.duty_hours
                 sheet['total_duty_hours'] = (sheet.total_duty_hours -
                                              sheet.total_attendance)
 
