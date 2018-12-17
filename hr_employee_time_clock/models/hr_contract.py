@@ -40,8 +40,21 @@ class HrContract(models.Model):
     def write(self, values):
         old_date_start = self.date_start
         old_date_end = self.date_end
+        old_state = self.state
         analytic_pool = self.env['attendance.line.analytic']
         res = super(HrContract, self).write(values)
+
+        if values.get('state') in ('open', 'pending', 'close') \
+                and old_state in ('draft', 'cancel'):
+            self.attach_attendance()
+            return res
+        elif values.get('state') == 'cancel':
+            lines = analytic_pool.search(
+                [('contract_id', '=', self.id)])
+            employee = self.employee_id
+            if lines:
+                self.remove_from_attendance(lines, employee)
+                return res
         if values.get('resource_calendar_id') \
                 or 'rate_per_hour' in values.keys():
             lines = analytic_pool.search(
@@ -102,29 +115,28 @@ class HrContract(models.Model):
                     line_date=str(date_line), employee_id=self.employee_id)
         return res
 
-    @api.model
-    def create(self, values):
-        contract = super(HrContract, self).create(values)
-        old_date_start = contract.date_start
-        old_date_end = contract.date_end
+    @api.multi
+    def attach_attendance(self):
+        date_start = self.date_start
+        date_end = self.date_end
         analytic_pool = self.env['attendance.line.analytic']
         sheets = self.env['hr_timesheet_sheet.sheet'].search(
-            [('employee_id', '=', contract.employee_id.id)])
+            [('employee_id', '=', self.employee_id.id)])
         if sheets:
-            if not old_date_end:
+            if not date_end:
                 lines = analytic_pool.search(
                     [('contract_id', '=', False),
                      ('sheet_id', 'in', sheets.ids), ])
                 for line in lines:
-                    date_1 = fields.Datetime.from_string(old_date_start)
+                    date_1 = fields.Datetime.from_string(date_start)
                     date_2 = fields.Datetime.from_string(line.name)
                     if date_1 <= date_2:
                         analytic_pool.recalculate_line(
                             line_date=line.name,
                             employee_id=self.employee_id)
             else:
-                date_1 = fields.Datetime.from_string(old_date_start)
-                date_2 = fields.Datetime.from_string(old_date_end)
+                date_1 = fields.Datetime.from_string(date_start)
+                date_2 = fields.Datetime.from_string(date_end)
                 lines = analytic_pool.search(
                     [('contract_id', '=', False),
                      ('sheet_id', 'in', sheets.ids),
@@ -135,7 +147,19 @@ class HrContract(models.Model):
                         line_date=line.name,
                         employee_id=self.employee_id)
 
-        return contract
+    @api.multi
+    def remove_from_attendance(self, lines, employee):
+        analytic_pool = self.env['attendance.line.analytic']
+        for line in lines:
+            date_from = line.name + ' 00:00:00'
+
+            dates = list(rrule.rrule(
+                rrule.DAILY,
+                dtstart=parser.parse(date_from),
+                until=parser.parse(date_from)))
+            for date_line in dates:
+                analytic_pool.recalculate_line(
+                    line_date=str(date_line), employee_id=employee)
 
     @api.multi
     def unlink(self):
@@ -145,16 +169,7 @@ class HrContract(models.Model):
         employee = self.employee_id
         res = super(HrContract, self).unlink()
         if lines:
-            for line in lines:
-                date_from = line.name + ' 00:00:00'
-
-                dates = list(rrule.rrule(
-                    rrule.DAILY,
-                    dtstart=parser.parse(date_from),
-                    until=parser.parse(date_from)))
-                for date_line in dates:
-                    analytic_pool.recalculate_line(
-                        line_date=str(date_line), employee_id=employee)
+            self.remove_from_attendance(lines, employee)
         return res
 
 

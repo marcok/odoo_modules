@@ -61,8 +61,16 @@ class AttendanceLineAnalytic(models.Model):
     leave_description = fields.Char(string='Leave Description',
                                     default='-', )
 
+    state = fields.Selection([('new', 'New'),
+                              ('done', 'Approved')],
+                             default='new',
+                             string='Status',
+                             required=True,
+                             readonly=True,
+                             )
+
     @api.multi
-    def recalculate_line(self, line_date, employee_id=None):
+    def recalculate_line(self, line_date, employee_id=None): 
         if employee_id:
             lines = self.search([('name', '=', line_date),
                                  ('sheet_id.employee_id', '=', employee_id.id)])
@@ -77,8 +85,12 @@ class AttendanceLineAnalytic(models.Model):
                 self.calculate_duty_hours(sheet=line.sheet_id,
                                           date_from=date_line)
             values = {'duty_hours': duty_hours,
-                      'contract_id': contract.id,
+                      'contract_id': False,
+                      'state':
+                          'new' if line.sheet_id.state != 'done' else 'done',
                       'leave_description': '-'}
+            if contract:
+                values.update(contract_id=contract.id)
             if public_holiday:
                 values.update(leave_description=public_holiday.name)
             if leave and leave[0]:
@@ -130,7 +142,8 @@ class AttendanceLineAnalytic(models.Model):
             name = new_attendance.check_in.split(' ')[0]
             if not line_new:
                 line = self.search([('name', '=', name),
-                                    ('sheet_id', '=', new_attendance.sheet_id.id)])
+                                    ('sheet_id', '=',
+                                     new_attendance.sheet_id.id)])
             else:
                 line = line_new
 
@@ -212,7 +225,7 @@ class AttendanceLineAnalytic(models.Model):
         calendar_obj = self.env['resource.calendar']
         duty_hours = 0.0
         contract = contract_obj.search(
-            [('state', '!=', 'cancel'),
+            [('state', 'not in', ('draft', 'cancel')),
              ('employee_id', '=', sheet.employee_id.id),
              ('date_start', '<=', date_from), '|',
              ('date_end', '>=', date_from),
@@ -235,7 +248,7 @@ class AttendanceLineAnalytic(models.Model):
             resource_id=sheet.employee_id.id,
             context=ctx)
 
-        if contract.state != 'cancel':
+        if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:
                 if not dh:
                     dh = 0.00

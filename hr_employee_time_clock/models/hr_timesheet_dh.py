@@ -111,7 +111,7 @@ class HrTimesheetDh(models.Model):
                 contracts = self.env['hr.contract'].search([
                     ('employee_id', '=', employee_id),
                     ('date_start', '<=', holiday_id.date_from),
-                    ('state', '!=', 'cancel')])
+                    ('state', 'not in', ('draft', 'cancel'))])
                 if contracts:
                     contract = contracts[-1]
                     day_of_week = calendar.weekday(date_line.year,
@@ -222,7 +222,7 @@ class HrTimesheetDh(models.Model):
             '|',
             ('date_end', '>=', date_line),
             ('date_end', '=', False),
-            ('state', '!=', 'cancel')])
+            ('state', 'not in', ('draft', 'cancel'))])
         return contract
 
     def get_date_mark(self, date_line, period):
@@ -412,7 +412,7 @@ class HrTimesheetDh(models.Model):
 
             leave = self.count_leaves(date_from, self.employee_id.id)
             public_holiday = self.count_public_holiday(date_from)
-            if contract.state != 'cancel':
+            if contract.state not in ('draft', 'cancel'):
                 if leave[1] == 0 and not public_holiday:
                     if not dh:
                         dh = 0.00
