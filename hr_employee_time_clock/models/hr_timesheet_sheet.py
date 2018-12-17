@@ -75,36 +75,29 @@ class HrTimesheetSheet(models.Model):
         and differences between them
             for all the days of a timesheet and the current day
         """
-        ids = [i.id for i in self]
+        ctx = self.env.context.copy()
+        ctx['online_analysis'] = True
+        for sheet in self:
+            total_attendance = 0.0
+            total_timesheet = 0.0
+            total_difference = 0.0
+            for line in sheet.period_ids:
+                total_attendance += line.worked_hours
+                total_timesheet += line.running
+                total_difference += line.difference
 
-        self.env.cr.execute("""
-                SELECT sheet_id as id,
-                       sum(worked_hours) as total_attendance,
-                       sum(running) as total_timesheet,
-                       sum(difference) as  total_difference
-                FROM attendance_line_analytic
-                WHERE sheet_id IN %s
-                GROUP BY sheet_id
-            """, (tuple(ids),))
+                attendance_analysis = \
+                    self.with_context(ctx).attendance_analysis()
 
-        res = self.env.cr.dictfetchall()
-        if res:
-            ctx = self.env.context.copy()
-            ctx['online_analysis'] = True
-            for sheet in self:
-                if sheet.id == res[0].get('id'):
-                    attendance_analysis = \
-                        self.with_context(ctx).attendance_analysis()
-
-                    if attendance_analysis['total'].get('bonus_hours'):
-                        sheet.total_attendance = \
-                            attendance_analysis['total'].get('worked_hours') \
-                            + attendance_analysis['total'].get('bonus_hours')
-                    else:
-                        sheet.total_attendance = \
-                            attendance_analysis['total'].get('worked_hours')
-                    sheet.total_timesheet = res[0].get('total_timesheet')
-                    sheet.total_difference = res[0].get('total_difference')
+                if attendance_analysis['total'].get('bonus_hours'):
+                    sheet.total_attendance = \
+                        attendance_analysis['total'].get('worked_hours') \
+                        + attendance_analysis['total'].get('bonus_hours')
+                else:
+                    sheet.total_attendance = \
+                        attendance_analysis['total'].get('worked_hours')
+                sheet.total_timesheet = total_timesheet
+                sheet.total_difference = total_difference
 
     @api.depends('attendances_ids')
     def _compute_attendances(self):
