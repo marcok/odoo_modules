@@ -65,7 +65,7 @@ class ResourceCalendar(models.Model):
                                      minute=0, second=0),
                     start_dt.replace(hour=default_interval[1],
                                      minute=0, second=0))
-            intervals = self._interval_remove_leaves(working_interval,
+            intervals = self._leave_intervals(working_interval,
                                                      work_limits)
             return intervals
 
@@ -73,7 +73,7 @@ class ResourceCalendar(models.Model):
         for calendar_working_day in self.get_attendances_for_weekdays(
                 ids, [start_dt.weekday()], start_dt,
                 end_dt):
-
+            print('\n calendar_working_day >>>>>> %s' % calendar_working_day)
             str_time_from_dict = str(calendar_working_day.hour_from).split('.')
             hour_from = int(str_time_from_dict[0])
             if int(str_time_from_dict[1]) < 10:
@@ -99,6 +99,8 @@ class ResourceCalendar(models.Model):
                 work_dt.replace(hour=hour_from).replace(minute=minutes_from),
                 work_dt.replace(hour=hour_to).replace(minute=minutes_to)
             )
+            print('\n working_interval >>>>>> %s', working_interval)
+            print('\n work_limits >>>>>> %s', work_limits)
             working_intervals += self._interval_remove_leaves(working_interval,
                                                               work_limits)
         # find leave intervals

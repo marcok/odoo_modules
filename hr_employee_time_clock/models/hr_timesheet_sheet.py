@@ -338,9 +338,7 @@ class HrTimesheetSheet(models.Model):
     @api.multi
     def name_get(self):
         # week number according to ISO 8601 Calendar
-        return [(r['id'], _('Week ') + str(
-            datetime.strptime(r['date_from'], '%Y-%m-%d').isocalendar()[1]))
-                for r in self.read(['date_from'], load='_classic_write')]
+        return [(r['id'], _('Week ') + str(r['date_from'].isocalendar()[1])) for r in self.read(['date_from'], load='_classic_write')]
 
     @api.multi
     def unlink(self):
@@ -357,7 +355,13 @@ class HrTimesheetSheet(models.Model):
         for sheet in self:
             analytic_timesheet_toremove += sheet.timesheet_ids.filtered(
                 lambda t: not t.task_id)
+            analytic = self.env['attendance.line.analytic'].search(
+                [('sheet_id', '=', sheet.id)])
+            for a in analytic:
+                a.unlink_attendance()
         analytic_timesheet_toremove.unlink()
+
+
 
         return super(HrTimesheetSheet, self).unlink()
 

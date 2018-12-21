@@ -35,7 +35,7 @@ class ImportLeaveRequests(models.TransientModel):
                                 required=True,
                                 help="Select csv file having "
                                      "holiday dates.")
-    leave_type_id = fields.Many2one('hr.holidays.status',
+    leave_type_id = fields.Many2one('hr.leave.type',
                                     'Leave Type',
                                     required=True)
     employee_tag_id = fields.Many2one('hr.employee.category',
@@ -50,7 +50,7 @@ class ImportLeaveRequests(models.TransientModel):
 
     @api.multi
     def import_leave_data(self):
-        holiday_obj = self.env['hr.holidays']
+        holiday_obj = self.env['hr.leave']
         employee_obj = self.env['hr.employee']
         timesheet_obj = self.env['hr_timesheet_sheet.sheet']
         converter = self.env['ir.fields.converter']

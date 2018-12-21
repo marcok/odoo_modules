@@ -69,6 +69,8 @@ class HrAttendance(models.Model):
 
     @api.multi
     def _get_attendance_employee_tz(self, employee_id, date):
+        print('\n date >>>>>> %s' % date)
+        print('\n date >>>>>> %s' % type(date))
         """ Simulate timesheet in employee timezone
 
         Return the attendance date in string format in the employee
@@ -103,7 +105,7 @@ class HrAttendance(models.Model):
             date = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
         att_tz_date_str = self._get_attendance_employee_tz(
-            employee_id, date=date)
+            employee_id, date=str(date))
         sheet_ids = sheet_obj.search(
             [('date_from', '<=', att_tz_date_str),
              ('date_to', '>=', att_tz_date_str),
@@ -190,7 +192,7 @@ class HrAttendance(models.Model):
     def write(self, values):
         check_in = values.get('check_in') or self.check_in
         if check_in:
-            values['name'] = check_in
+            values['name'] = str(check_in)
             times = datetime.strptime(values.get('name'), "%Y-%m-%d %H:%M:%S")
             if datetime.now() < times:
                 raise ValidationError(
@@ -212,12 +214,11 @@ class HrAttendance(models.Model):
     @api.multi
     def unlink(self):
         for attendance in self:
-            name = attendance.check_in.split(' ')[0]
-
+            name = str(attendance.check_in.date())
             analytic = self.env['attendance.line.analytic'].search(
                 [('name', '=', name),
                  ('sheet_id', '=', attendance.sheet_id.id)])
             res = super(HrAttendance, attendance).unlink()
-
-            analytic.unlink_attendance()
+            for a in analytic:
+                a.unlink_attendance()
         return res

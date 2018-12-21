@@ -56,9 +56,9 @@ class HrTimesheetDh(models.Model):
     def take_holiday_status(self):
         """
         Takes holiday types, which must change duty hours.
-        :return: hr.holidays.status objects
+        :return: hr.leave.type objects
         """
-        return self.env['hr.holidays.status'].search(
+        return self.env['hr.leave.type'].search(
             [('take_into_attendance', '=', True)])
 
     def get_timezone_time(self, time_without_tz, date_line):
@@ -91,15 +91,14 @@ class HrTimesheetDh(models.Model):
         Checks if employee has any leave on current date.
         :param date_line: datetime
         :param employee_id: hr.employee object's id
-        :return: list [hr.holidays objects, float]
+        :return: list [hr.leave objects, float]
         """
 
         date_line = fields.Datetime.from_string(date_line)
-        holiday_obj = self.env['hr.holidays']
+        holiday_obj = self.env['hr.leave']
         holiday_ids = holiday_obj.search([
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
-            ('type', '=', 'remove'),
             ('holiday_status_id', 'in', self.take_holiday_status().ids),
             ('date_from', '<', str(date_line + timedelta(days=1))),
             ('date_to', '>', str(date_line))])
@@ -170,7 +169,7 @@ class HrTimesheetDh(models.Model):
         """
         Checks if there is any public holiday on current date.
         :param date_from: datetime string
-        :return: hr.holidays.public.line objects
+        :return: hr.leave.public.line objects
         """
         public_holidays = []
         model = self.env['ir.model'].search(
@@ -196,7 +195,7 @@ class HrTimesheetDh(models.Model):
             contract = self.check_contract(employee_id, start_date)
 
             old_timesheet_start_from = parser.parse(
-                sheet.date_from) - timedelta(days=1)
+                str(sheet.date_from)) - timedelta(days=1)
             prev_timesheet_diff = \
                 sheet.get_previous_month_diff(
                     sheet.employee_id.id,
@@ -238,11 +237,10 @@ class HrTimesheetDh(models.Model):
 
     def get_leave_descr(self, date_line, employee_id):
         leave_descr = ' '
-        holiday_obj = self.env['hr.holidays']
+        holiday_obj = self.env['hr.leave']
         holiday_ids = holiday_obj.search([
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
-            ('type', '=', 'remove'),
             ('date_from', '<', str(date_line + timedelta(days=1))),
             ('date_to', '>', str(date_line))])
         descr = None

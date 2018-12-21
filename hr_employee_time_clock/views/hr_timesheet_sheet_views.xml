@@ -72,11 +72,8 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[2]" position="replace">
+            <xpath expr="//filter[1]" position="after">
                 <filter string="Current Month" name="current_month" domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]" />
-            </xpath>
-            <xpath expr="//filter[4]" position="replace">
-                <filter string="My Attendances" name="my_attendances" domain="[('employee_id.user_id.id', '=', uid)]" />
             </xpath>
         </field>
     </record>
@@ -239,8 +236,10 @@
                 <field name="department_id"/>
                 <group expand="0" string="Group By">
                     <filter string="Employees" domain="[]"
+                            name="employees"
                             context="{'group_by':'employee_id'}"/>
                     <filter string="Department" domain="[]"
+                            name="department"
                             context="{'group_by':'department_id'}"/>
                 </group>
             </search>

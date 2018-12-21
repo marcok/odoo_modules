@@ -124,7 +124,7 @@ class AttendanceLineAnalytic(models.Model):
             line_new = False
             if values.get('check_in'):
                 value_check_in = values.get('check_in').split(' ')[0]
-                attendance_check_in = new_attendance.check_in.split(' ')[0]
+                attendance_check_in = str(new_attendance.check_in.date())
                 if value_check_in != attendance_check_in:
                     line_new = self.search(
                         [('name', '=', value_check_in),
@@ -139,7 +139,7 @@ class AttendanceLineAnalytic(models.Model):
 
             check_in = values.get('check_in') or new_attendance.check_in
             check_out = values.get('check_out') or new_attendance.check_out
-            name = new_attendance.check_in.split(' ')[0]
+            name = str(new_attendance.check_in.date())
             if not line_new:
                 line = self.search([('name', '=', name),
                                     ('sheet_id', '=',
@@ -176,9 +176,9 @@ class AttendanceLineAnalytic(models.Model):
 
                     else:
                         delta = datetime.strptime(
-                            check_out, DEFAULT_SERVER_DATETIME_FORMAT) - \
+                            str(check_out), DEFAULT_SERVER_DATETIME_FORMAT) - \
                                 datetime.strptime(
-                                    check_in, DEFAULT_SERVER_DATETIME_FORMAT)
+                                    str(check_in), DEFAULT_SERVER_DATETIME_FORMAT)
                         worked_hours += delta.total_seconds() / 3600.0
                 line.write({
                     'duty_hours': duty_hours,
@@ -190,11 +190,11 @@ class AttendanceLineAnalytic(models.Model):
     @api.multi
     def create_line(self, sheet, date_from, date_to):
         dates = list(rrule.rrule(rrule.DAILY,
-                                 dtstart=parser.parse(date_from),
-                                 until=parser.parse(date_to)))
+                                 dtstart=parser.parse(str(date_from)),
+                                 until=parser.parse(str(date_to))))
 
         for date_line in dates:
-            name = str(date_line).split(' ')[0]
+            name = str(date_line.date())
             line = self.search(
                 [('name', '=', name),
                  ('sheet_id', '=', sheet.id)])

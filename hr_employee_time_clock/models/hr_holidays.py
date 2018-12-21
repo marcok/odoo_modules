@@ -28,20 +28,20 @@ from dateutil import rrule, parser
 _logger = logging.getLogger(__name__)
 
 
-class HolidaysType(models.Model):
-    _inherit = "hr.holidays.status"
+class LeaveType(models.Model):
+    _inherit = "hr.leave.type"
 
     take_into_attendance = fields.Boolean(default=True,
                                           string='Take Into Attendance')
 
 
-class HrHolidays(models.Model):
-    _inherit = "hr.holidays"
+class HrLeave(models.Model):
+    _inherit = "hr.leave"
 
     @api.multi
     def write(self, values):
         state = self.state
-        res = super(HrHolidays, self).write(values)
+        res = super(HrLeave, self).write(values)
         if (values.get('state') == 'validate' and state == 'confirm') \
                 or (values.get('state') == 'refuse'
                     and state == 'validate'):
