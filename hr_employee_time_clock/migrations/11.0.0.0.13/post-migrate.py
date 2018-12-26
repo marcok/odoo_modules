@@ -42,7 +42,8 @@ def migrate(cr, version):
 
     employee_ids = env['hr.employee'].search([('active', '=', True)])
     i = len(employee_ids)
-    env['employee.attendance.analytic'].search([]).unlink()
+    analytic = env['employee.attendance.analytic']
+    analytic.search([]).unlink()
     for employee in employee_ids:
         _logger.info('\n')
         _logger.info(i)
@@ -51,14 +52,12 @@ def migrate(cr, version):
             [('employee_id', '=', employee.id)])
 
         for sheet in sheets:
-            env['employee.attendance.analytic'].create_line(
+            analytic.create_line(
                 sheet, sheet.date_from, sheet.date_to)
             attendances = env['hr.attendance'].search(
                 [('sheet_id', '=', sheet.id)])
             for attendance in attendances:
                 if attendance.check_out:
-                    try:
-                        attendance.write({'check_out': attendance.check_out})
-                    except:
-                        pass
+                    analytic.recalculate_line_worktime(
+                        attendance, {'check_out': attendance.check_out})
         i -= 1

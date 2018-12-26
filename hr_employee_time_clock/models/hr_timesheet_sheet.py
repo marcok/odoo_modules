@@ -74,7 +74,7 @@ class HrTimesheetSheet(models.Model):
 
     @api.multi
     def _total(self):
-
+        print('\n _total >>>>>> %s')
         """ Compute the attendances, analytic lines timesheets
         and differences between them
             for all the days of a timesheet and the current day
@@ -86,12 +86,13 @@ class HrTimesheetSheet(models.Model):
                        sum(duty_hours) as duty_hours,
                        sum(worked_hours) as total_attendance,
                        sum(running) as total_timesheet
-                FROM attendance_line_analytic
+                FROM employee_attendance_analytic
                 WHERE sheet_id IN %s
                 GROUP BY sheet_id
             """, (tuple(ids),))
 
         res = self.env.cr.dictfetchall()
+        print('\n res >>>>>> %s' % res)
         if res:
             ctx = self.env.context.copy()
             ctx['online_analysis'] = True

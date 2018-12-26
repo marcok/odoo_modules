@@ -545,7 +545,7 @@ class HrAttendance(models.Model):
         for attendance in self:
             name = attendance.check_in.split(' ')[0]
 
-            analytic = self.env['attendance.line.analytic'].search(
+            analytic = self.env['employee.attendance.analytic'].search(
                 [('name', '=', name),
                  ('sheet_id', '=', attendance.sheet_id.id)])
             res = super(HrAttendance, attendance).unlink()
