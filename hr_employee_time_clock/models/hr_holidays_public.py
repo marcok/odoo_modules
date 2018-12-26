@@ -36,7 +36,7 @@ class HrHolidaysPublicLine(models.Model):
     @api.model
     def create(self, values):
         line = super(HrHolidaysPublicLine, self).create(values)
-        self.env['attendance.line.analytic'].recalculate_line(
+        self.env['employee.attendance.analytic'].recalculate_line(
             line_date=line.date)
         return line
 
@@ -47,9 +47,9 @@ class HrHolidaysPublicLine(models.Model):
         res = super(HrHolidaysPublicLine, self).write(values)
         self.env.cr.commit()
         if values.get('date'):
-            self.env['attendance.line.analytic'].recalculate_line(
+            self.env['employee.attendance.analytic'].recalculate_line(
                 line_date=old_date)
-            self.env['attendance.line.analytic'].recalculate_line(
+            self.env['employee.attendance.analytic'].recalculate_line(
                 line_date=new_date)
 
         return res
@@ -58,6 +58,6 @@ class HrHolidaysPublicLine(models.Model):
     def unlink(self):
         old_date = self.date
         res = super(HrHolidaysPublicLine, self).unlink()
-        self.env['attendance.line.analytic'].recalculate_line(
+        self.env['employee.attendance.analytic'].recalculate_line(
             line_date=old_date)
         return res

@@ -41,7 +41,7 @@ class HrContract(models.Model):
         old_date_start = self.date_start
         old_date_end = self.date_end
         old_state = self.state
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         res = super(HrContract, self).write(values)
 
         if values.get('state') in ('open', 'pending', 'close') \
@@ -119,7 +119,7 @@ class HrContract(models.Model):
     def attach_attendance(self):
         date_start = self.date_start
         date_end = self.date_end
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         sheets = self.env['hr_timesheet_sheet.sheet'].search(
             [('employee_id', '=', self.employee_id.id)])
         if sheets:
@@ -149,7 +149,7 @@ class HrContract(models.Model):
 
     @api.multi
     def remove_from_attendance(self, lines, employee):
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         for line in lines:
             date_from = line.name + ' 00:00:00'
 
@@ -163,7 +163,7 @@ class HrContract(models.Model):
 
     @api.multi
     def unlink(self):
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         lines = analytic_pool.search(
             [('contract_id', '=', self.id)])
         employee = self.employee_id

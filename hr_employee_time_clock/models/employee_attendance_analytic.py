@@ -30,8 +30,8 @@ from odoo.exceptions import UserError, ValidationError, AccessError
 _logger = logging.getLogger(__name__)
 
 
-class AttendanceLineAnalytic(models.Model):
-    _name = "attendance.line.analytic"
+class EmployeeAttendanceAnalytic(models.Model):
+    _name = "employee.attendance.analytic"
     _order = "name"
 
     name = fields.Date(string='Date')
@@ -40,9 +40,8 @@ class AttendanceLineAnalytic(models.Model):
                                string='Sheet',
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
-                                     'attendance_line_analytic_id',
-                                     string='Attendance IDS',
-                                     readonly=True, )
+                                      'line_analytic_id',
+                                      string='Attendance IDS')
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
@@ -129,7 +128,7 @@ class AttendanceLineAnalytic(models.Model):
                     line_new = self.search(
                         [('name', '=', value_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
-                    new_attendance.attendance_line_analytic_id = line_new.id
+                    new_attendance.line_analytic_id = line_new.id
 
                     line = self.search(
                         [('name', '=', attendance_check_in),
@@ -158,10 +157,10 @@ class AttendanceLineAnalytic(models.Model):
                 line = self.create({'name': name,
                                     'sheet_id': new_attendance.sheet_id.id,
                                     'duty_hours': duty_hours})
-                new_attendance.attendance_line_analytic_id = line.id
+                new_attendance.line_analytic_id = line.id
             else:
-                if not new_attendance.attendance_line_analytic_id:
-                    new_attendance.attendance_line_analytic_id = line.id
+                if not new_attendance.line_analytic_id:
+                    new_attendance.line_analytic_id = line.id
 
             if check_out:
                 worked_hours = 0
@@ -192,7 +191,6 @@ class AttendanceLineAnalytic(models.Model):
         dates = list(rrule.rrule(rrule.DAILY,
                                  dtstart=parser.parse(date_from),
                                  until=parser.parse(date_to)))
-
         for date_line in dates:
             name = str(date_line).split(' ')[0]
             line = self.search(
