@@ -380,4 +380,4 @@ class HrEmployee(models.Model):
                  'name': employee.name,
                  'image': employee.image_medium,
                  'running': running,
-                 'user_id': employee.user_id}]
+                 'user_id': employee.user_id.id}]
