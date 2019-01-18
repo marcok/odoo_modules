@@ -529,11 +529,11 @@ class HrAttendance(models.Model):
 
         if values.get('check_out'):
             attendance = super(HrAttendance, self).create(values)
-            self.env['employee.attendance.analytic'].recalculate_line_worktime(
-                attendance, values)
             val = {'check_out': values.get('check_out')}
             values = attendance.check_overtime(val)
             attendance.write(values)
+            self.env['employee.attendance.analytic'].recalculate_line_worktime(
+                attendance, values)
         else:
             attendance = super(HrAttendance, self).create(values)
             self.env['employee.attendance.analytic'].recalculate_line_worktime(

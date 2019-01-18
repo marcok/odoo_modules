@@ -161,11 +161,14 @@ class EmployeeAttendanceAnalytic(models.Model):
             else:
                 if not new_attendance.line_analytic_id:
                     new_attendance.line_analytic_id = line.id
-
             if check_out:
                 worked_hours = 0
                 bonus_worked_hours = 0
                 night_shift_worked_hours = 0
+                if new_attendance not in line.attendance_ids:
+                    worked_hours = new_attendance.worked_hours
+                    bonus_worked_hours = new_attendance.bonus_worked_hours
+                    night_shift_worked_hours = new_attendance.night_shift_worked_hours
                 for attendance in line.attendance_ids:
                     bonus_worked_hours += attendance.bonus_worked_hours
                     night_shift_worked_hours \
