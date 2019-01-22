@@ -500,10 +500,11 @@ class HrAttendance(models.Model):
                     " of approved attendance sheet."))
 
         check_out = values.get('check_out') or self.check_out
+        res = super(HrAttendance, self).write(values)
         if check_out and check_in:
             self.env['employee.attendance.analytic'].recalculate_line_worktime(
                 self, values)
-        return super(HrAttendance, self).write(values)
+        return res
 
     @api.model
     def create(self, values):
@@ -526,16 +527,14 @@ class HrAttendance(models.Model):
                 raise ValidationError(
                     _('You can not set time of Sing In (resp. Sing Out) which '
                       'is later than a current time'))
-
+        attendance = super(HrAttendance, self).create(values)
         if values.get('check_out'):
-            attendance = super(HrAttendance, self).create(values)
             val = {'check_out': values.get('check_out')}
             values = attendance.check_overtime(val)
             attendance.write(values)
             self.env['employee.attendance.analytic'].recalculate_line_worktime(
                 attendance, values)
         else:
-            attendance = super(HrAttendance, self).create(values)
             self.env['employee.attendance.analytic'].recalculate_line_worktime(
                 attendance, values)
         return attendance
