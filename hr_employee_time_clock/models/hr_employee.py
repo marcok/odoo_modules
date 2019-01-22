@@ -320,7 +320,13 @@ class HrEmployee(models.Model):
 
     @api.model
     def check_in_out_action(self, values):
-        employee = self.sudo().browse(values.get('employee_id'))
+        employee = self.sudo().browse(values.get('employee_id')).exists()
+        if not employee:
+            return [
+                {'error': _(
+                    'Please contact your manager to create '
+                    'employee for you and change QR-code.')}]
+
         hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
         hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
             [('employee_id', '=', employee.id),
