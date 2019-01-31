@@ -61,12 +61,12 @@ class HrContract(models.Model):
                 [('contract_id', '=', self.id)])
             if lines:
                 for line in lines:
-                    date_from = line.name + ' 00:00:00'
+                    date_from = str(line.name) + ' 00:00:00'
 
                     dates = list(rrule.rrule(
                         rrule.DAILY,
-                        dtstart=parser.parse(date_from),
-                        until=parser.parse(date_from)))
+                        dtstart=parser.parse(str(date_from)),
+                        until=parser.parse(str(date_from))))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
                             line_date=str(date_line),
@@ -151,12 +151,12 @@ class HrContract(models.Model):
     def remove_from_attendance(self, lines, employee):
         analytic_pool = self.env['attendance.line.analytic']
         for line in lines:
-            date_from = line.name + ' 00:00:00'
+            date_from = str(line.name) + ' 00:00:00'
 
             dates = list(rrule.rrule(
                 rrule.DAILY,
-                dtstart=parser.parse(date_from),
-                until=parser.parse(date_from)))
+                dtstart=parser.parse(str(date_from)),
+                until=parser.parse(str(date_from))))
             for date_line in dates:
                 analytic_pool.recalculate_line(
                     line_date=str(date_line), employee_id=employee)

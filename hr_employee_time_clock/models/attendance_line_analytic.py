@@ -240,13 +240,9 @@ class AttendanceLineAnalytic(models.Model):
             return 0.00, contract, leave, public_holiday
         ctx = dict(self.env.context).copy()
         # ctx.update(period)
-        dh = calendar_obj.get_working_hours_of_date(
-            cr=self._cr,
-            uid=self.env.user.id,
-            ids=contract.resource_calendar_id.id,
+        dh = contract.resource_calendar_id.get_working_hours_of_date(
             start_dt=fields.Datetime.from_string(str(date_from)),
-            resource_id=sheet.employee_id.id,
-            context=ctx)
+            resource_id=sheet.employee_id.id)
 
         if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:
