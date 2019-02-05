@@ -874,6 +874,9 @@ class HrTimesheetSheet(models.Model):
                 end_date = sheet.date_to
 
                 contract = self.check_contract(employee_id, start_date)
+                if len(contract)>1:
+                    raise UserError(_(
+                        'You have more than one active contract'))
                 if contract:
                     resource_calendar_id = contract.resource_calendar_id
                 else:
