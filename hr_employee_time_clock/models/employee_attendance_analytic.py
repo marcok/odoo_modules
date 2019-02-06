@@ -138,12 +138,6 @@ class EmployeeAttendanceAnalytic(models.Model):
 
             check_in = values.get('check_in') or new_attendance.check_in
             check_out = values.get('check_out') or new_attendance.check_out
-            if check_in and not check_out:
-                attendance_state = 'checked_in'
-            else:
-                attendance_state = 'checked_out'
-            new_attendance.employee_id.attendance_state = attendance_state
-
             name = new_attendance.check_in.split(' ')[0]
             if not line_new:
                 line = self.search([('name', '=', name),

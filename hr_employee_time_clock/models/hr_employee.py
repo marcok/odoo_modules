@@ -71,15 +71,9 @@ class HrEmployee(models.Model):
         help='list of attendances for the employee')
     last_attendance_id = fields.Many2one('hr.attendance',
                                          compute='_compute_last_attendance_id')
-    # attendance_state = fields.Selection(
-    #     string="Attendance",
-    #     compute='_compute_attendance_state',
-    #     selection=[('checked_out', "Checked out"),
-    #                ('checked_in', "Checked in")])
-
     attendance_state = fields.Selection(
         string="Attendance",
-        store=True,
+        compute='_compute_attendance_state',
         selection=[('checked_out', "Checked out"),
                    ('checked_in', "Checked in")])
     manual_attendance = fields.Boolean(
@@ -149,12 +143,11 @@ class HrEmployee(models.Model):
                  'last_attendance_id.check_out',
                  'last_attendance_id')
     def _compute_attendance_state(self):
-        print('\n _compute_attendance_state >>>>>> %s')
-    #     for employee in self:
-    #         employee.attendance_state = (
-    #             employee.last_attendance_id
-    #             and not employee.last_attendance_id.check_out
-    #             and 'checked_in' or 'checked_out')
+        for employee in self:
+            employee.attendance_state = (
+                employee.last_attendance_id
+                and not employee.last_attendance_id.check_out
+                and 'checked_in' or 'checked_out')
 
     @api.constrains('pin')
     def _verify_pin(self):
