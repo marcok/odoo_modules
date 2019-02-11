@@ -41,7 +41,7 @@ class HrContract(models.Model):
         old_date_start = self.date_start
         old_date_end = self.date_end
         old_state = self.state
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         res = super(HrContract, self).write(values)
 
         if values.get('state') in ('open', 'pending', 'close') \
@@ -65,8 +65,8 @@ class HrContract(models.Model):
 
                     dates = list(rrule.rrule(
                         rrule.DAILY,
-                        dtstart=parser.parse(str(date_from)),
-                        until=parser.parse(str(date_from))))
+                        dtstart=parser.parse(date_from),
+                        until=parser.parse(date_from)))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
                             line_date=str(date_line),
@@ -119,7 +119,7 @@ class HrContract(models.Model):
     def attach_attendance(self):
         date_start = self.date_start
         date_end = self.date_end
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         sheets = self.env['hr_timesheet_sheet.sheet'].search(
             [('employee_id', '=', self.employee_id.id)])
         if sheets:
@@ -149,21 +149,20 @@ class HrContract(models.Model):
 
     @api.multi
     def remove_from_attendance(self, lines, employee):
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         for line in lines:
             date_from = str(line.name) + ' 00:00:00'
-
             dates = list(rrule.rrule(
                 rrule.DAILY,
-                dtstart=parser.parse(str(date_from)),
-                until=parser.parse(str(date_from))))
+                dtstart=parser.parse(date_from),
+                until=parser.parse(date_from)))
             for date_line in dates:
                 analytic_pool.recalculate_line(
                     line_date=str(date_line), employee_id=employee)
 
     @api.multi
     def unlink(self):
-        analytic_pool = self.env['attendance.line.analytic']
+        analytic_pool = self.env['employee.attendance.analytic']
         lines = analytic_pool.search(
             [('contract_id', '=', self.id)])
         employee = self.employee_id
@@ -179,11 +178,11 @@ def calculate_days(date_start, date_end):
     if old_date_1 > old_date_2:
         dates = list(rrule.rrule(
             rrule.DAILY,
-            dtstart=parser.parse(date_end),
-            until=parser.parse(date_start)))
+            dtstart=parser.parse(str(date_end)),
+            until=parser.parse(str(date_start))))
     else:
         dates = list(rrule.rrule(
             rrule.DAILY,
-            dtstart=parser.parse(date_start),
-            until=parser.parse(date_end)))
+            dtstart=parser.parse(str(date_start)),
+            until=parser.parse(str(date_end))))
     return dates

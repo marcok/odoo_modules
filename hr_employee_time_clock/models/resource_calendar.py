@@ -26,73 +26,13 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 import pytz
-from operator import itemgetter
-from collections import namedtuple
 
 
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
-    _interval_obj = namedtuple('Interval',
-                               ('start_datetime', 'end_datetime', 'data'))
-
-    def _merge_kw(self, kw, kw_ext):
-        new_kw = dict(kw, **kw_ext)
-        new_kw.update(
-            attendances=kw.get('attendances',
-                               self.env['resource.calendar.attendance']) |
-                        kw_ext.get('attendances',
-                                   self.env['resource.calendar.attendance']),
-            leaves=kw.get('leaves',
-                          self.env['resource.calendar.leaves']) |
-                   kw_ext.get('leaves', self.env['resource.calendar.leaves'])
-        )
-        return new_kw
-
-    def _interval_new(self, start_datetime, end_datetime, kw=None):
-        kw = kw if kw is not None else dict()
-        kw.setdefault('attendances', self.env['resource.calendar.attendance'])
-        kw.setdefault('leaves', self.env['resource.calendar.leaves'])
-        return self._interval_obj(start_datetime, end_datetime, kw)
-
-    def _interval_exclude_left(self, interval, interval_dst):
-        return self._interval_obj(
-            interval.start_datetime > interval_dst.end_datetime
-            and interval.start_datetime or interval_dst.end_datetime,
-            interval.end_datetime,
-            self._merge_kw(interval.data, interval_dst.data)
-        )
-
-    def _interval_exclude_right(self, interval, interval_dst):
-        return self._interval_obj(
-            interval.start_datetime,
-            interval.end_datetime < interval_dst.start_datetime
-            and interval.end_datetime or interval_dst.start_datetime,
-            self._merge_kw(interval.data, interval_dst.data)
-        )
-
-    def _interval_or(self, interval, interval_dst):
-        return self._interval_obj(
-            interval.start_datetime < interval_dst.start_datetime
-            and interval.start_datetime or interval_dst.start_datetime,
-            interval.end_datetime > interval_dst.end_datetime
-            and interval.end_datetime or interval_dst.end_datetime,
-            self._merge_kw(interval.data, interval_dst.data)
-        )
-
-    def _interval_and(self, interval, interval_dst):
-        if interval.start_datetime > interval_dst.end_datetime \
-                or interval.end_datetime < interval_dst.start_datetime:
-            return None
-        return self._interval_obj(
-            interval.start_datetime > interval_dst.start_datetime
-            and interval.start_datetime or interval_dst.start_datetime,
-            interval.end_datetime < interval_dst.end_datetime
-            and interval.end_datetime or interval_dst.end_datetime,
-            self._merge_kw(interval.data, interval_dst.data)
-        )
 
     @api.multi
-    def get_working_intervals_of_day(self,  start_dt=None,
+    def get_working_intervals_of_day(self, start_dt=None,
                                      end_dt=None, leaves=None,
                                      compute_leaves=False, resource_id=None,
                                      default_interval=None):
@@ -115,7 +55,7 @@ class ResourceCalendar(models.Model):
         work_dt = start_dt.replace(hour=0, minute=0, second=0)
 
         # no calendar: try to use the default_interval, then return directly
-        if not self:
+        if not self.ids:
             working_interval = []
             if default_interval:
                 working_interval = (
@@ -123,14 +63,19 @@ class ResourceCalendar(models.Model):
                                      minute=0, second=0),
                     start_dt.replace(hour=default_interval[1],
                                      minute=0, second=0))
-            intervals = self._leave_intervals(working_interval,
-                                                     work_limits)
+            # intervals = self._interval_remove_leaves(working_interval, work_limits)
+            date_from = start_dt.replace(hour=default_interval[0],
+                                     minute=0, second=0).replace(tzinfo=pytz.UTC)
+            date_to = start_dt.replace(hour=default_interval[1],
+                                     minute=0, second=0).replace(tzinfo=pytz.UTC)
+            intervals += self._leave_intervals(date_from, date_to)
             return intervals
 
-        working_intervals = []
+        #working_intervals = []
         for calendar_working_day in self.get_attendances_for_weekdays(
-                self.ids, [start_dt.weekday()], start_dt,
+                [start_dt.weekday()], start_dt,
                 end_dt):
+
             str_time_from_dict = str(calendar_working_day.hour_from).split('.')
             hour_from = int(str_time_from_dict[0])
             if int(str_time_from_dict[1]) < 10:
@@ -151,88 +96,38 @@ class ResourceCalendar(models.Model):
                 minutes_to = round(60 * m / 100)
             else:
                 minutes_to = int(60 * int(str_time_to_dict[1]) / 100)
+
             working_interval = (
                 work_dt.replace(hour=hour_from).replace(minute=minutes_from),
                 work_dt.replace(hour=hour_to).replace(minute=minutes_to)
             )
+            # working_intervals += self._interval_remove_leaves(working_interval, work_limits)
+            intervals.append(working_interval)
+            date_from = work_dt.replace(hour=hour_from).replace(minute=minutes_from).replace(tzinfo=pytz.UTC)
+            date_to = work_dt.replace(hour=hour_to).replace(minute=minutes_to).replace(tzinfo=pytz.UTC)
 
-            working_intervals += self._interval_remove_leaves(working_interval,
-                                                              work_limits)
+            # working_intervals += self._leave_intervals(date_from, date_to)
         # find leave intervals
         if leaves is None and compute_leaves:
-            leaves = resource_id._get_leave_intervals()
+            leaves = self._get_leave_intervals(resource_id=resource_id)
 
         # filter according to leaves
-        for interval in working_intervals:
-            if not leaves:
-                leaves = []
-            work_intervals = self._interval_remove_leaves(interval, leaves)
-            intervals += work_intervals
-        return intervals
-
-    def _interval_merge(self, intervals):
-        """ Sort intervals based on starting datetime and merge overlapping intervals.
-
-        :return list cleaned: sorted intervals merged without overlap """
-        intervals = sorted(intervals, key=itemgetter(0))  # sort on first datetime
-        cleaned = []
-        working_interval = None
-        while intervals:
-            current_interval = intervals.pop(0)
-            if not working_interval:  # init
-                working_interval = self._interval_new(*current_interval)
-            elif working_interval[1] < current_interval[0]:  # interval is disjoint
-                cleaned.append(working_interval)
-                working_interval = self._interval_new(*current_interval)
-            elif working_interval[1] < current_interval[1]:  # union of greater intervals
-                working_interval = self._interval_or(working_interval, current_interval)
-        if working_interval:  # handle void lists
-            cleaned.append(working_interval)
-        return cleaned
-
-    @api.model
-    def _interval_remove_leaves(self, interval, leave_intervals):
-        """ Remove leave intervals from a base interval
-
-        :param tuple interval: an interval (see above) that is the base interval
-                               from which the leave intervals will be removed
-        :param list leave_intervals: leave intervals to remove
-        :return list intervals: ordered intervals with leaves removed """
-        intervals = []
-        leave_intervals = self._interval_merge(leave_intervals)
-        current_interval = interval
-        for leave in leave_intervals:
-            # skip if ending before the current start datetime
-            if leave[1] <= current_interval[0]:
-                continue
-            # skip if starting after current end datetime; break as leaves are ordered and
-            # are therefore all out of range
-            if leave[0] >= current_interval[1]:
-                break
-            # begins within current interval: close current interval and begin a new one
-            # that begins at the leave end datetime
-            if current_interval[0] < leave[0] < current_interval[1]:
-                intervals.append(
-                    self._interval_exclude_right(current_interval, leave))
-                current_interval = self._interval_exclude_left(interval, leave)
-            # ends within current interval: set current start datetime as leave end datetime
-            if current_interval[0] <= leave[1]:
-                current_interval = self._interval_exclude_left(interval, leave)
-        if current_interval and current_interval[0] < interval[
-            1]:  # remove intervals moved outside base interval due to leaves
-            intervals.append(current_interval)
+        # for interval in working_intervals:
+        #     if not leaves:
+        #         leaves = []
+        #     work_intervals = self._interval_remove_leaves(interval, leaves)
+        #     intervals += work_intervals
         return intervals
 
     @api.multi
     def get_working_hours_of_date(self, start_dt=None,
                                   end_dt=None, leaves=None,
-                                  compute_leaves=False, resource_id=None,
+                                  compute_leaves=None, resource_id=None,
                                   default_interval=None):
         """ Get the working hours of the day based on calendar. This method uses
         get_working_intervals_of_day to have the work intervals of the day. It
         then calculates the number of hours contained in those intervals. """
         res = dtime.timedelta()
-        print('\n res >>>>>> %s' % res)
         intervals = self.get_working_intervals_of_day(
             start_dt, end_dt, leaves,
             compute_leaves, resource_id,
@@ -242,31 +137,29 @@ class ResourceCalendar(models.Model):
         return seconds(res) / 3600.0
 
     @api.multi
-    def get_bonus_hours_of_date(self, cr, uid, ids, start_dt=None,
+    def get_bonus_hours_of_date(self, start_dt=None,
                                 end_dt=None, leaves=None,
                                 compute_leaves=False, resource_id=None,
-                                default_interval=None, context=None):
+                                default_interval=None):
         """ Get the working hours of the day based on calendar. This method uses
         get_working_intervals_of_day to have the work intervals of the day. It
         then calculates the number of hours contained in those intervals. """
         res = dtime.timedelta()
         intervals = self.get_working_intervals_of_day(
-            cr, uid, ids,
             start_dt, end_dt, leaves,
             compute_leaves, resource_id,
-            default_interval, context)
+            default_interval)
         for interval in intervals:
             res += interval[1] - interval[0]
         return seconds(res) / 3600.0
 
     @api.multi
-    def get_attendances_for_weekdays(self, ids, weekdays, start_dt, end_dt):
+    def get_attendances_for_weekdays(self, weekdays, start_dt, end_dt):
         """ Given a list of weekdays, return matching
         resource.calendar.attendance"""
-        calendar = self.browse(ids)
 
         res = []
-        for att in calendar.attendance_ids:
+        for att in self.attendance_ids:
             if int(att.dayofweek) in weekdays:
                 if not att.date_from or not att.date_to:
                     res.append(att)
@@ -310,11 +203,12 @@ class ResourceCalendar(models.Model):
                                           "shift is not using.")
 
     @api.multi
-    def _get_leave_intervals(self, start_datetime=None, end_datetime=None):
+    def _get_leave_intervals(self, resource_id=None,
+                             start_datetime=None, end_datetime=None):
         self.ensure_one()
-        if self.id:
+        if resource_id:
             domain = ['|',
-                      ('resource_id', '=', self.id),
+                      ('resource_id', '=', resource_id),
                       ('resource_id', '=', False)]
         else:
             domain = [('resource_id', '=', False)]

@@ -30,8 +30,8 @@ from odoo.exceptions import UserError, ValidationError, AccessError
 _logger = logging.getLogger(__name__)
 
 
-class AttendanceLineAnalytic(models.Model):
-    _name = "attendance.line.analytic"
+class EmployeeAttendanceAnalytic(models.Model):
+    _name = "employee.attendance.analytic"
     _order = "name"
 
     name = fields.Date(string='Date')
@@ -40,9 +40,8 @@ class AttendanceLineAnalytic(models.Model):
                                string='Sheet',
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
-                                     'attendance_line_analytic_id',
-                                     string='Attendance IDS',
-                                     readonly=True, )
+                                      'line_analytic_id',
+                                      string='Attendance IDS')
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
@@ -76,33 +75,35 @@ class AttendanceLineAnalytic(models.Model):
                                  ('sheet_id.employee_id', '=', employee_id.id)])
             date_line = line_date
         else:
-            lines = self.search([('name', '=', line_date)])
+            lines = self.search([('name', '=', str(line_date))])
             date_line = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(line_date),
-                                         until=parser.parse(line_date)))[0]
+                                         dtstart=parser.parse(str(line_date)),
+                                         until=parser.parse(str(line_date))))[0]
         for line in lines:
-            duty_hours, contract, leave, public_holiday = \
-                self.calculate_duty_hours(sheet=line.sheet_id,
-                                          date_from=date_line)
-            values = {'duty_hours': duty_hours,
-                      'contract_id': False,
-                      'state':
-                          'new' if line.sheet_id.state != 'done' else 'done',
-                      'leave_description': '-'}
-            if contract:
-                values.update(contract_id=contract.id)
-            if public_holiday:
-                values.update(leave_description=public_holiday.name)
-            if leave and leave[0]:
-                values.update(leave_description=leave[0].name)
-            line.write(values)
+            if line.sheet_id:
+
+                duty_hours, contract, leave, public_holiday = \
+                    self.calculate_duty_hours(sheet=line.sheet_id,
+                                              date_from=date_line)
+                values = {'duty_hours': duty_hours,
+                          'contract_id': False,
+                          'state':
+                              'new' if line.sheet_id.state != 'done' else 'done',
+                          'leave_description': '-'}
+                if contract:
+                    values.update(contract_id=contract.id)
+                if public_holiday:
+                    values.update(leave_description=public_holiday.name)
+                if leave and leave[0]:
+                    values.update(leave_description=leave[0].name)
+                line.write(values)
 
     @api.multi
     def _get_difference(self):
         for line in self:
             line.difference = line.worked_hours - line.duty_hours
 
-    @api.multi
+    @api.one
     def unlink_attendance(self):
         worked_hours = 0
         bonus_worked_hours = 0
@@ -123,13 +124,13 @@ class AttendanceLineAnalytic(models.Model):
         if values.get('check_in') or values.get('check_out'):
             line_new = False
             if values.get('check_in'):
-                value_check_in = values.get('check_in').split(' ')[0]
-                attendance_check_in = str(new_attendance.check_in.date())
+                value_check_in = str(values.get('check_in')).split(' ')[0]
+                attendance_check_in = str(new_attendance.check_in).split(' ')[0]
                 if value_check_in != attendance_check_in:
                     line_new = self.search(
                         [('name', '=', value_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
-                    new_attendance.attendance_line_analytic_id = line_new.id
+                    new_attendance.line_analytic_id = line_new.id
 
                     line = self.search(
                         [('name', '=', attendance_check_in),
@@ -137,9 +138,11 @@ class AttendanceLineAnalytic(models.Model):
 
                     line.unlink_attendance()
 
-            check_in = values.get('check_in') or new_attendance.check_in
+            check_in = values.get('check_in') or str(new_attendance.check_in)
             check_out = values.get('check_out') or new_attendance.check_out
-            name = str(new_attendance.check_in.date())
+            if check_out:
+                check_out = str(check_out)
+            name = str(new_attendance.check_in).split(' ')[0]
             if not line_new:
                 line = self.search([('name', '=', name),
                                     ('sheet_id', '=',
@@ -158,15 +161,18 @@ class AttendanceLineAnalytic(models.Model):
                 line = self.create({'name': name,
                                     'sheet_id': new_attendance.sheet_id.id,
                                     'duty_hours': duty_hours})
-                new_attendance.attendance_line_analytic_id = line.id
+                new_attendance.line_analytic_id = line.id
             else:
-                if not new_attendance.attendance_line_analytic_id:
-                    new_attendance.attendance_line_analytic_id = line.id
-
+                if not new_attendance.line_analytic_id:
+                    new_attendance.line_analytic_id = line.id
             if check_out:
                 worked_hours = 0
                 bonus_worked_hours = 0
                 night_shift_worked_hours = 0
+                if new_attendance not in line.attendance_ids:
+                    worked_hours = new_attendance.worked_hours
+                    bonus_worked_hours = new_attendance.bonus_worked_hours
+                    night_shift_worked_hours = new_attendance.night_shift_worked_hours
                 for attendance in line.attendance_ids:
                     bonus_worked_hours += attendance.bonus_worked_hours
                     night_shift_worked_hours \
@@ -175,11 +181,12 @@ class AttendanceLineAnalytic(models.Model):
                         worked_hours += attendance.worked_hours
 
                     else:
-                        delta = datetime.strptime(
-                            str(check_out), DEFAULT_SERVER_DATETIME_FORMAT) - \
-                                datetime.strptime(
-                                    str(check_in), DEFAULT_SERVER_DATETIME_FORMAT)
-                        worked_hours += delta.total_seconds() / 3600.0
+                        if check_out:
+                            delta = datetime.strptime(
+                                str(check_out), DEFAULT_SERVER_DATETIME_FORMAT) - \
+                                    datetime.strptime(
+                                        str(check_in), DEFAULT_SERVER_DATETIME_FORMAT)
+                            worked_hours += delta.total_seconds() / 3600.0
                 line.write({
                     'duty_hours': duty_hours,
                     'worked_hours': worked_hours,
@@ -192,9 +199,8 @@ class AttendanceLineAnalytic(models.Model):
         dates = list(rrule.rrule(rrule.DAILY,
                                  dtstart=parser.parse(str(date_from)),
                                  until=parser.parse(str(date_to))))
-
         for date_line in dates:
-            name = str(date_line.date())
+            name = str(date_line).split(' ')[0]
             line = self.search(
                 [('name', '=', name),
                  ('sheet_id', '=', sheet.id)])
@@ -230,7 +236,6 @@ class AttendanceLineAnalytic(models.Model):
              ('date_start', '<=', date_from), '|',
              ('date_end', '>=', date_from),
              ('date_end', '=', None)])
-
         if len(contract) > 1:
             raise UserError(_(
                 'You have more than one active contract'))
@@ -238,11 +243,14 @@ class AttendanceLineAnalytic(models.Model):
         public_holiday = sheet.count_public_holiday(str(date_from))
         if contract and contract.rate_per_hour:
             return 0.00, contract, leave, public_holiday
-        ctx = dict(self.env.context).copy()
+        # ctx = dict(self.env.context).copy()
         # ctx.update(period)
-        dh = contract.resource_calendar_id.get_working_hours_of_date(
-            start_dt=fields.Datetime.from_string(str(date_from)),
-            resource_id=sheet.employee_id.id)
+        if contract:
+            dh = contract.resource_calendar_id.get_working_hours_of_date(
+                start_dt=fields.Datetime.from_string(date_from),
+                resource_id=sheet.employee_id.id)
+        else:
+            dh = 0.00
 
         if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:

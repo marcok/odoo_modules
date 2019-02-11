@@ -320,7 +320,13 @@ class HrEmployee(models.Model):
 
     @api.model
     def check_in_out_action(self, values):
-        employee = self.sudo().browse(values.get('employee_id'))
+        employee = self.sudo().browse(values.get('employee_id')).exists()
+        if not employee:
+            return [
+                {'error': _(
+                    'Please contact your manager to create '
+                    'employee for you and change QR-code.')}]
+
         hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
         hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
             [('employee_id', '=', employee.id),
@@ -368,7 +374,10 @@ class HrEmployee(models.Model):
         running = 0
         date_line = values.get('date').split(' ')[0]
         dddd = (fields.Datetime.from_string(date_line + ' 00:00:00'))
-        date_line = dddd.strftime("%d/%m/%Y %H:%M:%S").split(' ')[0]
+        date_format, time_format = \
+            hr_timesheet_sheet_sheet_pool._get_user_datetime_format()
+        date_line = dddd.strftime("{} {}".format(date_format,
+                                                 time_format)).split(' ')[0]
         for d in res.get('hours'):
             if d.get('name') == date_line:
                 running = d.get('running')
@@ -376,4 +385,5 @@ class HrEmployee(models.Model):
         return [{'log': employee.attendance_state,
                  'name': employee.name,
                  'image': employee.image_medium,
-                 'running': running}]
+                 'running': running,
+                 'user_id': employee.user_id.id}]

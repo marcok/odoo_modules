@@ -28,31 +28,30 @@ from dateutil import rrule, parser
 _logger = logging.getLogger(__name__)
 
 
-class LeaveType(models.Model):
+class HolidaysType(models.Model):
     _inherit = "hr.leave.type"
 
     take_into_attendance = fields.Boolean(default=True,
                                           string='Take Into Attendance')
 
 
-class HrLeave(models.Model):
+class HrHolidays(models.Model):
     _inherit = "hr.leave"
 
     @api.multi
     def write(self, values):
         state = self.state
-        res = super(HrLeave, self).write(values)
+        res = super(HrHolidays, self).write(values)
         if (values.get('state') == 'validate' and state == 'confirm') \
                 or (values.get('state') == 'refuse'
                     and state == 'validate'):
 
-            date_from = self.date_from.split(' ')[0] + ' 00:00:00'
-            date_to = self.date_to.split(' ')[0] + ' 00:00:00'
-
+            date_from = str(self.date_from).split(' ')[0] + ' 00:00:00'
+            date_to = str(self.date_to).split(' ')[0] + ' 00:00:00'
             dates = list(rrule.rrule(rrule.DAILY,
                                      dtstart=parser.parse(date_from),
                                      until=parser.parse(date_to)))
             for date_line in dates:
-                self.env['attendance.line.analytic'].recalculate_line(
+                self.env['employee.attendance.analytic'].recalculate_line(
                     line_date=str(date_line), employee_id=self.employee_id)
         return res

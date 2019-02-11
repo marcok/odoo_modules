@@ -72,9 +72,12 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[1]" position="after">
+            <xpath expr="//filter[2]" position="replace">
                 <filter string="Current Month" name="current_month" domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]" />
             </xpath>
+            <!--<xpath expr="//filter[4]" position="replace">-->
+                <!--<filter string="My Attendances" name="my_attendances" domain="[('employee_id.user_id.id', '=', uid)]" />-->
+            <!--</xpath>-->
         </field>
     </record>
 
@@ -230,16 +233,17 @@
                 <filter name="to_approve" string="To Approve"
                         domain="[('state','=','confirm')]"
                         help="Confirmed Timesheets"/>
-                <filter string="Unread Messages" name="message_needaction"
+                <filter string="Unread Messages"
+                        name="message_needaction"
                         domain="[('message_needaction','=',True)]"/>
                 <field name="employee_id"/>
                 <field name="department_id"/>
                 <group expand="0" string="Group By">
                     <filter string="Employees" domain="[]"
-                            name="employees"
+                            name="group_by_employee"
                             context="{'group_by':'employee_id'}"/>
                     <filter string="Department" domain="[]"
-                            name="department"
+                            name="group_by_department"
                             context="{'group_by':'department_id'}"/>
                 </group>
             </search>
