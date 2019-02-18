@@ -382,8 +382,7 @@ class HrEmployee(models.Model):
             if d.get('name') == date_line:
                 running = d.get('running')
         module = self.env['ir.module.module'].search(
-            [('name', '=', 'Employee time clock')])
-
+            [('name', '=', 'hr_employee_time_clock')])
         return [{'log': employee.attendance_state,
                  'name': employee.name,
                  'image': employee.image_medium,
