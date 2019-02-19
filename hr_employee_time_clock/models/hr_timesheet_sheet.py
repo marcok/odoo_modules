@@ -780,13 +780,9 @@ class HrTimesheetSheet(models.Model):
                 return 0.00
             ctx = dict(self.env.context).copy()
             ctx.update(period)
-            dh = calendar_obj.get_working_hours_of_date(
-                cr=self._cr,
-                uid=self.env.user.id,
-                ids=contract.resource_calendar_id.id,
+            dh = contract.resource_calendar_id.get_working_hours_of_date(
                 start_dt=fields.Datetime.from_string(date_from),
-                resource_id=self.employee_id.id,
-                context=ctx)
+                resource_id=self.employee_id.id)
 
             leave = self.count_leaves(date_from, self.employee_id.id)
             public_holiday = self.count_public_holiday(date_from)

@@ -32,12 +32,10 @@ class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
 
     @api.multi
-    def get_working_intervals_of_day(self, cr, uid, ids, start_dt=None,
+    def get_working_intervals_of_day(self, start_dt=None,
                                      end_dt=None, leaves=None,
                                      compute_leaves=False, resource_id=None,
-                                     default_interval=None, context=None):
-        if isinstance(ids, (list, tuple)):
-            ids = ids[0]
+                                     default_interval=None):
         work_limits = []
         if start_dt is None and end_dt is not None:
             start_dt = end_dt.replace(hour=0, minute=0, second=0)
@@ -57,7 +55,7 @@ class ResourceCalendar(models.Model):
         work_dt = start_dt.replace(hour=0, minute=0, second=0)
 
         # no calendar: try to use the default_interval, then return directly
-        if ids is None:
+        if self.ids is None:
             working_interval = []
             if default_interval:
                 working_interval = (
@@ -71,7 +69,7 @@ class ResourceCalendar(models.Model):
 
         working_intervals = []
         for calendar_working_day in self.get_attendances_for_weekdays(
-                ids, [start_dt.weekday()], start_dt,
+                [start_dt.weekday()], start_dt,
                 end_dt):
 
             str_time_from_dict = str(calendar_working_day.hour_from).split('.')
@@ -103,9 +101,7 @@ class ResourceCalendar(models.Model):
                                                               work_limits)
         # find leave intervals
         if leaves is None and compute_leaves:
-            leaves = self._get_leave_intervals(cr, uid, ids,
-                                               resource_id=resource_id,
-                                               context=context)
+            leaves = self._get_leave_intervals(resource_id=resource_id)
 
         # filter according to leaves
         for interval in working_intervals:
@@ -116,49 +112,46 @@ class ResourceCalendar(models.Model):
         return intervals
 
     @api.multi
-    def get_working_hours_of_date(self, cr, uid, ids, start_dt=None,
+    def get_working_hours_of_date(self, start_dt=None,
                                   end_dt=None, leaves=None,
-                                  compute_leaves=False, resource_id=None,
-                                  default_interval=None, context=None):
+                                  compute_leaves=None, resource_id=None,
+                                  default_interval=None):
         """ Get the working hours of the day based on calendar. This method uses
         get_working_intervals_of_day to have the work intervals of the day. It
         then calculates the number of hours contained in those intervals. """
         res = dtime.timedelta()
         intervals = self.get_working_intervals_of_day(
-            cr, uid, ids,
             start_dt, end_dt, leaves,
             compute_leaves, resource_id,
-            default_interval, context)
+            default_interval)
         for interval in intervals:
             res += interval[1] - interval[0]
         return seconds(res) / 3600.0
 
     @api.multi
-    def get_bonus_hours_of_date(self, cr, uid, ids, start_dt=None,
+    def get_bonus_hours_of_date(self, start_dt=None,
                                 end_dt=None, leaves=None,
                                 compute_leaves=False, resource_id=None,
-                                default_interval=None, context=None):
+                                default_interval=None):
         """ Get the working hours of the day based on calendar. This method uses
         get_working_intervals_of_day to have the work intervals of the day. It
         then calculates the number of hours contained in those intervals. """
         res = dtime.timedelta()
         intervals = self.get_working_intervals_of_day(
-            cr, uid, ids,
             start_dt, end_dt, leaves,
             compute_leaves, resource_id,
-            default_interval, context)
+            default_interval)
         for interval in intervals:
             res += interval[1] - interval[0]
         return seconds(res) / 3600.0
 
     @api.multi
-    def get_attendances_for_weekdays(self, ids, weekdays, start_dt, end_dt):
+    def get_attendances_for_weekdays(self, weekdays, start_dt, end_dt):
         """ Given a list of weekdays, return matching
         resource.calendar.attendance"""
-        calendar = self.browse(ids)
 
         res = []
-        for att in calendar.attendance_ids:
+        for att in self.attendance_ids:
             if int(att.dayofweek) in weekdays:
                 if not att.date_from or not att.date_to:
                     res.append(att)
