@@ -381,7 +381,6 @@ class HrEmployee(models.Model):
         for d in res.get('hours'):
             if d.get('name') == date_line:
                 running = d.get('running')
-
         return [{'log': employee.attendance_state,
                  'name': employee.name,
                  'image': employee.image_medium,
