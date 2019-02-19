@@ -154,6 +154,6 @@ class HrEmployee(models.Model):
 
         return [{'log': employee.attendance_state,
                  'name': employee.name,
-                 # 'image': employee.image_medium,
+                 'image': employee.image_medium,
                  'running': running,
                  'user_id': employee.user_id.id}]
