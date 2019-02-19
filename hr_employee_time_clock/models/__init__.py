@@ -20,6 +20,7 @@
 #
 ##############################################################################
 
+from . import res_users
 from . import hr_timesheet_sheet
 from . import hr_attendance
 from . import hr_holidays_public
