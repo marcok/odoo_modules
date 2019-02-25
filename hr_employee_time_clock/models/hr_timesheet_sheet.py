@@ -603,7 +603,7 @@ class HrTimesheetSheet(models.Model):
             ('state', 'not in', ('draft', 'cancel'))])
         return contract
 
-    def get_date_mark(self, date_line, period):
+    def get_date_mark(self, date_line):
         date_mark = ''
         public_holidays = self.count_public_holiday(date_line)
         date_line_day_of_week = calendar.weekday(date_line.year,
@@ -936,7 +936,7 @@ class HrTimesheetSheet(models.Model):
                     current_month_diff += diff
                     work_current_month_diff += diff
                     date_line = fields.Datetime.from_string(line.name)
-                    date_mark = sheet.get_date_mark(date_line, period)
+                    date_mark = sheet.get_date_mark(date_line)
 
                     leave_descr = line.leave_description
 
