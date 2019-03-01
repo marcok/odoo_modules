@@ -22,7 +22,10 @@
 
 from . import hr_timesheet_sheet
 from . import hr_attendance
-from . import hr_holidays_public
+try:
+    from . import hr_holidays_public
+except:
+    pass
 from . import employee_attendance_analytic
 from . import resource_calendar
 from . import hr_holidays
