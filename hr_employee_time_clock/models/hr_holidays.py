@@ -43,9 +43,8 @@ class HrHolidays(models.Model):
         state = self.state
         res = super(HrHolidays, self).write(values)
         if (values.get('state') == 'validate' and state == 'confirm') \
-                or (values.get('state') == 'refuse'
-                    and state == 'validate'):
-
+                or (values.get('state') == 'refuse' and state == 'validate') \
+                or (values.get('state') == 'validate' and state == 'validate1'):
             date_from = str(self.date_from).split(' ')[0] + ' 00:00:00'
             date_to = str(self.date_to).split(' ')[0] + ' 00:00:00'
             dates = list(rrule.rrule(rrule.DAILY,

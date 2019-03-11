@@ -26,7 +26,7 @@
     'summary': 'Track over- and under-time, generate timesheets, upload public holidays',
     'website': "https://www.bytebrand.net",
     'category': 'Human Resources',
-    'version': '11.0.3.0.0',
+    'version': '12.0.3.0.0',
     'depends': ['mail',
                 'analytic',
                 'hr_timesheet',
