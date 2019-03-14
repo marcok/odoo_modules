@@ -21,7 +21,7 @@
 ##############################################################################
 
 
-from odoo import fields, models, SUPERUSER_ID, api
+from openerp import fields, models, SUPERUSER_ID, api
 import logging
 
 _logger = logging.getLogger(__name__)
