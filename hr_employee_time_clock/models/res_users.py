@@ -30,7 +30,6 @@ _logger = logging.getLogger(__name__)
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    @classmethod
     def authenticate(cls, db, login, password, user_agent_env):
         uid = cls._login(db, login, password)
         if uid == SUPERUSER_ID:
