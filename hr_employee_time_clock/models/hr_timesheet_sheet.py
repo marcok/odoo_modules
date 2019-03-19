@@ -341,6 +341,19 @@ class HrTimesheetSheet(models.Model):
             raise UserError(_("Cannot approve a non-submitted timesheet."))
         self.write({'state': 'done'})
 
+    @api.model
+    def action_timesheet_auto_approve(self):
+        self.env.cr.execute("""select array_agg(id) 
+                                from hr_timesheet_sheet_sheet
+                                where state = 'confirm' """)
+        sheet_ids = self.env.cr.fetchone()
+        if sheet_ids[0] and sheet_ids[0][0]:
+            for sheet_id in sheet_ids[0]:
+                sheet_obj = self.browse(sheet_id)
+                calc_diff = self.browse(sheet_id).calculate_diff_hours
+                if -6.0 < calc_diff < 6.0:
+                    sheet_obj.write({'state': 'done'})
+
     @api.multi
     def name_get(self):
         # week number according to ISO 8601 Calendar

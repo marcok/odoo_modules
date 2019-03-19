@@ -38,7 +38,7 @@
     'installable': True,
     'data': [
         'data/hr_timesheet_sheet_data.xml',
-
+        'data/timesheet_auto_approve.xml',
         'views/hr_timesheet_sheet_views.xml',
 
         'views/hr_attendance_subtypes.xml',
