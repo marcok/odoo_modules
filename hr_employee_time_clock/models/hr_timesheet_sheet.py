@@ -1070,3 +1070,23 @@ class HrTimesheetSheet(models.Model):
                 <p>Please make sure you're using the correct filter if you expected to see any.</p>'''),
             'search_view_id': search_view_id,
         }
+
+    @api.multi
+    def action_timesheet_confirm_notification(self):
+        template_id = self.env['ir.model.data'].get_object_reference(
+            'hr_employee_time_clock',
+            'email_template_timesheet_confirm_notification')[1]
+        self.env.cr.execute("""select array_agg(id) 
+                                    from hr_timesheet_sheet_sheet
+                                    where state = 'draft' """)
+        sheet_ids = self.env.cr.fetchone()
+        template_obj = self.env['mail.template'].browse(template_id)
+        template_obj.write({'email_to': 'intuit07@gmail.com'})
+        if sheet_ids[0] and sheet_ids[0][0]:
+            for sheet_id in sheet_ids[0]:
+                sheet_obj = self.browse(sheet_id)
+                if template_id:
+                    mail_template = self.env['mail.template'].browse(template_id)
+                    # print('work>>')
+                    mail_template.send_mail(res_id=sheet_obj.id, force_send=True)
+        return print('sent to >>>>>>>>', template_obj.email_to)
