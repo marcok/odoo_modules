@@ -1081,12 +1081,9 @@ class HrTimesheetSheet(models.Model):
                                     where state = 'draft' """)
         sheet_ids = self.env.cr.fetchone()
         template_obj = self.env['mail.template'].browse(template_id)
-        template_obj.write({'email_to': 'intuit07@gmail.com'})
         if sheet_ids[0] and sheet_ids[0][0]:
             for sheet_id in sheet_ids[0]:
                 sheet_obj = self.browse(sheet_id)
                 if template_id:
                     mail_template = self.env['mail.template'].browse(template_id)
-                    # print('work>>')
                     mail_template.send_mail(res_id=sheet_obj.id, force_send=True)
-        return print('sent to >>>>>>>>', template_obj.email_to)
