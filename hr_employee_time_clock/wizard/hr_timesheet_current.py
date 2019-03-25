@@ -37,6 +37,9 @@ class HrTimesheetCurrentOpen(models.TransientModel):
              ('state', 'in', ('draft', 'new')),
              ('date_from', '<=', fields.Date.today()),
              ('date_to', '>=', fields.Date.today())])
+        if not sheets:
+           action = self.env.ref('hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets').read()[0]
+           return action
         if len(sheets) > 1:
             view_type = 'tree,form'
             domain = "[('id', 'in', " + str(sheets.ids) \
