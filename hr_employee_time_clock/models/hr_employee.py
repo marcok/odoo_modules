@@ -100,11 +100,12 @@ class HrEmployee(models.Model):
                 running = d.get('running')
         re = {'log': log,
               'name': employee.name,
-              'image': employee.image_medium,
+              'image': employee.image_medium or '',
               'running': running,
               'user_id': employee.user_id.id}
+        print('\n re >>>>>> %s' % re)
         return [{'log': log,
                  'name': employee.name,
-                 'image': employee.image_medium,
+                 'image': employee.image_medium or '',
                  'running': running,
                  'user_id': employee.user_id.id}]
