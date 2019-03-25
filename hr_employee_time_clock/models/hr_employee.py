@@ -72,25 +72,17 @@ class HrEmployee(models.Model):
                 _('Cannot perform check in or '
                   'check out on multiple employees.'))
         action_date = fields.Datetime.now()
-        if employee.attendance_state != 'checked_in':
-            vals = {
-                'employee_id': employee.id,
-                'check_in': action_date,
-            }
-            self.env['hr.attendance'].sudo().create(vals)
+        if employee.state != 'absent':
+            vals = {'name': action_date,
+                    'action': 'sign_out',
+                    'employee_id': employee.id, }
+            log = 'checked_out'
         else:
-            attendance = self.env['hr.attendance'].sudo().search(
-                [('employee_id', '=', employee.id),
-                 ('check_out', '=', False)], limit=1).exists()
-            if attendance:
-                attendance.sudo().check_out = action_date
-            else:
-                return [
-                    {'error': _('Cannot perform check out on %s, '
-                                'could not find corresponding check in. '
-                                'Your attendances have probably been modified '
-                                'manually by human resources.') % self.name}]
-
+            vals = {'name': action_date,
+                    'action': 'sign_in',
+                    'employee_id': employee.id, }
+            log = 'checked_in'
+        self.env['hr.attendance'].sudo().create(vals)
         employee = self.sudo().browse(employee.id)
         ctx = self.env.context.copy()
         ctx.update(online_analysis=True)
@@ -106,8 +98,12 @@ class HrEmployee(models.Model):
         for d in res.get('hours'):
             if d.get('name') == date_line:
                 running = d.get('running')
-
-        return [{'log': employee.attendance_state,
+        re = {'log': log,
+              'name': employee.name,
+              'image': employee.image_medium,
+              'running': running,
+              'user_id': employee.user_id.id}
+        return [{'log': log,
                  'name': employee.name,
                  'image': employee.image_medium,
                  'running': running,
