@@ -476,7 +476,6 @@ class HrTimesheetSheet(models.Model):
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
             ('type', '=', 'remove'),
-            ('holiday_status_id', 'in', self.take_holiday_status().ids),
             ('date_from', '<', str(date_line + timedelta(days=1))),
             ('date_to', '>', str(date_line))])
         number_of_days = 0
@@ -793,9 +792,12 @@ class HrTimesheetSheet(models.Model):
                     dh = 0.00
                     duty_hours += dh
                 else:
-
                     if not public_holiday and leave[1] != 0:
-                        duty_hours += dh * (1 - leave[1])
+                        leave_type = leave[0].holiday_status_id
+                        if not leave_type.take_into_attendance:
+                            duty_hours += dh
+                        else:
+                            duty_hours += dh * (1 - leave[1])
             else:
                 dh = 0.00
                 duty_hours += dh
