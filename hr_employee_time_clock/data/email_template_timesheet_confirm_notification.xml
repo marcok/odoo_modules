@@ -12,7 +12,7 @@
             <field name="body_html"><![CDATA[
                 <span style="padding:5px;font-size: 14px;color:#000000">
                      <p>Dear ${object.employee_id.name},</p>
-                    <p>Please check your summary of month attendance sheet - <b><a href='/web?#id=${object.id}&view_type=form&model=hr_timesheet_sheet.sheet'>sheet</a></b><br/>
+                    <p>Please check your summary of month attendance sheet - <b><a href='https://odoo.bytebrand.net/web?#id=${object.id}&view_type=form&model=hr_timesheet_sheet.sheet'>sheet</a></b><br/>
                        In case of inaccuracies - contact your HR manager. If everything seems fine - click the button "Submit to manager".<br/>
                        </p>
                     <p>Have a nice day,<br/>
