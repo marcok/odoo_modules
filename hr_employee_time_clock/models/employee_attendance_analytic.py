@@ -200,15 +200,15 @@ class EmployeeAttendanceAnalytic(models.Model):
                 [('name', '=', name),
                  ('sheet_id', '=', sheet.id)])
             if not line:
-
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
                 if leave[0]:
-                    duty_hours -= duty_hours * leave[1]
+                    leave_type = leave[0].holiday_status_id
+                    if leave_type.take_into_attendance:
+                        duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
                     duty_hours = 0.0
-
                 values = {'name': name,
                           'attendance_date': name,
                           'sheet_id': sheet.id,
@@ -244,7 +244,6 @@ class EmployeeAttendanceAnalytic(models.Model):
         dh = contract.resource_calendar_id.get_working_hours_of_date(
             start_dt=fields.Datetime.from_string(str(date_from)),
             resource_id=sheet.employee_id.id)
-
         if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:
                 if not dh:
@@ -255,7 +254,11 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours += dh
             else:
                 if not public_holiday and leave[1] != 0:
-                    duty_hours += dh * (1 - leave[1])
+                    leave_type = leave[0].holiday_status_id
+                    if not leave_type.take_into_attendance:
+                        duty_hours += dh
+                    else:
+                        duty_hours += dh * (1 - leave[1])
         else:
             dh = 0.00
             duty_hours += dh

@@ -26,6 +26,7 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 import pytz
+from datetime import datetime
 
 
 class ResourceCalendar(models.Model):
@@ -290,3 +291,60 @@ def to_tz(datetime, tz_name):
     tz = pytz.timezone(tz_name)
     return pytz.UTC.localize(datetime.replace(tzinfo=None),
                              is_dst=False).astimezone(tz).replace(tzinfo=None)
+
+class ResourceCalendarAttendance(models.Model):
+    _inherit = "resource.calendar.attendance"
+
+    @api.multi
+    def write(self, values):
+        old_date_from = self.date_from
+        old_date_to = self.date_to
+        new_date_from = values.get('date_from')
+        new_date_to = values.get('date_to')
+        list_of_string_dates = []
+        if values.get('date_from') and values.get('date_to'):
+            list_of_string_dates = [old_date_from, old_date_to, new_date_from, new_date_to]
+        elif values.get('date_from') and not values.get('date_to'):
+            list_of_string_dates = [old_date_from, old_date_to, new_date_from]
+        elif values.get('date_to') and not values.get('date_from'):
+            list_of_string_dates = [old_date_from, old_date_to, new_date_to]
+        list_of_dates = [datetime.strptime(date, "%Y-%m-%d") for date in list_of_string_dates]
+        if not list_of_dates:
+            date_end, date_start = self.date_from, self.date_to
+        else:
+            date_end = max(list_of_dates)
+            date_start = min(list_of_dates)
+        res = super(ResourceCalendarAttendance, self).write(values)
+        self.change_working_time(date_start, date_end)
+        return res
+
+    @api.model
+    def create(self, values):
+        date_start = values.get('date_from')
+        date_end = values.get('date_to')
+        res = super(ResourceCalendarAttendance, self).create(values)
+        res.change_working_time(date_start, date_end)
+        return res
+
+    @api.multi
+    def unlink(self):
+        date_start = self.date_from
+        date_end = self.date_to
+        resource_calendar_id = self.calendar_id.id
+        res = super(ResourceCalendarAttendance, self).unlink()
+        self.change_working_time(date_start, date_end, resource_calendar_id)
+        return res
+
+    @api.multi
+    def change_working_time(self, date_start, date_end, resource_calendar_id=False):
+        analytic_pool = self.env['employee.attendance.analytic']
+        if not resource_calendar_id:
+            resource_calendar_id = self.calendar_id.id
+        contract_ids = self.env['hr.contract'].search([('state', '=', 'open'),
+                       ('resource_calendar_id', '=', resource_calendar_id)]).ids
+        lines = analytic_pool.search(
+            [('contract_id', 'in', contract_ids),
+             ('attendance_date', '<=', date_end),
+             ('attendance_date', '>=', date_start)])
+        for line in lines:
+            analytic_pool.recalculate_line(line.name)
