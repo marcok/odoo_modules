@@ -297,51 +297,58 @@ class ResourceCalendarAttendance(models.Model):
 
     @api.multi
     def write(self, values):
+        end_calc = (datetime.now().date().replace(month=12, day=31)).strftime(
+            "%Y-%m-%d")
+        start_calc = (datetime.now().date().replace(month=1, day=1)).strftime(
+            "%Y-%m-%d")
         old_date_from = self.date_from
         old_date_to = self.date_to
         new_date_from = values.get('date_from')
         new_date_to = values.get('date_to')
-        list_of_string_dates = []
-        if values.get('date_from') and values.get('date_to'):
-            list_of_string_dates = [old_date_from, old_date_to, new_date_from, new_date_to]
-        elif values.get('date_from') and not values.get('date_to'):
-            list_of_string_dates = [old_date_from, old_date_to, new_date_from]
-        elif values.get('date_to') and not values.get('date_from'):
-            list_of_string_dates = [old_date_from, old_date_to, new_date_to]
-        list_of_dates = [datetime.strptime(date, "%Y-%m-%d") for date in list_of_string_dates]
-        if not list_of_dates:
-            date_end, date_start = self.date_from, self.date_to
-        else:
-            date_end = max(list_of_dates)
-            date_start = min(list_of_dates)
+        list_of_dates = filter(None, [new_date_from, new_date_to, old_date_from,
+                                      old_date_to, end_calc, start_calc])
+        list_of_dates = [datetime.strptime(date, "%Y-%m-%d") for date in
+                         list_of_dates]
+        date_end = max(list_of_dates)
+        date_start = min(list_of_dates)
+
         res = super(ResourceCalendarAttendance, self).write(values)
         self.change_working_time(date_start, date_end)
         return res
 
     @api.model
     def create(self, values):
-        date_start = values.get('date_from')
-        date_end = values.get('date_to')
+        date_start = values.get('date_from') or (
+            datetime.now().date().replace(month=1, day=1)).strftime("%Y-%m-%d")
+        date_end = values.get('date_to') or (
+            datetime.now().date().replace(month=12, day=31)).strftime(
+            "%Y-%m-%d")
         res = super(ResourceCalendarAttendance, self).create(values)
         res.change_working_time(date_start, date_end)
         return res
 
     @api.multi
     def unlink(self):
-        date_start = self.date_from
-        date_end = self.date_to
+        date_start = self.date_from or (
+            datetime.now().date().replace(month=1, day=1)).strftime("%Y-%m-%d")
+        date_end = self.date_to or (
+            datetime.now().date().replace(month=12, day=31)).strftime(
+            "%Y-%m-%d")
         resource_calendar_id = self.calendar_id.id
         res = super(ResourceCalendarAttendance, self).unlink()
         self.change_working_time(date_start, date_end, resource_calendar_id)
         return res
 
     @api.multi
-    def change_working_time(self, date_start, date_end, resource_calendar_id=False):
+    def change_working_time(self, date_start, date_end,
+                            resource_calendar_id=False):
         analytic_pool = self.env['employee.attendance.analytic']
         if not resource_calendar_id:
             resource_calendar_id = self.calendar_id.id
         contract_ids = self.env['hr.contract'].search([('state', '=', 'open'),
-                       ('resource_calendar_id', '=', resource_calendar_id)]).ids
+                                                       ('resource_calendar_id',
+                                                        '=',
+                                                        resource_calendar_id)]).ids
         lines = analytic_pool.search(
             [('contract_id', 'in', contract_ids),
              ('attendance_date', '<=', date_end),
