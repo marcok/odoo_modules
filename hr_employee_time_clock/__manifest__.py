@@ -38,9 +38,6 @@
     'installable': True,
     'data': [
         'data/hr_timesheet_sheet_data.xml',
-        'data/timesheet_auto_approve.xml',
-        'data/email_notification_confirm_timesheet.xml',
-        'data/email_template_timesheet_confirm_notification.xml',
 
         'views/hr_timesheet_sheet_views.xml',
         'views/hr_attendance_subtypes.xml',

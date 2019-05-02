@@ -341,19 +341,6 @@ class HrTimesheetSheet(models.Model):
             raise UserError(_("Cannot approve a non-submitted timesheet."))
         self.write({'state': 'done'})
 
-    @api.model
-    def action_timesheet_auto_approve(self):
-        self.env.cr.execute("""select array_agg(id) 
-                                from hr_timesheet_sheet_sheet
-                                where state = 'confirm' """)
-        sheet_ids = self.env.cr.fetchone()
-        if sheet_ids[0] and sheet_ids[0][0]:
-            for sheet_id in sheet_ids[0]:
-                sheet_obj = self.browse(sheet_id)
-                calc_diff = self.browse(sheet_id).calculate_diff_hours
-                if -6.0 < calc_diff < 6.0:
-                    sheet_obj.write({'state': 'done'})
-
     @api.multi
     def name_get(self):
         # week number according to ISO 8601 Calendar
@@ -1072,20 +1059,3 @@ class HrTimesheetSheet(models.Model):
                 <p>Please make sure you're using the correct filter if you expected to see any.</p>'''),
             'search_view_id': search_view_id,
         }
-
-    @api.multi
-    def action_timesheet_confirm_notification(self):
-        template_id = self.env['ir.model.data'].get_object_reference(
-            'hr_employee_time_clock',
-            'email_template_timesheet_confirm_notification')[1]
-        self.env.cr.execute("""select array_agg(id) 
-                                    from hr_timesheet_sheet_sheet
-                                    where state = 'draft' """)
-        sheet_ids = self.env.cr.fetchone()
-        template_obj = self.env['mail.template'].browse(template_id)
-        if sheet_ids[0] and sheet_ids[0][0]:
-            for sheet_id in sheet_ids[0]:
-                sheet_obj = self.browse(sheet_id)
-                if template_id:
-                    mail_template = self.env['mail.template'].browse(template_id)
-                    mail_template.send_mail(res_id=sheet_obj.id, force_send=True)
