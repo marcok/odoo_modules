@@ -52,6 +52,6 @@ class ResUsers(models.Model):
         else:
             with cls.pool.cursor() as cr:
                 module = api.Environment(
-                    cr, uid, {})['ir.module.module'].search(
+                    cr, uid, {})['ir.module.module'].sudo().search(
                     [('name', '=', 'hr_employee_time_clock')])
                 return {'uid': uid, 'version': module.latest_version}

@@ -43,16 +43,16 @@ class HrHolidays(models.Model):
         state = self.state
         res = super(HrHolidays, self).write(values)
         if (values.get('state') == 'validate' and state == 'confirm') \
-                or (values.get('state') == 'refuse'
-                    and state == 'validate'):
+                or (values.get('state') == 'refuse' and state == 'validate') \
+                or (values.get('state') == 'validate' and state == 'validate1'):
+            if self.date_from and self.date_to:
+                date_from = self.date_from.split(' ')[0] + ' 00:00:00'
+                date_to = self.date_to.split(' ')[0] + ' 00:00:00'
 
-            date_from = self.date_from.split(' ')[0] + ' 00:00:00'
-            date_to = self.date_to.split(' ')[0] + ' 00:00:00'
-
-            dates = list(rrule.rrule(rrule.DAILY,
-                                     dtstart=parser.parse(date_from),
-                                     until=parser.parse(date_to)))
-            for date_line in dates:
-                self.env['employee.attendance.analytic'].recalculate_line(
-                    line_date=str(date_line), employee_id=self.employee_id)
+                dates = list(rrule.rrule(rrule.DAILY,
+                                         dtstart=parser.parse(date_from),
+                                         until=parser.parse(date_to)))
+                for date_line in dates:
+                    self.env['employee.attendance.analytic'].recalculate_line(
+                        line_date=str(date_line), employee_id=self.employee_id)
         return res

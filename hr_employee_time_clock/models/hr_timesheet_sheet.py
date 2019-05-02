@@ -74,7 +74,6 @@ class HrTimesheetSheet(models.Model):
 
     @api.multi
     def _total(self):
-        print('\n _total >>>>>> %s')
         """ Compute the attendances, analytic lines timesheets
         and differences between them
             for all the days of a timesheet and the current day
@@ -92,7 +91,6 @@ class HrTimesheetSheet(models.Model):
             """, (tuple(ids),))
 
         res = self.env.cr.dictfetchall()
-        print('\n res >>>>>> %s' % res)
         if res:
             ctx = self.env.context.copy()
             ctx['online_analysis'] = True
@@ -343,6 +341,19 @@ class HrTimesheetSheet(models.Model):
             raise UserError(_("Cannot approve a non-submitted timesheet."))
         self.write({'state': 'done'})
 
+    @api.model
+    def action_timesheet_auto_approve(self):
+        self.env.cr.execute("""select array_agg(id) 
+                                from hr_timesheet_sheet_sheet
+                                where state = 'confirm' """)
+        sheet_ids = self.env.cr.fetchone()
+        if sheet_ids[0] and sheet_ids[0][0]:
+            for sheet_id in sheet_ids[0]:
+                sheet_obj = self.browse(sheet_id)
+                calc_diff = self.browse(sheet_id).calculate_diff_hours
+                if -6.0 < calc_diff < 6.0:
+                    sheet_obj.write({'state': 'done'})
+
     @api.multi
     def name_get(self):
         # week number according to ISO 8601 Calendar
@@ -478,7 +489,6 @@ class HrTimesheetSheet(models.Model):
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
             ('type', '=', 'remove'),
-            ('holiday_status_id', 'in', self.take_holiday_status().ids),
             ('date_from', '<', str(date_line + timedelta(days=1))),
             ('date_to', '>', str(date_line))])
         number_of_days = 0
@@ -603,7 +613,7 @@ class HrTimesheetSheet(models.Model):
             ('state', 'not in', ('draft', 'cancel'))])
         return contract
 
-    def get_date_mark(self, date_line, period):
+    def get_date_mark(self, date_line):
         date_mark = ''
         public_holidays = self.count_public_holiday(date_line)
         date_line_day_of_week = calendar.weekday(date_line.year,
@@ -795,9 +805,12 @@ class HrTimesheetSheet(models.Model):
                     dh = 0.00
                     duty_hours += dh
                 else:
-
                     if not public_holiday and leave[1] != 0:
-                        duty_hours += dh * (1 - leave[1])
+                        leave_type = leave[0].holiday_status_id
+                        if not leave_type.take_into_attendance:
+                            duty_hours += dh
+                        else:
+                            duty_hours += dh * (1 - leave[1])
             else:
                 dh = 0.00
                 duty_hours += dh
@@ -936,7 +949,7 @@ class HrTimesheetSheet(models.Model):
                     current_month_diff += diff
                     work_current_month_diff += diff
                     date_line = fields.Datetime.from_string(line.name)
-                    date_mark = sheet.get_date_mark(date_line, period)
+                    date_mark = sheet.get_date_mark(date_line)
 
                     leave_descr = line.leave_description
 
@@ -1059,3 +1072,20 @@ class HrTimesheetSheet(models.Model):
                 <p>Please make sure you're using the correct filter if you expected to see any.</p>'''),
             'search_view_id': search_view_id,
         }
+
+    @api.multi
+    def action_timesheet_confirm_notification(self):
+        template_id = self.env['ir.model.data'].get_object_reference(
+            'hr_employee_time_clock',
+            'email_template_timesheet_confirm_notification')[1]
+        self.env.cr.execute("""select array_agg(id) 
+                                    from hr_timesheet_sheet_sheet
+                                    where state = 'draft' """)
+        sheet_ids = self.env.cr.fetchone()
+        template_obj = self.env['mail.template'].browse(template_id)
+        if sheet_ids[0] and sheet_ids[0][0]:
+            for sheet_id in sheet_ids[0]:
+                sheet_obj = self.browse(sheet_id)
+                if template_id:
+                    mail_template = self.env['mail.template'].browse(template_id)
+                    mail_template.send_mail(res_id=sheet_obj.id, force_send=True)
