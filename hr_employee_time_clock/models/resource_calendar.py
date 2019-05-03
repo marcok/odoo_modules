@@ -27,7 +27,9 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 import pytz
 from datetime import datetime
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
@@ -353,6 +355,8 @@ class ResourceCalendarAttendance(models.Model):
     @api.multi
     def change_working_time(self, date_start, date_end,
                             resource_calendar_id=False):
+        _logger.info(date_start)
+        _logger.info(date_end)
         analytic_pool = self.env['employee.attendance.analytic']
         if not resource_calendar_id:
             resource_calendar_id = self.calendar_id.id
@@ -363,5 +367,6 @@ class ResourceCalendarAttendance(models.Model):
             [('contract_id', 'in', contract_ids),
              ('attendance_date', '<=', date_end),
              ('attendance_date', '>=', date_start)])
+        _logger.info(len(lines))
         for line in lines:
             analytic_pool.recalculate_line(line.name)
