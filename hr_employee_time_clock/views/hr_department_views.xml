@@ -5,17 +5,21 @@
         <field name="name">hr.department.kanban.inherit</field>
         <field name="model">hr.department</field>
         <field name="inherit_id" ref="hr.hr_department_view_kanban"/>
-        <field name="groups_id" eval="[(4,ref('hr_timesheet.group_hr_timesheet_user'))]"/>
+        <field name="groups_id"
+               eval="[(4,ref('hr_timesheet.group_hr_timesheet_user'))]"/>
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//templates" position="before">
                     <field name="timesheet_to_approve_count"/>
                 </xpath>
+                <xpath expr="//div[hasclass('o_kanban_primary_right')]"
+                       position="inside">
 
-                <xpath expr="//div[contains(@class, 'col-6 o_kanban_primary_right')]" position="inside">
-                    <div t-if="record.timesheet_to_approve_count.raw_value > 0" class="row">
+                    <div t-if="record.timesheet_to_approve_count.raw_value > 0"
+                         class="row">
                         <div class="col-9">
-                            <a name="%(hr_timesheet_action_from_department)d" type="action">
+                            <a name="%(hr_timesheet_action_from_department)d"
+                               type="action">
                                 Timesheets
                             </a>
                         </div>
@@ -24,12 +28,14 @@
                         </div>
                     </div>
                 </xpath>
-
-                <xpath expr="//div[contains(@class, 'col-4 o_kanban_card_manage_section o_kanban_manage_to_approve')]" position="inside">
+                <xpath expr="//div[hasclass('o_kanban_card_manage_section')]"
+                       position="inside">
                     <div class="row">
                         <div class="col-12 text-left">
-                            <a name="%(hr_timesheet_action_from_department)d" type="action">
-                                <t t-esc="record.timesheet_to_approve_count.raw_value or 0"/> Timesheets
+                            <a name="%(hr_timesheet_action_from_department)d"
+                               type="action">
+                                <t t-esc="record.timesheet_to_approve_count.raw_value or 0"/>
+                                Timesheets
                             </a>
                         </div>
                     </div>

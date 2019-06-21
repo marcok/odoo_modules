@@ -33,6 +33,7 @@ _logger = logging.getLogger(__name__)
 class EmployeeAttendanceAnalytic(models.Model):
     _name = "employee.attendance.analytic"
     _order = "name"
+    _description = 'EmployeeAttendanceAnalytic'
 
     name = fields.Date(string='Date')
     attendance_date = fields.Date(string='Attendance Date')
