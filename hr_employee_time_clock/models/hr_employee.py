@@ -387,3 +387,9 @@ class HrEmployee(models.Model):
                  'image': employee.image_medium,
                  'running': running,
                  'user_id': employee.user_id.id}]
+
+    @api.model
+    def get_version(self):
+        module = self.env['ir.module.module'].sudo().search(
+            [('name', '=', 'hr_employee_time_clock')])
+        return {'version': module.latest_version}

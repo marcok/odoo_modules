@@ -27,7 +27,7 @@ from odoo.exceptions import UserError
 
 class AccountAnalyticLine(models.Model):
     _inherit = "account.analytic.line"
-    _description = ''
+    _description = 'AccountAnalyticLine'
 
     @api.depends('date', 'user_id', 'sheet_id_computed.date_to',
                  'sheet_id_computed.date_from', 'sheet_id_computed.employee_id')

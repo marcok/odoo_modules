@@ -49,7 +49,7 @@ def _employee_get(obj):
 
 
 class HrAttendance(models.Model):
-    _description = ''
+    _description = 'HrAttendance'
 
     @api.multi
     def write(self, values):
