@@ -30,28 +30,8 @@ _logger = logging.getLogger(__name__)
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    @classmethod
-    def authenticate(cls, db, login, password, user_agent_env):
-        uid = cls._login(db, login, password)
-        if uid == SUPERUSER_ID:
-            # Successfully logged in as admin!
-            # Attempt to guess the web base url...
-            if user_agent_env and user_agent_env.get('base_location'):
-                try:
-                    with cls.pool.cursor() as cr:
-                        base = user_agent_env['base_location']
-                        ICP = api.Environment(cr, uid, {})[
-                            'ir.config_parameter']
-                        if not ICP.get_param('web.base.url.freeze'):
-                            ICP.set_param('web.base.url', base)
-                except Exception:
-                    _logger.exception(
-                        "Failed to update web.base.url configuration parameter")
-        if user_agent_env:
-            return uid
-        else:
-            with cls.pool.cursor() as cr:
-                module = api.Environment(
-                    cr, uid, {})['ir.module.module'].sudo().search(
-                    [('name', '=', 'hr_employee_time_clock')])
-                return {'uid': uid, 'version': module.latest_version}
+    @api.model
+    def get_version(self):
+        module = self.env['ir.module.module'].sudo().search(
+            [('name', '=', 'hr_employee_time_clock')])
+        return [{'version': module.latest_version}]
