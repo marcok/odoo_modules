@@ -325,8 +325,8 @@ class HrTimesheetSheet(models.Model):
                 if sheet.employee_id \
                         and sheet.employee_id.parent_id \
                         and sheet.employee_id.parent_id.user_id:
-                    self.message_subscribe_users(
-                        user_ids=[sheet.employee_id.parent_id.user_id.id])
+                    self.message_subscribe(
+                        partner_ids=[sheet.employee_id.user_id.partner_id.id])
             else:
                 raise UserError(_(
                     'Please verify that the total difference '
