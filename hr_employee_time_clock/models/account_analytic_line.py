@@ -27,27 +27,9 @@ from odoo.exceptions import UserError
 
 class AccountAnalyticLine(models.Model):
     _inherit = "account.analytic.line"
+    _description = ''
 
-    sheet_id_computed = fields.Many2one('hr_timesheet_sheet.sheet',
-                                        string='Sheet',
-                                        compute='_compute_sheet',
-                                        index=True,
-                                        ondelete='cascade',
-                                        search='_search_sheet')
-    sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
-                               compute='_compute_sheet',
-                               string='Sheet',
-                               store=True)
-    task_id = fields.Many2one('project.task', 'Task')
-    project_id = fields.Many2one('project.project', 'Project',
-                                 domain=[('allow_timesheets', '=', True)])
-
-    employee_id = fields.Many2one('hr.employee', "Employee")
-    department_id = fields.Many2one('hr.department', "Department",
-                                    related='employee_id.department_id',
-                                    store=True, readonly=True)
-
-    @api.depends('date', 'user_id',  'sheet_id_computed.date_to',
+    @api.depends('date', 'user_id', 'sheet_id_computed.date_to',
                  'sheet_id_computed.date_from', 'sheet_id_computed.employee_id')
     def _compute_sheet(self):
         """Links the timesheet line to the corresponding sheet
@@ -65,6 +47,25 @@ class AccountAnalyticLine(models.Model):
                 # employee between 2 dates
                 ts_line.sheet_id_computed = sheets[0]
                 ts_line.sheet_id = sheets[0]
+
+    sheet_id_computed = fields.Many2one('hr_timesheet_sheet.sheet',
+                                        string='Compute Sheet',
+                                        compute='_compute_sheet',
+                                        index=True,
+                                        ondelete='cascade',
+                                        search='_search_sheet')
+    sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',
+                               compute='_compute_sheet',
+                               string='Sheet',
+                               store=True)
+    task_id = fields.Many2one('project.task', 'Task')
+    project_id = fields.Many2one('project.project', 'Project',
+                                 domain=[('allow_timesheets', '=', True)])
+
+    employee_id = fields.Many2one('hr.employee', "Employee")
+    department_id = fields.Many2one('hr.department', "Department",
+                                    related='employee_id.department_id',
+                                    store=True, readonly=True)
 
     def _search_sheet(self, operator, value):
         assert operator == 'in'

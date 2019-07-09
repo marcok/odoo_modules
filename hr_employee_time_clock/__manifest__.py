@@ -23,24 +23,32 @@
 {
     'name': "Employee time clock",
     'author': "Bytebrand GmbH",
+    'license': 'AGPL-3',
     'summary': 'Track over- and under-time, generate timesheets, upload public holidays',
     'website': "https://www.bytebrand.net",
     'category': 'Human Resources',
     'version': '12.0.3.0.0',
-    'depends': ['mail',
-                'analytic',
-                'hr_timesheet',
-                'hr_attendance',
-                'hr_contract',
-                'hr_holidays',
-                'hr_holidays_public'],
+    'depends': [
+        'base',
+        'resource',
+        'mail',
+        'analytic',
+        'hr_timesheet',
+        'hr_attendance',
+        'hr',
+        'hr_contract',
+        'hr_holidays',
+        'project',
+        # 'hr_holidays_public'
+    ],
+
     'images': ['images/overundertime.png'],
     'installable': True,
+
     'data': [
         'data/hr_timesheet_sheet_data.xml',
 
         'views/hr_timesheet_sheet_views.xml',
-
         'views/hr_attendance_subtypes.xml',
         'views/hr_holidays_views.xml',
         'views/hr_department_views.xml',
@@ -61,5 +69,6 @@
         'views/hr_contract_views.xml',
         'views/resource_calendar_view.xml',
     ],
+
     'qweb': ['static/src/xml/timesheet.xml', ],
 }

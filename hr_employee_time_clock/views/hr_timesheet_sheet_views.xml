@@ -109,6 +109,8 @@
                         <button type="object"
                                 groups="hr_attendance.group_hr_attendance"
                                 class="oe_stat_button" icon="fa-users"
+                                aria-label="Users"
+                                title="Users"
                                 name="hr_attendance_employee_action">
                             <field name="attendance_count" widget="statinfo"
                                    string="Attendances"/>
@@ -380,8 +382,8 @@
                 <button name="%(hr_attendance.hr_attendance_action_employee)d"
                     class="oe_stat_button"
                     type="action" attrs="{'invisible': [('attendance_state', '=', False)]}">
-                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_green" attrs="{'invisible': [('attendance_state', '=', 'checked_out')]}"/>
-                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_red" attrs="{'invisible': [('attendance_state', '=', 'checked_in')]}"/>
+                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_green" attrs="{'invisible': [('attendance_state', '=', 'checked_out')]}" aria-label="Users" title="Users"/>
+                    <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_red" attrs="{'invisible': [('attendance_state', '=', 'checked_in')]}" aria-label="Users" title="Users"/>
                     <div class="o_stat_info">
                         <span class="o_stat_text">Attendance</span>
                     </div>

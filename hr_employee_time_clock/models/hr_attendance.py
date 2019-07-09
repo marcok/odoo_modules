@@ -74,6 +74,7 @@ def to_tz(datetime, tz_name):
 class HrAttendance(models.Model):
     _name = "hr.attendance"
     _inherit = ["hr.attendance", "mail.thread"]
+    _description = ''
 
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now,
                                required=True, track_visibility='always')
@@ -81,7 +82,6 @@ class HrAttendance(models.Model):
 
     name = fields.Datetime(string='Date',
                            required=True,
-                           select=1,
                            default=datetime.now())
 
     sheet_id = fields.Many2one('hr_timesheet_sheet.sheet',

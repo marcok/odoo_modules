@@ -65,10 +65,10 @@ class HrEmployee(models.Model):
                            "(if enabled in Configuration).",
                       copy=False)
 
-    attendance_ids = fields.One2many(
-        'hr.attendance',
-        'employee_id',
-        help='list of attendances for the employee')
+    attendance_ids = fields.One2many('hr.attendance',
+                                     'employee_id',
+                                     string="Attendances",
+                                     help='list of attendances for the employee')
     last_attendance_id = fields.Many2one('hr.attendance',
                                          compute='_compute_last_attendance_id')
     attendance_state = fields.Selection(

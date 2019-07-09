@@ -49,6 +49,7 @@ def _employee_get(obj):
 
 
 class HrAttendance(models.Model):
+    _description = ''
 
     @api.multi
     def write(self, values):
