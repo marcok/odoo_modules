@@ -203,8 +203,13 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
-                if leave[0]:
-                    leave_type = leave[0].holiday_status_id
+                leaves = leave[0]
+                if len(leaves) > 1:
+                    l = leaves[0]
+                else:
+                    l = leave[0]
+                if l:
+                    leave_type = l[0].holiday_status_id
                     if leave_type.take_into_attendance:
                         duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
@@ -217,7 +222,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=leave[0].name)
+                    values.update(leave_description=l.name)
                 self.create(values)
 
     @api.multi
@@ -254,7 +259,13 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours += dh
             else:
                 if not public_holiday and leave[1] != 0:
-                    leave_type = leave[0].holiday_status_id
+                    print('\n leave >>>>>> %s' % leave, leave[0])
+                    leaves = leave[0]
+                    if len(leaves)>1:
+                        l = leaves[0]
+                    else:
+                        l = leave[0]
+                    leave_type = l.holiday_status_id
                     if not leave_type.take_into_attendance:
                         duty_hours += dh
                     else:
