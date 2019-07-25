@@ -93,7 +93,14 @@ class EmployeeAttendanceAnalytic(models.Model):
             if public_holiday:
                 values.update(leave_description=public_holiday.name)
             if leave and leave[0]:
-                values.update(leave_description=leave[0].name)
+                print('leave[0]>>>>>>>>', leave[0])
+                leaves = leave[0]
+                if len(leaves) > 1:
+                    l = leaves[0]
+                else:
+                    l = leave[0]
+                print('l>>>>>>>>', l)
+                values.update(leave_description=l.name)
             line.write(values)
 
     @api.multi
