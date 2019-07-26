@@ -26,6 +26,7 @@ import logging
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from dateutil import rrule, parser
 from odoo.exceptions import UserError, ValidationError, AccessError
+import pytz
 
 _logger = logging.getLogger(__name__)
 
@@ -104,16 +105,24 @@ class EmployeeAttendanceAnalytic(models.Model):
         for line in self:
             line.difference = line.worked_hours - line.duty_hours
 
-    @api.one
-    def unlink_attendance(self):
+    @api.multi
+    def unlink_attendance(self, attend=False):
         worked_hours = 0
         bonus_worked_hours = 0
         night_shift_worked_hours = 0
-        for attendance in self.attendance_ids:
-            bonus_worked_hours += attendance.bonus_worked_hours
-            night_shift_worked_hours \
-                += attendance.night_shift_worked_hours
-            worked_hours += attendance.worked_hours
+        if attend:
+            for attendance in self.attendance_ids:
+                if attend != attendance:
+                    bonus_worked_hours += attendance.bonus_worked_hours
+                    night_shift_worked_hours \
+                        += attendance.night_shift_worked_hours
+                    worked_hours += attendance.worked_hours
+        else:
+            for attendance in self.attendance_ids:
+                bonus_worked_hours += attendance.bonus_worked_hours
+                night_shift_worked_hours \
+                    += attendance.night_shift_worked_hours
+                worked_hours += attendance.worked_hours
         self.write({
             'worked_hours': worked_hours,
             'bonus_worked_hours': bonus_worked_hours,
@@ -125,35 +134,52 @@ class EmployeeAttendanceAnalytic(models.Model):
         if values.get('check_in') or values.get('check_out'):
             line_new = False
             if values.get('check_in'):
-                value_check_in = str(values.get('check_in')).split(' ')[0]
-                attendance_check_in = str(new_attendance.check_in).split(' ')[0]
-                if value_check_in != attendance_check_in:
+                value_check_in = values.get('check_in').split(' ')[0]
+
+                user_tz = pytz.timezone(
+                    new_attendance.employee_id.user_id.tz or 'UTC')
+                local_date = fields.Datetime.from_string(
+                    value_check_in).replace(
+                    tzinfo=pytz.utc).astimezone(user_tz)
+                local_value_check_in = local_date.replace(tzinfo=None)
+
+                attendance_check_in = new_attendance.check_in.split(' ')[0]
+
+                user_tz = pytz.timezone(
+                    new_attendance.employee_id.user_id.tz or 'UTC')
+                local_date = fields.Datetime.from_string(
+                    attendance_check_in).replace(tzinfo=pytz.utc).astimezone(
+                    user_tz)
+                local_attendance_check_in = local_date.replace(tzinfo=None)
+                if local_value_check_in != local_attendance_check_in:
                     line_new = self.search(
-                        [('name', '=', value_check_in),
+                        [('name', '=', local_value_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
                     new_attendance.line_analytic_id = line_new.id
 
                     line = self.search(
-                        [('name', '=', attendance_check_in),
+                        [('name', '=', local_attendance_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
 
-                    line.unlink_attendance()
+                    line.unlink_attendance(new_attendance)
 
-            check_in = values.get('check_in') or str(new_attendance.check_in)
+            check_in = values.get('check_in') or new_attendance.check_in
             check_out = values.get('check_out') or new_attendance.check_out
-            if check_out:
-                check_out = str(check_out)
-            name = str(new_attendance.check_in).split(' ')[0]
+
+            user_tz = pytz.timezone(
+                new_attendance.employee_id.user_id.tz or 'UTC')
+            local_date = fields.Datetime.from_string(check_in).replace(
+                tzinfo=pytz.utc).astimezone(user_tz)
+            local_check_in = local_date.replace(tzinfo=None)
+
+            name = str(local_check_in).split(' ')[0]
             if not line_new:
                 line = self.search([('name', '=', name),
                                     ('sheet_id', '=',
                                      new_attendance.sheet_id.id)])
             else:
                 line = line_new
-
             time1 = '{} 00:00:00'.format(name)
-
-            # t1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S")
             duty_hours = new_attendance.sheet_id.calculate_duty_hours(
                 time1,
                 {'date_to': str(new_attendance.sheet_id.date_to),
