@@ -500,11 +500,10 @@ class HrAttendance(models.Model):
                     " of approved attendance sheet."))
 
         check_out = values.get('check_out') or self.check_out
-        res = super(HrAttendance, self).write(values)
         if check_out and check_in:
             self.env['employee.attendance.analytic'].recalculate_line_worktime(
                 self, values)
-        return res
+        return super(HrAttendance, self).write(values)
 
     @api.model
     def create(self, values):

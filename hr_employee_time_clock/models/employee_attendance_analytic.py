@@ -26,6 +26,7 @@ import logging
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from dateutil import rrule, parser
 from odoo.exceptions import UserError, ValidationError, AccessError
+import pytz
 
 _logger = logging.getLogger(__name__)
 
@@ -40,8 +41,8 @@ class EmployeeAttendanceAnalytic(models.Model):
                                string='Sheet',
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
-                                      'line_analytic_id',
-                                      string='Attendance IDS')
+                                     'line_analytic_id',
+                                     string='Attendance IDS')
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
@@ -69,7 +70,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                              )
 
     @api.multi
-    def recalculate_line(self, line_date, employee_id=None): 
+    def recalculate_line(self, line_date, employee_id=None):
         if employee_id:
             lines = self.search([('name', '=', line_date),
                                  ('sheet_id.employee_id', '=', employee_id.id)])
@@ -93,7 +94,12 @@ class EmployeeAttendanceAnalytic(models.Model):
             if public_holiday:
                 values.update(leave_description=public_holiday.name)
             if leave and leave[0]:
-                values.update(leave_description=leave[0].name)
+                leaves = leave[0]
+                if len(leaves) > 1:
+                    l = leaves[0]
+                else:
+                    l = leave[0]
+                values.update(leave_description=l.name)
             line.write(values)
 
     @api.multi
@@ -102,15 +108,23 @@ class EmployeeAttendanceAnalytic(models.Model):
             line.difference = line.worked_hours - line.duty_hours
 
     @api.multi
-    def unlink_attendance(self):
+    def unlink_attendance(self, attend=False):
         worked_hours = 0
         bonus_worked_hours = 0
         night_shift_worked_hours = 0
-        for attendance in self.attendance_ids:
-            bonus_worked_hours += attendance.bonus_worked_hours
-            night_shift_worked_hours \
-                += attendance.night_shift_worked_hours
-            worked_hours += attendance.worked_hours
+        if attend:
+            for attendance in self.attendance_ids:
+                if attend != attendance:
+                    bonus_worked_hours += attendance.bonus_worked_hours
+                    night_shift_worked_hours \
+                        += attendance.night_shift_worked_hours
+                    worked_hours += attendance.worked_hours
+        else:
+            for attendance in self.attendance_ids:
+                bonus_worked_hours += attendance.bonus_worked_hours
+                night_shift_worked_hours \
+                    += attendance.night_shift_worked_hours
+                worked_hours += attendance.worked_hours
         self.write({
             'worked_hours': worked_hours,
             'bonus_worked_hours': bonus_worked_hours,
@@ -123,32 +137,52 @@ class EmployeeAttendanceAnalytic(models.Model):
             line_new = False
             if values.get('check_in'):
                 value_check_in = values.get('check_in').split(' ')[0]
+
+                user_tz = pytz.timezone(
+                    new_attendance.employee_id.user_id.tz or 'UTC')
+                local_date = fields.Datetime.from_string(
+                    value_check_in).replace(
+                    tzinfo=pytz.utc).astimezone(user_tz)
+                local_value_check_in = local_date.replace(tzinfo=None)
+
                 attendance_check_in = new_attendance.check_in.split(' ')[0]
-                if value_check_in != attendance_check_in:
+
+                user_tz = pytz.timezone(
+                    new_attendance.employee_id.user_id.tz or 'UTC')
+                local_date = fields.Datetime.from_string(
+                    attendance_check_in).replace(tzinfo=pytz.utc).astimezone(
+                    user_tz)
+                local_attendance_check_in = local_date.replace(tzinfo=None)
+                if local_value_check_in != local_attendance_check_in:
                     line_new = self.search(
-                        [('name', '=', value_check_in),
+                        [('name', '=', local_value_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
                     new_attendance.line_analytic_id = line_new.id
 
                     line = self.search(
-                        [('name', '=', attendance_check_in),
+                        [('name', '=', local_attendance_check_in),
                          ('sheet_id', '=', new_attendance.sheet_id.id)])
 
-                    line.unlink_attendance()
+                    line.unlink_attendance(new_attendance)
 
             check_in = values.get('check_in') or new_attendance.check_in
             check_out = values.get('check_out') or new_attendance.check_out
-            name = new_attendance.check_in.split(' ')[0]
+
+            user_tz = pytz.timezone(
+                new_attendance.employee_id.user_id.tz or 'UTC')
+            local_date = fields.Datetime.from_string(check_in).replace(
+                tzinfo=pytz.utc).astimezone(user_tz)
+            local_check_in = local_date.replace(tzinfo=None)
+
+            name = str(local_check_in).split(' ')[0]
             if not line_new:
                 line = self.search([('name', '=', name),
                                     ('sheet_id', '=',
                                      new_attendance.sheet_id.id)])
             else:
                 line = line_new
-
             time1 = '{} 00:00:00'.format(name)
 
-            # t1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S")
             duty_hours = new_attendance.sheet_id.calculate_duty_hours(
                 time1,
                 {'date_to': str(new_attendance.sheet_id.date_to),
@@ -203,8 +237,13 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
-                if leave[0]:
-                    leave_type = leave[0].holiday_status_id
+                leaves = leave[0]
+                if len(leaves) > 1:
+                    l = leaves[0]
+                else:
+                    l = leave[0]
+                if l:
+                    leave_type = l[0].holiday_status_id
                     if leave_type.take_into_attendance:
                         duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
@@ -217,7 +256,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=leave[0].name)
+                    values.update(leave_description=l.name)
                 self.create(values)
 
     @api.multi
@@ -254,7 +293,13 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours += dh
             else:
                 if not public_holiday and leave[1] != 0:
-                    leave_type = leave[0].holiday_status_id
+                    print('\n leave >>>>>> %s' % leave, leave[0])
+                    leaves = leave[0]
+                    if len(leaves) > 1:
+                        l = leaves[0]
+                    else:
+                        l = leave[0]
+                    leave_type = l.holiday_status_id
                     if not leave_type.take_into_attendance:
                         duty_hours += dh
                     else:

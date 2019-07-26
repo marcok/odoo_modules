@@ -38,82 +38,86 @@ class HrContract(models.Model):
 
     @api.multi
     def write(self, values):
-        old_date_start = self.date_start
-        old_date_end = self.date_end
-        old_state = self.state
-        analytic_pool = self.env['employee.attendance.analytic']
-        res = super(HrContract, self).write(values)
+        for contract in self:
+            old_date_start = contract.date_start
+            old_date_end = contract.date_end
+            old_state = contract.state
+            analytic_pool = self.env['employee.attendance.analytic']
+            res = super(HrContract, self).write(values)
 
-        if values.get('state') in ('open', 'pending', 'close') \
-                and old_state in ('draft', 'cancel'):
-            self.attach_attendance()
-            return res
-        elif values.get('state') == 'cancel':
-            lines = analytic_pool.search(
-                [('contract_id', '=', self.id)])
-            employee = self.employee_id
-            if lines:
-                self.remove_from_attendance(lines, employee)
+            if values.get('state') in ('open', 'pending', 'close') \
+                    and old_state in ('draft', 'cancel'):
+                contract.attach_attendance()
                 return res
-        if values.get('resource_calendar_id') \
-                or 'rate_per_hour' in values.keys():
-            lines = analytic_pool.search(
-                [('contract_id', '=', self.id)])
-            if lines:
-                for line in lines:
-                    date_from = line.name + ' 00:00:00'
+            elif values.get('state') == 'cancel':
+                lines = analytic_pool.search(
+                    [('contract_id', '=', contract.id)])
+                employee = contract.employee_id
+                if lines:
+                    contract.remove_from_attendance(lines, employee)
+                    return res
+            if values.get('resource_calendar_id') \
+                    or 'rate_per_hour' in values.keys():
+                lines = analytic_pool.search(
+                    [('contract_id', '=', contract.id)])
+                if lines:
+                    for line in lines:
+                        date_from = line.name + ' 00:00:00'
 
-                    dates = list(rrule.rrule(
-                        rrule.DAILY,
-                        dtstart=parser.parse(date_from),
-                        until=parser.parse(date_from)))
+                        dates = list(rrule.rrule(
+                            rrule.DAILY,
+                            dtstart=parser.parse(date_from),
+                            until=parser.parse(date_from)))
+                        for date_line in dates:
+                            analytic_pool.recalculate_line(
+                                line_date=str(date_line),
+                                employee_id=contract.employee_id)
+
+            if values.get('date_end'):
+                if old_date_end:
+                    dates = calculate_days(old_date_end, values.get('date_end'))
+
                     for date_line in dates:
                         analytic_pool.recalculate_line(
                             line_date=str(date_line),
-                            employee_id=self.employee_id)
-
-        if values.get('date_end'):
-            if old_date_end:
-                dates = calculate_days(old_date_end, values.get('date_end'))
-
-                for date_line in dates:
-                    analytic_pool.recalculate_line(
-                        line_date=str(date_line), employee_id=self.employee_id)
-            else:
+                            employee_id=contract.employee_id)
+                else:
+                    lines = analytic_pool.search(
+                        [('contract_id', '=', contract.id),
+                         ('attendance_date', '>', values.get('date_end'))])
+                    if lines:
+                        dates = list(rrule.rrule(
+                            rrule.DAILY,
+                            dtstart=parser.parse(values.get('date_end')),
+                            until=parser.parse(lines[-1].name)))
+                        for date_line in dates:
+                            analytic_pool.recalculate_line(
+                                line_date=str(date_line),
+                                employee_id=contract.employee_id)
+            elif 'date_end' in values.keys():
+                line = analytic_pool.search(
+                    [('contract_id', '=', contract.id),
+                     ('attendance_date', '=', old_date_end)])
                 lines = analytic_pool.search(
-                    [('contract_id', '=', self.id),
-                     ('attendance_date', '>', values.get('date_end'))])
+                    [('sheet_id', '=', line.sheet_id.id),
+                     ('attendance_date', '>', old_date_end)])
                 if lines:
                     dates = list(rrule.rrule(
                         rrule.DAILY,
-                        dtstart=parser.parse(values.get('date_end')),
+                        dtstart=parser.parse(old_date_end),
                         until=parser.parse(lines[-1].name)))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
                             line_date=str(date_line),
-                            employee_id=self.employee_id)
-        elif 'date_end' in values.keys():
-            line = analytic_pool.search(
-                [('contract_id', '=', self.id),
-                 ('attendance_date', '=', old_date_end)])
-            lines = analytic_pool.search(
-                [('sheet_id', '=', line.sheet_id.id),
-                 ('attendance_date', '>', old_date_end)])
-            if lines:
-                dates = list(rrule.rrule(
-                    rrule.DAILY,
-                    dtstart=parser.parse(old_date_end),
-                    until=parser.parse(lines[-1].name)))
+                            employee_id=contract.employee_id)
+            if values.get('date_start'):
+
+                dates = calculate_days(old_date_start, values.get('date_start'))
                 for date_line in dates:
                     analytic_pool.recalculate_line(
-                        line_date=str(date_line), employee_id=self.employee_id)
-        if values.get('date_start'):
-
-            dates = calculate_days(old_date_start, values.get('date_start'))
-            for date_line in dates:
-                analytic_pool.recalculate_line(
-                    line_date=str(date_line), employee_id=self.employee_id)
-        return res
+                        line_date=str(date_line),
+                        employee_id=contract.employee_id)
+            return res
 
     @api.multi
     def attach_attendance(self):
