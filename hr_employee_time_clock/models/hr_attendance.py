@@ -74,7 +74,7 @@ def to_tz(datetime, tz_name):
 class HrAttendance(models.Model):
     _name = "hr.attendance"
     _inherit = ["hr.attendance", "mail.thread"]
-    _description = ''
+    _description = 'HrAttendance'
 
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now,
                                required=True, track_visibility='always')

@@ -797,9 +797,12 @@ class HrTimesheetSheet(models.Model):
                     dh = 0.00
                     duty_hours += dh
                 else:
-
                     if not public_holiday and leave[1] != 0:
-                        duty_hours += dh * (1 - leave[1])
+                        leave_type = leave[0].holiday_status_id
+                        if not leave_type.take_into_attendance:
+                            duty_hours += dh
+                        else:
+                            duty_hours += dh * (1 - leave[1])
             else:
                 dh = 0.00
                 duty_hours += dh
@@ -872,6 +875,9 @@ class HrTimesheetSheet(models.Model):
                 end_date = sheet.date_to
 
                 contract = self.check_contract(employee_id, start_date)
+                if len(contract) > 1:
+                    raise UserError(_(
+                        'You have more than one active contract'))
                 if contract:
                     resource_calendar_id = contract.resource_calendar_id
                 else:

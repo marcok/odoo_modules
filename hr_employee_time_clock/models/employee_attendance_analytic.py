@@ -71,19 +71,18 @@ class EmployeeAttendanceAnalytic(models.Model):
                              )
 
     @api.multi
-    def recalculate_line(self, line_date, employee_id=None): 
+    def recalculate_line(self, line_date, employee_id=None):
         if employee_id:
             lines = self.search([('name', '=', line_date),
                                  ('sheet_id.employee_id', '=', employee_id.id)])
             date_line = line_date
         else:
-            lines = self.search([('name', '=', str(line_date))])
+            lines = self.search([('name', '=', line_date)])
             date_line = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(str(line_date)),
-                                         until=parser.parse(str(line_date))))[0]
+                                         dtstart=parser.parse(line_date),
+                                         until=parser.parse(line_date)))[0]
         for line in lines:
             if line.sheet_id:
-
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=line.sheet_id,
                                               date_from=date_line)
@@ -97,7 +96,12 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=leave[0].name)
+                    leaves = leave[0]
+                    if len(leaves) > 1:
+                        l = leaves[0]
+                    else:
+                        l = leave[0]
+                    values.update(leave_description=l.name)
                 line.write(values)
 
     @api.multi
@@ -210,9 +214,11 @@ class EmployeeAttendanceAnalytic(models.Model):
                     else:
                         if check_out:
                             delta = datetime.strptime(
-                                str(check_out), DEFAULT_SERVER_DATETIME_FORMAT) - \
+                                str(check_out),
+                                DEFAULT_SERVER_DATETIME_FORMAT) - \
                                     datetime.strptime(
-                                        str(check_in), DEFAULT_SERVER_DATETIME_FORMAT)
+                                        str(check_in),
+                                        DEFAULT_SERVER_DATETIME_FORMAT)
                             worked_hours += delta.total_seconds() / 3600.0
                 line.write({
                     'duty_hours': duty_hours,
@@ -224,23 +230,28 @@ class EmployeeAttendanceAnalytic(models.Model):
     @api.multi
     def create_line(self, sheet, date_from, date_to):
         dates = list(rrule.rrule(rrule.DAILY,
-                                 dtstart=parser.parse(str(date_from)),
-                                 until=parser.parse(str(date_to))))
+                                 dtstart=parser.parse(date_from),
+                                 until=parser.parse(date_to)))
         for date_line in dates:
             name = str(date_line).split(' ')[0]
             line = self.search(
                 [('name', '=', name),
                  ('sheet_id', '=', sheet.id)])
             if not line:
-
                 duty_hours, contract, leave, public_holiday = \
                     self.calculate_duty_hours(sheet=sheet,
                                               date_from=date_line)
-                if leave[0]:
-                    duty_hours -= duty_hours * leave[1]
+                leaves = leave[0]
+                if len(leaves) > 1:
+                    l = leaves[0]
+                else:
+                    l = leave[0]
+                if l:
+                    leave_type = l[0].holiday_status_id
+                    if leave_type.take_into_attendance:
+                        duty_hours -= duty_hours * leave[1]
                 if contract and contract.rate_per_hour:
                     duty_hours = 0.0
-
                 values = {'name': name,
                           'attendance_date': name,
                           'sheet_id': sheet.id,
@@ -249,13 +260,12 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=leave[0].name)
+                    values.update(leave_description=l.name)
                 self.create(values)
 
     @api.multi
     def calculate_duty_hours(self, sheet, date_from):
         contract_obj = self.env['hr.contract']
-        calendar_obj = self.env['resource.calendar']
         duty_hours = 0.0
         contract = contract_obj.search(
             [('state', 'not in', ('draft', 'cancel')),
@@ -263,6 +273,7 @@ class EmployeeAttendanceAnalytic(models.Model):
              ('date_start', '<=', date_from), '|',
              ('date_end', '>=', date_from),
              ('date_end', '=', None)])
+
         if len(contract) > 1:
             raise UserError(_(
                 'You have more than one active contract'))
@@ -270,15 +281,9 @@ class EmployeeAttendanceAnalytic(models.Model):
         public_holiday = sheet.count_public_holiday(str(date_from))
         if contract and contract.rate_per_hour:
             return 0.00, contract, leave, public_holiday
-        # ctx = dict(self.env.context).copy()
-        # ctx.update(period)
-        if contract:
-            dh = contract.resource_calendar_id.get_working_hours_of_date(
-                start_dt=fields.Datetime.from_string(date_from),
-                resource_id=sheet.employee_id.id)
-        else:
-            dh = 0.00
-
+        dh = contract.resource_calendar_id.get_working_hours_of_date(
+            start_dt=fields.Datetime.from_string(str(date_from)),
+            resource_id=sheet.employee_id.id)
         if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:
                 if not dh:
@@ -289,7 +294,16 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours += dh
             else:
                 if not public_holiday and leave[1] != 0:
-                    duty_hours += dh * (1 - leave[1])
+                    leaves = leave[0]
+                    if len(leaves) > 1:
+                        l = leaves[0]
+                    else:
+                        l = leave[0]
+                    leave_type = l.holiday_status_id
+                    if not leave_type.take_into_attendance:
+                        duty_hours += dh
+                    else:
+                        duty_hours += dh * (1 - leave[1])
         else:
             dh = 0.00
             duty_hours += dh
