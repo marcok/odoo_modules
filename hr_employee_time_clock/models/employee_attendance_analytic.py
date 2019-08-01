@@ -34,6 +34,7 @@ _logger = logging.getLogger(__name__)
 class EmployeeAttendanceAnalytic(models.Model):
     _name = "employee.attendance.analytic"
     _order = "name"
+    _description = 'EmployeeAttendanceAnalytic'
 
     name = fields.Date(string='Date')
     attendance_date = fields.Date(string='Attendance Date')
@@ -81,26 +82,27 @@ class EmployeeAttendanceAnalytic(models.Model):
                                          dtstart=parser.parse(line_date),
                                          until=parser.parse(line_date)))[0]
         for line in lines:
-            duty_hours, contract, leave, public_holiday = \
-                self.calculate_duty_hours(sheet=line.sheet_id,
-                                          date_from=date_line)
-            values = {'duty_hours': duty_hours,
-                      'contract_id': False,
-                      'state':
-                          'new' if line.sheet_id.state != 'done' else 'done',
-                      'leave_description': '-'}
-            if contract:
-                values.update(contract_id=contract.id)
-            if public_holiday:
-                values.update(leave_description=public_holiday.name)
-            if leave and leave[0]:
-                leaves = leave[0]
-                if len(leaves) > 1:
-                    l = leaves[0]
-                else:
-                    l = leave[0]
-                values.update(leave_description=l.name)
-            line.write(values)
+            if line.sheet_id:
+                duty_hours, contract, leave, public_holiday = \
+                    self.calculate_duty_hours(sheet=line.sheet_id,
+                                              date_from=date_line)
+                values = {'duty_hours': duty_hours,
+                          'contract_id': False,
+                          'state':
+                              'new' if line.sheet_id.state != 'done' else 'done',
+                          'leave_description': '-'}
+                if contract:
+                    values.update(contract_id=contract.id)
+                if public_holiday:
+                    values.update(leave_description=public_holiday.name)
+                if leave and leave[0]:
+                    leaves = leave[0]
+                    if len(leaves) > 1:
+                        l = leaves[0]
+                    else:
+                        l = leave[0]
+                    values.update(leave_description=l.name)
+                line.write(values)
 
     @api.multi
     def _get_difference(self):
@@ -211,11 +213,13 @@ class EmployeeAttendanceAnalytic(models.Model):
                         worked_hours += attendance.worked_hours
 
                     else:
-                        delta = datetime.strptime(
-                            check_out, DEFAULT_SERVER_DATETIME_FORMAT) - \
-                                datetime.strptime(
-                                    check_in, DEFAULT_SERVER_DATETIME_FORMAT)
-                        worked_hours += delta.total_seconds() / 3600.0
+                        if check_out:
+                            delta = datetime.strptime(
+                                check_out, DEFAULT_SERVER_DATETIME_FORMAT) - \
+                                    datetime.strptime(
+                                        check_in,
+                                        DEFAULT_SERVER_DATETIME_FORMAT)
+                            worked_hours += delta.total_seconds() / 3600.0
                 line.write({
                     'duty_hours': duty_hours,
                     'worked_hours': worked_hours,
@@ -262,7 +266,6 @@ class EmployeeAttendanceAnalytic(models.Model):
     @api.multi
     def calculate_duty_hours(self, sheet, date_from):
         contract_obj = self.env['hr.contract']
-        calendar_obj = self.env['resource.calendar']
         duty_hours = 0.0
         contract = contract_obj.search(
             [('state', 'not in', ('draft', 'cancel')),
@@ -278,8 +281,6 @@ class EmployeeAttendanceAnalytic(models.Model):
         public_holiday = sheet.count_public_holiday(str(date_from))
         if contract and contract.rate_per_hour:
             return 0.00, contract, leave, public_holiday
-        ctx = dict(self.env.context).copy()
-        # ctx.update(period)
         dh = contract.resource_calendar_id.get_working_hours_of_date(
             start_dt=fields.Datetime.from_string(str(date_from)),
             resource_id=sheet.employee_id.id)
@@ -293,7 +294,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                 duty_hours += dh
             else:
                 if not public_holiday and leave[1] != 0:
-                    print('\n leave >>>>>> %s' % leave, leave[0])
                     leaves = leave[0]
                     if len(leaves) > 1:
                         l = leaves[0]
