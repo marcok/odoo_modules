@@ -31,6 +31,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
 
