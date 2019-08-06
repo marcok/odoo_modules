@@ -1215,7 +1215,7 @@ msgstr "Sie können eine Arbeitszeittabelle nicht duplizieren."
 msgid "You cannot have 2 timesheets that overlap!\n"
 "Please use the menu 'My Current Timesheet' to avoid this problem."
 msgstr "Sie können nicht zwei überlappende Arbeitszeittabellen haben!\n"
-"Please use the menu 'Meine aktuelle Arbeitszeittabelle ', um dieses Problem zu vermeiden."
+"Bitte benutzen Sie das Menü 'Meine aktuelle Arbeitszeittabelle ', um dieses Problem zu vermeiden."
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models/account_analytic_line.py:101
@@ -1233,12 +1233,12 @@ msgstr "Sie haben mehr als einen aktiven Vertrag"
 
 #. module: hr_employee_time_clock
 #: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_form
-msgid "Sie müssen jeden Tag Anwesenheitslisten aufzeichnen und am Ende bestätigen\n"
-"                der Woche. Sobald die Anwesenheitsliste bestätigt ist, sollte es sein\n"
-"                von einem Manager bestätigt."
-msgstr "You have to record attendance lists every day and confirm at the end \ n "
+msgid "You have to record attendance lists every day and confirm at the end \ n "
 "                of the week, once the attendance list is confirmed, it should be \ n"
 "                validated by a manager."
+msgstr "Sie müssen jeden Tag Anwesenheitslisten aufzeichnen und am Ende bestätigen\n"
+"                der Woche. Sobald die Anwesenheitsliste bestätigt ist, sollte es sein\n"
+"                von einem Manager bestätigt.
 
 #. module: hr_employee_time_clock
 #: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
