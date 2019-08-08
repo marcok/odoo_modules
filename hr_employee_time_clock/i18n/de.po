@@ -22,7 +22,7 @@ msgid " * The 'Open' status is used when a user is encoding a new and unconfirme
 "* The 'Approved' status is used when the users timesheet is accepted by his/her senior."
 msgstr " * Der Status 'Offen' wird verwendet, wenn ein Benutzer eine neue und nicht bestätigte Arbeitszeittabelle codiert.\n"
 "* The Der Status 'Warten auf Genehmigung' wird verwendet, um die Arbeitszeittabelle vom Benutzer zu bestätigen. \n"
-"* The Der Status "Genehmigt" wird verwendet, wenn die Arbeitszeittabelle des Benutzers von seinem Vorgesetzten akzeptiert wird."
+"* The Der Status 'Genehmigt' wird verwendet, wenn die Arbeitszeittabelle des Benutzers von seinem Vorgesetzten akzeptiert wird."
 
 #. module: hr_employee_time_clock
 #: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:826
@@ -1238,7 +1238,7 @@ msgid "You have to record attendance lists every day and confirm at the end \ n 
 "                validated by a manager."
 msgstr "Sie müssen jeden Tag Anwesenheitslisten aufzeichnen und am Ende bestätigen\n"
 "                der Woche. Sobald die Anwesenheitsliste bestätigt ist, sollte es sein\n"
-"                von einem Manager bestätigt.
+"                von einem Manager bestätigt."
 
 #. module: hr_employee_time_clock
 #: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
@@ -1247,7 +1247,7 @@ msgid "You must record timesheets every day and confirm at the end\n"
 "                validated by a manager"
 msgstr "Sie müssen jeden Tag Stundenzettel aufzeichnen und am Ende bestätigen\n"
 "                der Woche. Sobald die Arbeitszeittabelle bestätigt ist, sollte es sein\n"
-"                von einem Manager validiert.
+"                von einem Manager validiert."
 
 #. module: hr_employee_time_clock
 #. openerp-web
