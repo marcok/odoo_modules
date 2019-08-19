@@ -1,160 +1,1288 @@
-# German translation for hr_employee_time_clock
-
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* hr_employee_time_clock
+#
 msgid ""
 msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-08-06 13:18+0000\n"
+"PO-Revision-Date: 2019-08-06 13:18+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
 
 #. module: hr_employee_time_clock
-#: field:hr_timesheet_sheet.sheet,calculate_diff_hours:0
-#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
-#: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
-msgid "Total balance"
-msgstr "Total Saldo"
+#: model:ir.model.fields,help:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_state
+msgid " * The 'Open' status is used when a user is encoding a new and unconfirmed timesheet.\n"
+"* The 'Waiting Approval' status is used to confirm the timesheet by user. \n"
+"* The 'Approved' status is used when the users timesheet is accepted by his/her senior."
+msgstr " * Der Status 'Offen' wird verwendet, wenn ein Benutzer eine neue und nicht bestätigte Arbeitszeittabelle codiert.\n"
+"* The Der Status 'Warten auf Genehmigung' wird verwendet, um die Arbeitszeittabelle vom Benutzer zu bestätigen. \n"
+"* The Der Status 'Genehmigt' wird verwendet, wenn die Arbeitszeittabelle des Benutzers von seinem Vorgesetzten akzeptiert wird."
 
 #. module: hr_employee_time_clock
-#: field:hr_timesheet_sheet.sheet,total_duty_hours:0
-#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
-#: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
-msgid "Remaining this timesheet"
-msgstr "Verbleibend diese Zeiterfassung"
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:826
+#, python-format
+msgid "%H:%M:%S"
+msgstr "%H:%M:%S"
 
 #. module: hr_employee_time_clock
-#: field:hr_timesheet_sheet.sheet,prev_timesheet_diff:0
-#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
-#: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
-msgid "Last timesheets"
-msgstr "Letzte Zeiterfassung"
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:825
+#, python-format
+msgid "%Y-%m-%d"
+msgstr "%Y-%m-%d"
 
 #. module: hr_employee_time_clock
-#: field:hr_timesheet_sheet.sheet,total_attendance:0
-#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
-#: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
-msgid "Attendance this timesheet"
-msgstr "Anwesenheit diese Zeiterfassung"
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:1058
+#, python-format
+msgid "<p>The attendance records of your employees will be displayed here.</p>\n"
+"                <p>Please make sure you're using the correct filter if you expected to see any.</p>"
+msgstr "<p>Hier werden die Anwesenheitslisten Ihrer Mitarbeiter angezeigt.</p>\n"
+"                <p>Bitte stellen Sie sicher, dass Sie den richtigen Filter verwenden, wenn Sie damit rechnen, einen zu sehen.</p>"
 
 #. module: hr_employee_time_clock
-#: field:hr_timesheet_sheet.sheet,analysis:0
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_current_open
+msgid ">Generate attendance sheets for employees having the following tag:"
+msgstr ">Erstellen Sie Anwesenheitslisten für Mitarbeiter mit dem folgenden Tag:"
+
+#. module: hr_employee_time_clock
+#. openerp-web
+#: code:addons/hr_employee_time_clock/static/src/xml/timesheet.xml:33
+#, python-format
+msgid "Add a Line"
+msgstr "Fügen Sie eine Zeile hinzu"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_res_company_timesheet_max_difference
+msgid "Allowed difference in hours between the sign in/out and the timesheet computation for one sheet. Set this to 0 if you do not want any control."
+msgstr "Zulässige Differenz in Stunden zwischen der An- / Abmeldung und der Arbeitszeittabellenberechnung für eine Tabelle. Setzen Sie diesen Wert auf 0, wenn Sie keine Steuerung wünschen."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_attendance_analysis_report_graph
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_attendance_analysis_report_tree
+msgid "Analysis by Timesheet"
+msgstr "Analyse per Arbeitszeittabelle"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.action_hr_attendance_analysis_report
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_hr_attendance_analysis_report
+msgid "Analysis by attendance sheet"
+msgstr "Analyse nach Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Analytische Linie"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_ids
+msgid "Analytic accounts"
+msgstr "Analytische Konten"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Approve"
+msgstr "Genehmigen"
+
+#. module: hr_employee_time_clock
+#: selection:employee.attendance.analytic,state:0
+#: selection:hr_timesheet_sheet.sheet,state:0
+#: model:mail.message.subtype,name:hr_employee_time_clock.mt_timesheet_approved
+msgid "Approved"
+msgstr "Genehmigt"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_attendance
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_total_attendance
+msgid "Attendance"
+msgstr "Teilnahme"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_analysis
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_hr_attendance_analysis_report_root
 msgid "Attendance Analysis"
-msgstr "Anwesenheit Analyse"
+msgstr "Anwesenheitsanalyse"
 
 #. module: hr_employee_time_clock
-#: view:hr_timesheet_sheet.sheet:hr_employee_time_clock.timesheet_overtime
-msgid "Overtime Analysis"
-msgstr "Überzeit Analyse"
+#: model:ir.model,name:hr_employee_time_clock.model_hr_attendance_analysis_report
+msgid "Attendance Analysis based on Timesheet"
+msgstr "Anwesenheitsanalyse basierend auf Arbeitszeittabelle"
 
 #. module: hr_employee_time_clock
-#: view:hr.timesheet.current.open:hr_employee_time_clock.view_hr_timesheet_current_open_inherit
-msgid "Generate timesheets for employees having the following tag:"
-msgstr "Generiere Zeiterfassungen für Mitarbeiter mit folgendem Tag:"
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_attendance_date
+msgid "Attendance Date"
+msgstr "Anwesenheitsdatum"
 
 #. module: hr_employee_time_clock
-#: field:hr.timesheet.current.open,category_id:0
-#: model:ir.model,name:hr.model_hr_employee_category
-msgid "Employee Tag"
-msgstr "Mitarbeiter Tag"
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_attendance_ids
+msgid "Attendance IDS"
+msgstr "Teilnahme IDS"
 
 #. module: hr_employee_time_clock
-#: field:hr.timesheet.current.open,date_from:0
-msgid "Start Date"
-msgstr "Startdatum"
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_line_analytic_id
+msgid "Attendance Line Analytic"
+msgstr "Anwesenheitslinienanalyse"
 
 #. module: hr_employee_time_clock
-#: field:hr.timesheet.current.open,date_to:0
-msgid "End Date"
-msgstr "Enddatum"
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Attendance Sheet Period"
+msgstr "Anwesenheitsliste Zeitraum"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/wizard/create_timesheet_with_tag.py:44
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_employee_extd_form
+msgid "Attendance sheets"
+msgstr "Anwesenheitslisten"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_form
+msgid "Attendance sheets can also be invoiced to customers, depending on the\n"
+"                configuration of each project's related contract."
+msgstr "Teilnahmeblätter können den Kunden auch in Rechnung gestellt werden\n"
+"                Konfiguration des jeweiligen Projektvertrags."
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.act_hr_timesheet_sheet_form
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_form
+msgid "Attendance sheets to approve"
+msgstr "Anwesenheitslisten zu genehmigen"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Attendance this attendance sheet"
+msgstr "Teilnahme dieser Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_attendance_count
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_attendances_ids
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Attendances"
+msgstr "Anwesenheiten"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:676
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:953
 #, python-format
-msgid "Timesheet already exists for %s."
-msgstr "Zeiterfassung existiert bereits für %s."
+msgid "Bonus Hours"
+msgstr "Bonusstunden"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/wizard/import_leave_requests.py:31
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_bonus_worked_hours
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_bonus_worked_hours
+msgid "Bonus Worked Hours"
+msgstr "Bonus geleistete Arbeitsstunden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_calculate_overtime
+msgid "Calculate Overtime"
+msgstr "Überstunden berechnen"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_current_open
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_import_leave_requests
+msgid "Cancel"
+msgstr "Stornieren"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:341
 #, python-format
-msgid "Data Error!"
-msgstr ""
+msgid "Cannot approve a non-submitted timesheet."
+msgstr "Eine nicht übermittelte Arbeitszeittabelle kann nicht genehmigt werden."
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/wizard/import_leave_requests.py:31
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:236
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:347
 #, python-format
-msgid "Date format in your .csv file does not match with database date format."
-msgstr ""
+msgid "Cannot perform check in or check out on multiple employees."
+msgstr "Einchecken oder Auschecken bei mehreren Mitarbeitern nicht möglich."
 
 #. module: hr_employee_time_clock
-#: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
-msgid "Generate timesheets for employees having the following tag:"
-msgstr "Generiere Zeiterfassungen für Mitarbeiter mit folgendem Tag:"
-
-#. module: hr_employee_time_clock
-#: field:import.leave.requests,leave_dates:0
-msgid "Select *.csv"
-msgstr "Wähle *.csv"
-
-#. module: hr_employee_time_clock
-#: field:import.leave.requests,leave_type_id:0
-#: model:ir.model,name:hr_holidays.model_hr_holidays_status
-#: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
-msgid "Leave Type"
-msgstr "Abwesenheitstyp"
-
-#. module: hr_employee_time_clock
-#: field:import.leave.requests,employee_tag_id:0
-#: model:ir.model,name:hr.model_hr_employee_category
-#: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
-msgid "Employee Tag"
-msgstr "Mitarbeiter Tag"
-
-#. module: hr_employee_time_clock
-#: view:import.leave.requests:hr_employee_time_clock.view_import_leave_requests
-#: model:ir.actions.act_window,name:hr_employee_time_clock.action_import_leave_requests
-#: model:ir.ui.menu,name:hr_employee_time_clock.menu_import_leave_requests
-msgid "Import Leave Requests"
-msgstr "Importiere Abwesenheiten"
-
-#. module: hr_employee_time_clock
-#: view:hr.timesheet.current.open:hr_employee_time_clock.view_hr_timesheet_current_open_inherit
-#: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_form_open_current
-msgid "Generate Timesheets"
-msgstr "Generiere Zeiterfassungen"
-
-#. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:104
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:254
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:274
 #, python-format
-msgid "Previous Timesheet:"
-msgstr "Letzte Zeiterfassung:"
+msgid "Cannot perform check out on %(empl_name)s, could not find corresponding check in. Your attendances have probably been modified manually by human resources."
+msgstr "Check-out für nicht möglich %(empl_name)s, der entsprechende Check-in konnte nicht gefunden werden. Ihre Teilnahme wurde wahrscheinlich manuell von der Personalabteilung geändert."
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:124
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:364
 #, python-format
-msgid "Total:"
-msgstr "Total:"
+msgid "Cannot perform check out on %s, could not find corresponding check in. Your attendances have probably been modified manually by human resources."
+msgstr "Kasse kann nicht durchgeführt werden on %s, der entsprechende Check-in konnte nicht gefunden werden. Ihre Teilnahme wurde wahrscheinlich manuell von der Personalabteilung geändert."
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:227
+#: model:ir.model.fields,help:hr_employee_time_clock.field_hr_timesheet_current_open_category_id
+msgid "Category of Employee"
+msgstr "Kategorie des Mitarbeiters"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_overtime_change
+msgid "Change Overtime"
+msgstr "Überstunden ändern"
+
+#. module: hr_employee_time_clock
+#. openerp-web
+#: code:addons/hr_employee_time_clock/static/src/xml/timesheet.xml:51
+#, python-format
+msgid "Click to add projects, contracts or analytic accounts."
+msgstr "Klicken Sie hier, um Projekte, Verträge oder Analysekonten hinzuzufügen."
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_res_company
+msgid "Companies"
+msgstr "Firmen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_company_id
+msgid "Company"
+msgstr "Unternehmen"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Confirmed Timesheets"
+msgstr "Bestätigte Stundenzettel"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_contract
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_contract_id
+msgid "Contract"
+msgstr "Vertrag"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_current_open
+msgid "Create Timesheet With Employee Tag"
+msgstr "Arbeitszeittabelle mit Mitarbeiter-Tag erstellen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_create_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_create_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_create_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_create_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_create_uid
+msgid "Created by"
+msgstr "Erstellt von"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_create_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_create_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_create_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_create_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_create_date
+msgid "Created on"
+msgstr "Erstellt am"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_attendance_view_filter
+msgid "Current Month"
+msgstr "Aktueller Monat"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:672
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:675
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:946
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:967
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_name
 #, python-format
 msgid "Date"
 msgstr "Datum"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:228
-#, python-format
-msgid "Duty Hours"
-msgstr "Pflichtstunden"
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_date_from
+msgid "Date From"
+msgstr "Stammen aus"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:229
-#, python-format
-msgid "Worked Hours"
-msgstr "Gearbeitete Stunden"
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_date_to
+msgid "Date To"
+msgstr "Datum bis"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:230
+#: code:addons/hr_employee_time_clock/wizard/import_leave_requests.py:69
+#, python-format
+msgid "Date format in your .csv file does not match with database date format."
+msgstr "Das Datumsformat in Ihrer .csv datei stimmt nicht mit dem Datumsformat der Datenbank überein."
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_dayofweek
+msgid "Day of Week"
+msgstr "Wochentag"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_department_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_department_id
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Department"
+msgstr "Abteilung"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Details"
+msgstr "Einzelheiten"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_calculate_diff_hours
+msgid "Diff (worked-duty)"
+msgstr "Diff (Arbeitspflicht)"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_prev_timesheet_diff
+msgid "Diff from old"
+msgstr "Diff von alt"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:673
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:677
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:959
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:974
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_difference
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_total_difference
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_difference
 #, python-format
 msgid "Difference"
-msgstr "Differenz"
+msgstr "Unterschied"
 
 #. module: hr_employee_time_clock
-#: code:addons/hr_employee_time_clock/models.py:231
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Differences"
+msgstr "Unterschiede"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_display_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_display_name
+msgid "Display Name"
+msgstr "Anzeigename"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:672
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:675
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:948
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:969
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_duty_hours
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_total_duty_hours_done
+#, python-format
+msgid "Duty Hours"
+msgstr "Arbeitsstunden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_employee
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_name
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_employee_id
+msgid "Employee"
+msgstr "Mitarbeiter"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_category_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_employee_tag_id
+msgid "Employee Tag"
+msgstr "Mitarbeiter-Tag"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:132
+#, python-format
+msgid "Employee must have related user."
+msgstr "Der Mitarbeiter muss einen verwandten Benutzer haben."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Employee's Name"
+msgstr "Name des Mitarbeiters"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Employees"
+msgstr "Angestellte"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_date_to
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_date_to
+msgid "End Date"
+msgstr "Endtermin"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Friday"
+msgstr "Freitag"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_form_open_current
+msgid "Generate attendance sheets"
+msgstr "Anwesenheitslisten erstellen"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_import_leave_requests
+msgid "Generate leave requests for employees having the following tag:"
+msgstr "Urlaubsanträge für Mitarbeiter mit folgendem Tag generieren:"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Group By"
+msgstr "Gruppiere nach"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_department
+msgid "HR Department"
+msgstr "Personalabteilung"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_have_overtime
+msgid "Have Overtime"
+msgstr "Überstunden haben"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Hours"
+msgstr "Std"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_id
+msgid "ID"
+msgstr "ID"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_import_leave_requests
+msgid "Import"
+msgstr "Einführen"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.action_import_leave_requests
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_import_leave_requests
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_import_leave_requests
+msgid "Import Leave Requests"
+msgstr "Urlaubsanträge importieren"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_import_leave_requests
+msgid "Import Leave Requests With Employee Tag"
+msgstr "Urlaubsanträge mit Mitarbeiter-Tag importieren"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "In Draft"
+msgstr "Im Entwurf"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:238
+#, python-format
+msgid "In order to create a timesheet for this employee, you must link him/her to a department."
+msgstr "Um eine Arbeitszeittabelle für diesen Mitarbeiter zu erstellen, müssen Sie ihn mit einer Abteilung verknüpfen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:233
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:303
+#, python-format
+msgid "In order to create a timesheet for this employee, you must link him/her to a user."
+msgstr "Um eine Arbeitszeittabelle für diesen Mitarbeiter zu erstellen, müssen Sie ihn / sie mit einem Benutzer verknüpfen."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_employee_extd_form
+msgid "Initial Employee Overtime"
+msgstr "Überstunden des ersten Mitarbeiters"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests___last_update
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime___last_update
+msgid "Last Modified on"
+msgstr "Letzte Änderung am"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_write_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_write_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_write_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_write_uid
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_write_uid
+msgid "Last Updated by"
+msgstr "Zuletzt aktualisiert von"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_write_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_write_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_write_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_write_date
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_write_date
+msgid "Last Updated on"
+msgstr "Zuletzt aktualisiert am"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Last attendance sheets"
+msgstr "Letzte Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_holidays
+msgid "Leave"
+msgstr "Ver lassen "
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_leave_description
+msgid "Leave Description"
+msgstr "Beschreibung verlassen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_holidays_status
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_leave_type_id
+msgid "Leave Type"
+msgstr "Typ verlassen"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:673
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:677
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:963
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:978
+#, python-format
+msgid "Leaves"
+msgstr "Blätter"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_min_overtime_count
+msgid "Minimum overtime days"
+msgstr "Minimale Überstunden Tage"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Monday"
+msgstr "Montag"
+
+#. module: hr_employee_time_clock
+#: selection:res.company,timesheet_range:0
+msgid "Month"
+msgstr "Monat"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_attendance_view_filter
+msgid "My Attendances"
+msgstr "Meine Anwesenheits"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.action_hr_timesheet_current_open
+#: model:ir.actions.server,name:hr_employee_time_clock.ir_actions_server_timesheet_sheet
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_current_open
+msgid "My Timesheet"
+msgstr "Mein Stundenzettel"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.action_hr_timesheet_current_open
+msgid "Meine Arbeitszeittabelle öffnet Ihre Arbeitszeittabelle, damit Sie es können\n"
+"                buchen Sie Ihre Aktivitäten in das System. Aus der gleichen Form, du\n"
+"                registrieren Sie Ihre Teilnahme (Anmelden / Abmelden) und beschreiben Sie die\n"
+"                arbeitszeit für die verschiedenen Projekte. Am Ende von\n"
+"                zeitraum in der Firma definiert, wird die Stundenzettel von der bestätigt\n"
+"                benutzer und kann von seinem Vorgesetzten validiert werden. Bei Bedarf als\n"
+"                im Projekt definiert, können Sie die Rechnungen basierend auf generieren\n"
+"                die Stundenzettel."
+msgstr "Meine Arbeitszeittabelle öffnet Ihre Arbeitszeittabelle, damit Sie es können\n"
+"                buchen Sie Ihre Aktivitäten in das System. Aus der gleichen Form, du\n"
+"                registrieren Sie Ihre Teilnahme (Anmelden / Abmelden) und beschreiben Sie die\n"
+"                arbeitszeit für die verschiedenen Projekte. Am Ende von\n"
+"                zeitraum in der Firma definiert, wird die Stundenzettel von der bestätigt\n"
+"                benutzer und kann von seinem Vorgesetzten validiert werden. Bei Bedarf als\n"
+"                im Projekt definiert, können Sie die Rechnungen basierend auf generieren\n"
+"                die Stundenzettel."
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_my_timesheets
+msgid "My attendance sheets"
+msgstr "Meine Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.menu,name:hr_employee_time_clock.menu_act_hr_timesheet_sheet_form_my_current
+msgid "My current attendance sheet"
+msgstr "Meine aktuelle Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_name
+msgid "Name"
+msgstr "Name"
+
+#. module: hr_employee_time_clock
+#: selection:employee.attendance.analytic,state:0
+#: selection:hr_timesheet_sheet.sheet,state:0
+msgid "New"
+msgstr "Neu"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_form
+msgid "New attendance sheet to approve."
+msgstr "Neue Anwesenheitsliste zu genehmigen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:676
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:956
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_night_shift_worked_hours
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_night_shift_worked_hours
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.resource_calendar_form
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_resource_calendar_attendance_overtime_tree
+#, python-format
+msgid "Night Shift"
+msgstr "Nachtschicht"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:168
+#, python-format
+msgid "No employee corresponding to barcode %(barcode)s"
+msgstr "Kein Mitarbeiter, der dem Barcode entspricht %(barcode)s"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_name
+msgid "Note"
+msgstr "Hinweis"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:338
+#, python-format
+msgid "Only an HR Officer or Manager can approve timesheets."
+msgstr "Nur ein HR-Beauftragter oder Manager kann Arbeitszeittabellen genehmigen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:312
+#, python-format
+msgid "Only an HR Officer or Manager can refuse timesheets or reset them to draft."
+msgstr "Nur ein HR-Beauftragter oder Manager kann Arbeitszeittabellen ablehnen oder auf Entwurf zurücksetzen."
+
+#. module: hr_employee_time_clock
+#: selection:hr_timesheet_sheet.sheet,state:0
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_current_open
+msgid "Open"
+msgstr "Öffnen"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/wizard/hr_timesheet_current.py:48
+#, python-format
+msgid "Open Timesheet"
+msgstr "Arbeitszeittabelle öffnen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_overtime_attendance_ids
+msgid "Overtime"
+msgstr "Im Laufe der Zeit"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Overtime Analysis"
+msgstr "Überstundenanalyse"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_hour_from
+msgid "Overtime from"
+msgstr "Überstunden ab"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_hour_to
+msgid "Overtime to"
+msgstr "Überstunden zu"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_count
+msgid "Percent Count"
+msgstr "Prozentzahl"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_period_ids
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Period"
+msgstr "Zeitraum"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_res_company_timesheet_range
+msgid "Periodicity on which you validate your timesheets."
+msgstr "Periodizität, in der Sie Ihre Arbeitszeittabellen validieren."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:326
+#, python-format
+msgid "Please contact your manager to create employee for you and change QR-code."
+msgstr "Bitte kontaktieren Sie Ihren Manager, um einen Mitarbeiter für Sie zu erstellen und den QR-Code zu ändern."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:229
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:337
+#, python-format
+msgid "Please contact your manager to create timesheet for you."
+msgstr "Bitte wenden Sie sich an Ihren Vorgesetzten, um eine Arbeitszeittabelle für Sie zu erstellen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:329
+#, python-format
+msgid "Please verify that the total difference of the sheet is lower than %.2f."
+msgstr "Bitte stellen Sie sicher, dass die Gesamtdifferenz des Blattes geringer ist als %.2f."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:664
+#, python-format
+msgid "Previous Attendance Sheet:"
+msgstr "Vorherige Anwesenheitsliste:"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_name
+msgid "Project / Analytic Account"
+msgstr "Projekt- / Analysekonto"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_holidays_public
+msgid "Public Holidays"
+msgstr "Feiertage"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_holidays_public_line
+msgid "Public Holidays Lines"
+msgstr "Linien für Feiertage"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_contract_form_inherit
+msgid "Rate"
+msgstr "Bewertung"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Refuse"
+msgstr "Sich weigern"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_user_id
+msgid "Related user name for the resource to manage its access."
+msgstr "Zugehöriger Benutzername für die Ressource zum Verwalten des Zugriffs."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Remaining this attendance sheet"
+msgstr "Verbleibende dieser Anwesenheitsliste"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_resource_calendar
+msgid "Resource Calendar"
+msgstr "Ressourcenkalender"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_overtime_calendar_id
+msgid "Resource's Calendar"
+msgstr "Ressourcenkalender"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:673
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:677
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:961
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:976
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_running
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_running
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_attendance_view_form
 #, python-format
 msgid "Running"
-msgstr "Laufend"
+msgstr "Laufen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_total_duty_hours_running
+msgid "Running Hours"
+msgstr "Betriebsstunden"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Saturday"
+msgstr "Samstag"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_account_filter
+msgid "Search Account"
+msgstr "Konto durchsuchen"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Search Timesheet"
+msgstr "Arbeitszeittabelle durchsuchen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_import_leave_requests_leave_dates
+msgid "Select *.csv"
+msgstr "Wählen *.csv"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_import_leave_requests_leave_dates
+msgid "Select csv file having holiday dates."
+msgstr "Wählen Sie eine csv-datei mit Feiertagsdaten aus."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Set to Draft"
+msgstr "Auf Entwurf setzen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_account_analytic_line_sheet_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_account_analytic_line_sheet_id_computed
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_sheet_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_sheet_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_sheet_id
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_sheet_id
+msgid "Sheet"
+msgstr "Blatt"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_two_days_shift
+msgid "Shift between two days"
+msgstr "Zwischen zwei Tagen wechseln"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_attendance.py:519
+#, python-format
+msgid "Sorry, only manager is allowed to create attendance of approved attendance sheet."
+msgstr "Es tut uns leid, aber nur der Manager darf die Teilnahme an der genehmigten Anwesenheitsliste erstellen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_attendance.py:499
+#, python-format
+msgid "Sorry, only manager is allowed to edit attendance of approved attendance sheet."
+msgstr "Es tut uns leid, aber nur Manager dürfen die Anwesenheitsliste der genehmigten Anwesenheitsliste bearbeiten."
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_current_open_date_from
+msgid "Start Date"
+msgstr "Anfangsdatum"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_employee_start_overtime_different
+msgid "Start Overtime Count"
+msgstr "Überstundenzählung starten"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_employee_start_time_different
+msgid "Start Time Different"
+msgstr "Startzeit abweichend"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_resource_calendar_attendance_overtime_hour_from
+msgid "Start and End time of Overtime."
+msgstr "Start- und Endzeit der Überstunden."
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_attendance_overtime_date_from
+msgid "Starting Date"
+msgstr "Anfangsdatum"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_state
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_state
+msgid "Status"
+msgstr "Status"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Submit to Manager"
+msgstr "An Manager senden"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Summary"
+msgstr "Zusammenfassung"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Sunday"
+msgstr "Sonntag"
+
+#. module: hr_employee_time_clock
+#: model:res.groups,name:hr_employee_time_clock.group_timesheet_supervisor
+msgid "Supervisor"
+msgstr "Supervisor"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_holidays_status_take_into_attendance
+msgid "Take Into Attendance"
+msgstr "Nehmen Sie in Anwesenheit"
+
+#. module: hr_employee_time_clock
+#: sql_constraint:hr.employee:0
+msgid "The Badge ID must be unique, this one is already assigned to another employee."
+msgstr "Die Badge ID muss eindeutig sein, diese ist bereits einem anderen Mitarbeiter zugeordnet."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:157
+#, python-format
+msgid "The PIN must be a sequence of digits."
+msgstr "Die PIN muss eine Ziffernfolge sein."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:414
+#, python-format
+msgid "The timesheet cannot be validated as it contains an attendance record with no Check Out."
+msgstr "Die Arbeitszeittabelle kann nicht validiert werden, da sie einen Anwesenheitsnachweis ohne Auschecken enthält."
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Thursday"
+msgstr "Donnerstag"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_timesheet_id
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Timesheet"
+msgstr "Arbeitszeittabelle"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.act_hr_timesheet_sheet_sheet_2_hr_analytic_timesheet
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Timesheet Activities"
+msgstr "Aktivitäten in der Arbeitszeittabelle"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet_account
+msgid "Timesheet Sheet Account"
+msgstr "Arbeitszeittabellenkonto"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_res_company_timesheet_max_difference
+msgid "Timesheet allowed difference(Hours)"
+msgstr "Stundenzettel erlaubte Differenz (Stunden)"
+
+#. module: hr_employee_time_clock
+#: model:mail.message.subtype,description:hr_employee_time_clock.mt_timesheet_approved
+msgid "Timesheet approved"
+msgstr "Stundenzettel genehmigt"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_account_form
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_account_tree
+msgid "Timesheet by Accounts"
+msgstr "Arbeitszeittabelle nach Konten"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_timesheet_ids
+msgid "Timesheet lines"
+msgstr "Zeilen in der Arbeitszeittabelle"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_res_company_timesheet_range
+msgid "Timesheet range"
+msgstr "Arbeitszeittabellenbereich"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_department_timesheet_to_approve_count
+msgid "Timesheet to Approve"
+msgstr "Arbeitszeittabelle zu genehmigen"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.act_hr_employee_2_hr_timesheet
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_employee_timesheet_count
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_department_view_kanban
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_tree_simplified
+msgid "Timesheets"
+msgstr "Stundenzettel"
+
+#. module: hr_employee_time_clock
+#: model:mail.message.subtype,name:hr_employee_time_clock.mt_department_timesheet_approved
+msgid "Timesheets Approved"
+msgstr "Stundenzettel genehmigt"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_hr_timesheet_sheet_sheet_day
+msgid "Timesheets by Period"
+msgstr "Stundenzettel nach Zeitraum"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
+msgid "Timesheets can also be invoiced to customers, depending on the\n"
+"                configuration of each project's related contract."
+msgstr "Arbeitszeittabellen können auch an Kunden in Rechnung gestellt werden\n"
+"                konfiguration des jeweiligen Projektvertrags."
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,name:hr_employee_time_clock.hr_timesheet_action_from_department
+#: model:mail.message.subtype,name:hr_employee_time_clock.mt_department_timesheet_confirmed
+msgid "Timesheets to Approve"
+msgstr "Zu genehmigende Arbeitszeittabellen"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:134
+#, python-format
+msgid "Timezone for {user} is not set."
+msgstr "Die Zeitzone für {user} ist nicht festgelegt."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "To Approve"
+msgstr "Zu genehmigen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_current_hours_running
+msgid "Today Running Hours"
+msgstr "Heute Betriebsstunden"
+
+#. module: hr_employee_time_clock
+#. openerp-web
+#: code:addons/hr_employee_time_clock/static/src/xml/timesheet.xml:14
+#: code:addons/hr_employee_time_clock/static/src/xml/timesheet.xml:36
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_account_form
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_account_tree
+#, python-format
+msgid "Total"
+msgstr "Gesamt"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_attendance
+msgid "Total Attendance"
+msgstr "Gesamtbesuch"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_diff_hours
+msgid "Total Diff Hours"
+msgstr "Total Diff Stunden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_duty_hours
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_duty_hours_done
+msgid "Total Duty Hours"
+msgstr "Gesamtdienststunden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_account_total
+msgid "Total Time"
+msgstr "Gesamtzeit"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_day_total_timesheet
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_total_timesheet
+msgid "Total Timesheet"
+msgstr "Arbeitszeittabelle gesamt"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "Total balance"
+msgstr "Gesamtsaldo"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:717
+#, python-format
+msgid "Total:"
+msgstr "Gesamt:"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Tuesday"
+msgstr "Dienstag"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Unread Messages"
+msgstr "ungelesene Nachrichten"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_hr_timesheet_sheet_filter
+msgid "Unvalidated Timesheets"
+msgstr "Nicht validierte Arbeitszeittabellen"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_resource_calendar_use_overtime
+msgid "Use Overtime Setting"
+msgstr "Überstundeneinstellung verwenden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,help:hr_employee_time_clock.field_resource_calendar_two_days_shift
+msgid "Use for night shift between two days."
+msgstr "Verwenden Sie für Nachtschicht zwischen zwei Tagen."
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_contract_rate_per_hour
+msgid "Use hour rate"
+msgstr "Stundensatz verwenden"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_timesheet_sheet_sheet_user_id
+msgid "User"
+msgstr "Nutzer"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_user_id
+msgid "User of Employee"
+msgstr "Benutzer des Mitarbeiters"
+
+#. module: hr_employee_time_clock
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_hr_attendance_analysis_report_parent_user_id
+msgid "User of Manager"
+msgstr "Benutzer des Managers"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_res_users
+msgid "Users"
+msgstr "Nutzer"
+
+#. module: hr_employee_time_clock
+#: selection:hr_timesheet_sheet.sheet,state:0
+#: model:mail.message.subtype,name:hr_employee_time_clock.mt_timesheet_confirmed
+msgid "Waiting Approval"
+msgstr "Warten auf Genehmigung"
+
+#. module: hr_employee_time_clock
+#: selection:resource.calendar.attendance.overtime,dayofweek:0
+msgid "Wednesday"
+msgstr "Warten auf Genehmigung"
+
+#. module: hr_employee_time_clock
+#: selection:res.company,timesheet_range:0
+msgid "Week"
+msgstr "Woche"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:347
+#, python-format
+msgid "Week "
+msgstr "Woche "
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_resource_calendar_attendance
+msgid "Work Detail"
+msgstr "Arbeitsdetail"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:672
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:675
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:950
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:971
+#: model:ir.model.fields,field_description:hr_employee_time_clock.field_employee_attendance_analytic_worked_hours
+#, python-format
+msgid "Worked Hours"
+msgstr "Arbeitsstunden"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_employee.py:180
+#, python-format
+msgid "Wrong PIN"
+msgstr "Falsch PIN"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:247
+#: code:addons/hr_employee_time_clock/wizard/create_timesheet_with_tag.py:46
+#: code:addons/hr_employee_time_clock/wizard/create_timesheet_with_tag.py:53
+#, python-format
+msgid "You added wrong date period."
+msgstr "Sie haben einen falschen Datumszeitraum hinzugefügt."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:292
+#, python-format
+msgid "You are not allowed to approve your attendance sheet."
+msgstr "Sie dürfen Ihre Anwesenheitsliste nicht genehmigen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_attendance.py:494
+#: code:addons/hr_employee_time_clock/models/hr_attendance.py:528
+#, python-format
+msgid "You can not set time of Sing In (resp. Sing Out) which is later than a current time"
+msgstr "Sie können keine Zeit für das Einspielen (bzw. Ausspielen) einstellen, die später als die aktuelle Zeit ist"
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:359
+#, python-format
+msgid "You cannot delete a timesheet that has attendance entries."
+msgstr "Sie können keine Arbeitszeittabelle mit Anwesenheitseinträgen löschen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:356
+#, python-format
+msgid "You cannot delete a timesheet which is already confirmed."
+msgstr "Sie können eine bereits bestätigte Arbeitszeittabelle nicht löschen."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:283
+#, python-format
+msgid "You cannot duplicate a timesheet."
+msgstr "Sie können eine Arbeitszeittabelle nicht duplizieren."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:271
+#, python-format
+msgid "You cannot have 2 timesheets that overlap!\n"
+"Please use the menu 'My Current Timesheet' to avoid this problem."
+msgstr "Sie können nicht zwei überlappende Arbeitszeittabellen haben!\n"
+"Bitte benutzen Sie das Menü 'Meine aktuelle Arbeitszeittabelle ', um dieses Problem zu vermeiden."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/account_analytic_line.py:101
+#, python-format
+msgid "You cannot modify an entry in a confirmed timesheet."
+msgstr "Sie können einen Eintrag in einer bestätigten Arbeitszeittabelle nicht ändern."
+
+#. module: hr_employee_time_clock
+#: code:addons/hr_employee_time_clock/models/employee_attendance_analytic.py:278
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:580
+#: code:addons/hr_employee_time_clock/models/hr_timesheet_sheet.py:874
+#, python-format
+msgid "You have more than one active contract"
+msgstr "Sie haben mehr als einen aktiven Vertrag"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_form
+msgid "You have to record attendance lists every day and confirm at the end \ n "
+"                of the week, once the attendance list is confirmed, it should be \ n"
+"                validated by a manager."
+msgstr "Sie müssen jeden Tag Anwesenheitslisten aufzeichnen und am Ende bestätigen\n"
+"                der Woche. Sobald die Anwesenheitsliste bestätigt ist, sollte es sein\n"
+"                von einem Manager bestätigt."
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
+msgid "You must record timesheets every day and confirm at the end\n"
+"                of the week. Once the timesheet is confirmed, it should be\n"
+"                validated by a manager"
+msgstr "Sie müssen jeden Tag Stundenzettel aufzeichnen und am Ende bestätigen\n"
+"                der Woche. Sobald die Arbeitszeittabelle bestätigt ist, sollte es sein\n"
+"                von einem Manager validiert."
+
+#. module: hr_employee_time_clock
+#. openerp-web
+#: code:addons/hr_employee_time_clock/static/src/xml/timesheet.xml:52
+#, python-format
+msgid "You will be able to register your working hours and activities."
+msgstr "Sie möchten Ihre Arbeitszeiten und Aktivitäten erfassen können."
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_employee_attendance_analytic
+msgid "employee.attendance.analytic"
+msgstr "employee.attendance.analytic"
+
+#. module: hr_employee_time_clock
+#: model:ir.actions.act_window,help:hr_employee_time_clock.act_hr_timesheet_sheet_my_timesheets
+msgid "new timesheet."
+msgstr "neue Stundenzettel."
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.view_import_leave_requests
+msgid "or"
+msgstr "oder"
+
+#. module: hr_employee_time_clock
+#: model:ir.model,name:hr_employee_time_clock.model_resource_calendar_attendance_overtime
+msgid "resource.calendar.attendance.overtime"
+msgstr "resource.calendar.attendance.overtime"
+
+#. module: hr_employee_time_clock
+#: model:ir.ui.view,arch_db:hr_employee_time_clock.hr_timesheet_sheet_form
+msgid "to"
+msgstr "zu"
+
+#. module: hr_employee_time_clock
+#: model:mail.message.subtype,description:hr_employee_time_clock.mt_timesheet_confirmed
+msgid "waiting approval"
+msgstr "Warten auf Genehmigung"
+
