@@ -138,7 +138,7 @@ class EmployeeAttendanceAnalytic(models.Model):
         if values.get('check_in') or values.get('check_out'):
             line_new = False
             if values.get('check_in'):
-                value_check_in = values.get('check_in').split(' ')[0]
+                value_check_in = str(values.get('check_in')).split(' ')[0]
 
                 user_tz = pytz.timezone(
                     new_attendance.employee_id.user_id.tz or 'UTC')
@@ -147,7 +147,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                     tzinfo=pytz.utc).astimezone(user_tz)
                 local_value_check_in = local_date.replace(tzinfo=None)
 
-                attendance_check_in = new_attendance.check_in.split(' ')[0]
+                attendance_check_in = str(new_attendance.check_in).split(' ')[0]
 
                 user_tz = pytz.timezone(
                     new_attendance.employee_id.user_id.tz or 'UTC')
@@ -230,8 +230,8 @@ class EmployeeAttendanceAnalytic(models.Model):
     @api.multi
     def create_line(self, sheet, date_from, date_to):
         dates = list(rrule.rrule(rrule.DAILY,
-                                 dtstart=parser.parse(date_from),
-                                 until=parser.parse(date_to)))
+                                 dtstart=parser.parse(str(date_from)),
+                                 until=parser.parse(str(date_to))))
         for date_line in dates:
             name = str(date_line).split(' ')[0]
             line = self.search(
