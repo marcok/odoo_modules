@@ -31,7 +31,7 @@ from . import hr_department
 from . import hr_employee
 from . import hr_timesheet_sheet_day
 from . import hr_timesheet_sheet_account
-# from . import res_company
+from . import res_company
 from . import hr_contract
 # from . import res_config_settings
 from . import res_users
