@@ -27,6 +27,7 @@ from odoo.exceptions import UserError
 
 class AccountAnalyticLine(models.Model):
     _inherit = "account.analytic.line"
+    _description = 'AccountAnalyticLine'
 
     sheet_id_computed = fields.Many2one('hr_timesheet_sheet.sheet',
                                         string='Sheet',
@@ -47,7 +48,7 @@ class AccountAnalyticLine(models.Model):
                                     related='employee_id.department_id',
                                     store=True, readonly=True)
 
-    @api.depends('date', 'user_id',  'sheet_id_computed.date_to',
+    @api.depends('date', 'user_id', 'sheet_id_computed.date_to',
                  'sheet_id_computed.date_from', 'sheet_id_computed.employee_id')
     def _compute_sheet(self):
         """Links the timesheet line to the corresponding sheet
@@ -79,7 +80,8 @@ class AccountAnalyticLine(models.Model):
                             AND %(user_id)s = l.user_id
                         GROUP BY l.id""", {'date_from': ts.date_from,
                                            'date_to': ts.date_to,
-                                           'user_id': ts.employee_id.user_id.id, })
+                                           'user_id': ts.employee_id.user_id.id
+                                           })
                 ids.extend([row[0] for row in self._cr.fetchall()])
         return [('id', 'in', ids)]
 
