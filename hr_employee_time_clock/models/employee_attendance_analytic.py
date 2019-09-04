@@ -281,9 +281,14 @@ class EmployeeAttendanceAnalytic(models.Model):
         public_holiday = sheet.count_public_holiday(str(date_from))
         if contract and contract.rate_per_hour:
             return 0.00, contract, leave, public_holiday
-        dh = contract.resource_calendar_id.get_working_hours_of_date(
-            start_dt=fields.Datetime.from_string(str(date_from)),
-            resource_id=sheet.employee_id.id)
+        if contract:
+            dh = contract.resource_calendar_id.get_working_hours_of_date(
+                start_dt=fields.Datetime.from_string(str(date_from)),
+                resource_id=sheet.employee_id.id)
+        else:
+            dh = sheet.employee_id.resource_calendar_id.get_working_hours_of_date(
+                start_dt=fields.Datetime.from_string(str(date_from)),
+                resource_id=sheet.employee_id.id)
         if contract.state not in ('draft', 'cancel'):
             if leave[1] == 0 and not public_holiday:
                 if not dh:
