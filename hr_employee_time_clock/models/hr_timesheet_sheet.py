@@ -72,7 +72,6 @@ class HrTimesheetSheet(models.Model):
             [('user_id', '=', self.env.uid)])
         return emp_ids and emp_ids[0] or False
 
-    @api.multi
     def _total(self):
         print('\n _total >>>>>> %s')
         """ Compute the attendances, analytic lines timesheets
@@ -118,7 +117,6 @@ class HrTimesheetSheet(models.Model):
             sheet.attendance_count = len(sheet.attendances_ids)
 
     @api.onchange('date_from', 'date_to')
-    @api.multi
     def change_date_from(self):
         date_from = self.date_from
         date_to = self.date_to
@@ -284,7 +282,6 @@ class HrTimesheetSheet(models.Model):
     def copy(self, *args, **argv):
         raise UserError(_('You cannot duplicate a timesheet.'))
 
-    @api.multi
     def write(self, vals):
         if 'state' in vals and vals['state'] == 'done':
             employee = self.env['hr.employee'].search([
@@ -308,7 +305,6 @@ class HrTimesheetSheet(models.Model):
             self._check_sheet_date(forced_user_id=new_user_id)
         return super(HrTimesheetSheet, self).write(vals)
 
-    @api.multi
     def action_timesheet_draft(self):
         if not self.env.user.has_group('hr_timesheet.group_hr_timesheet_user'):
             raise UserError(_('Only an HR Officer or Manager can refuse '
@@ -316,7 +312,6 @@ class HrTimesheetSheet(models.Model):
         self.write({'state': 'draft'})
         return True
 
-    @api.multi
     def action_timesheet_confirm(self):
         for sheet in self:
             sheet.check_employee_attendance_state()
@@ -334,7 +329,6 @@ class HrTimesheetSheet(models.Model):
         self.write({'state': 'confirm'})
         return True
 
-    @api.multi
     def action_timesheet_done(self):
         if not self.env.user.has_group('hr_timesheet.group_hr_timesheet_user'):
             raise UserError(_(
@@ -343,14 +337,12 @@ class HrTimesheetSheet(models.Model):
             raise UserError(_("Cannot approve a non-submitted timesheet."))
         self.write({'state': 'done'})
 
-    @api.multi
     def name_get(self):
         # week number according to ISO 8601 Calendar
         return [(r['id'], _('Week ') + str(
             datetime.strptime(str(r['date_from']), '%Y-%m-%d').isocalendar()[1]))
                 for r in self.read(['date_from'], load='_classic_write')]
 
-    @api.multi
     def unlink(self):
         sheets = self.read(['state', 'total_attendance'])
         for sheet in sheets:
@@ -373,7 +365,6 @@ class HrTimesheetSheet(models.Model):
     # OpenChatter methods and notifications
     # ------------------------------------------------
 
-    @api.multi
     def _track_subtype(self, init_values):
         if self:
             record = self[0]
@@ -392,7 +383,6 @@ class HrTimesheetSheet(models.Model):
         return ['&', ('state', '=', 'confirm'),
                 ('employee_id', 'in', empids.ids)]
 
-    @api.multi
     def action_sheet_report(self):
         self.ensure_one()
         return {
@@ -405,7 +395,6 @@ class HrTimesheetSheet(models.Model):
             'context': {'search_default_user_id': self.user_id.id, }
         }
 
-    @api.multi
     def check_employee_attendance_state(self):
         """ Checks the attendance records of the timesheet,
             make sure they are all closed
@@ -418,7 +407,6 @@ class HrTimesheetSheet(models.Model):
                               "Check Out."))
         return True
 
-    @api.multi
     def _duty_hours(self):
         for sheet in self:
             sheet['total_duty_hours'] = 0.0
@@ -430,7 +418,6 @@ class HrTimesheetSheet(models.Model):
                 sheet['total_duty_hours'] = (sheet.total_duty_hours -
                                              sheet.total_attendance)
 
-    @api.multi
     def take_holiday_status(self):
         """
         Takes holiday types, which must change duty hours.
@@ -463,7 +450,6 @@ class HrTimesheetSheet(models.Model):
             tzinfo=None)
         return default_date
 
-    @api.multi
     def count_leaves(self, date_line, employee_id):
         """
         Checks if employee has any leave on current date.
@@ -559,14 +545,12 @@ class HrTimesheetSheet(models.Model):
                 [('date', '=', date_from)])
         return public_holidays
 
-    @api.multi
     def get_overtime(self, start_date):
         for sheet in self:
             if sheet.state == 'done':
                 return sheet.total_duty_hours_done * -1
             return self.calculate_diff(start_date)
 
-    @api.multi
     def _overtime_diff(self):
         for sheet in self:
             employee_id = sheet.employee_id.id
@@ -629,7 +613,6 @@ class HrTimesheetSheet(models.Model):
             leave_descr = descr[0].name
         return leave_descr
 
-    @api.multi
     def _get_analysis(self):
         for sheet in self:
             contract = self.check_contract(sheet.employee_id.id,
@@ -764,7 +747,6 @@ class HrTimesheetSheet(models.Model):
             order=order)
         return res
 
-    @api.multi
     def calculate_duty_hours(self, date_from, period):
         contract_obj = self.env['hr.contract']
         calendar_obj = self.env['resource.calendar']
@@ -808,7 +790,6 @@ class HrTimesheetSheet(models.Model):
                 duty_hours += dh
         return duty_hours
 
-    @api.multi
     def get_previous_month_diff(self, employee_id, prev_timesheet_date_from):
         total_diff = self.env['hr.employee'].browse(
             employee_id).start_time_different
@@ -820,7 +801,6 @@ class HrTimesheetSheet(models.Model):
             total_diff = prev_timesheet_ids[-1].calculate_diff_hours
         return total_diff
 
-    @api.multi
     def _get_user_datetime_format(self):
         """ Get user's language & fetch date/time formats of
         that language """
@@ -841,7 +821,6 @@ class HrTimesheetSheet(models.Model):
             key=lambda v: v.check_out)
         return previous_attendance
 
-    @api.multi
     def attendance_analysis(self, timesheet_id=None, function_call=False):
         attendance_obj = self.env['hr.attendance']
         date_format, time_format = self._get_user_datetime_format()
@@ -1029,18 +1008,15 @@ class HrTimesheetSheet(models.Model):
                     res['total'] = total
                 return res
 
-    @api.multi
     def sign_float_time_convert(self, float_time):
         sign = '-' if float_time < 0 else ''
         attendance_obj = self.env['hr.attendance']
         return sign + attendance_obj.float_time_convert(float_time)
 
-    @api.multi
     def calculate_diff(self, end_date=None):
         for sheet in self:
             return sheet.total_duty_hours * (-1)
 
-    @api.multi
     def hr_attendance_employee_action(self):
         ctx = {'default_employee_id': self.employee_id.id}
 

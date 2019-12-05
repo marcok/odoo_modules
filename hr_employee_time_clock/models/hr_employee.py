@@ -35,7 +35,6 @@ class HrEmployee(models.Model):
     _inherit = "hr.employee"
     _description = "Employee"
 
-    @api.multi
     def _compute_timesheet_count(self):
         for employee in self:
             employee.timesheet_count = employee.env[
@@ -93,14 +92,12 @@ class HrEmployee(models.Model):
     start_overtime_different = fields.Integer(string='Start Overtime Count',
                                               default=0.00)
 
-    @api.multi
     def _compute_manual_attendance(self):
         for employee in self:
             employee.manual_attendance = employee.user_id.has_group(
                 'hr_attendance.group_hr_attendance') \
                 if employee.user_id else False
 
-    @api.multi
     def _inverse_manual_attendance(self):
         manual_attendance_group = self.env.ref(
             'hr_attendance.group_hr_attendance')
@@ -120,7 +117,6 @@ class HrEmployee(models.Model):
                                           and employee.attendance_ids[
                                               0] or False
 
-    @api.one
     def initial_overtime(self):
         """
         Checks if timezone is set for each user.
@@ -168,7 +164,6 @@ class HrEmployee(models.Model):
                {'warning': _('No employee corresponding to '
                              'barcode %(barcode)s') % {'barcode': barcode}}
 
-    @api.multi
     def attendance_manual(self, next_action, entered_pin=None):
         self.ensure_one()
         if not (entered_pin is None) or self.env['res.users'].browse(
@@ -182,7 +177,6 @@ class HrEmployee(models.Model):
         ctx['attendance_manual'] = True
         return self.with_context(ctx).attendance_action(next_action)
 
-    @api.multi
     def attendance_action(self, next_action):
         """ Changes the attendance of the employee.
             Returns an action to the check in/out message,
@@ -212,7 +206,6 @@ class HrEmployee(models.Model):
         action_message['attendance'] = modified_attendance.read()[0]
         return {'action': action_message}
 
-    @api.multi
     def attendance_action_change(self):
         hr_timesheet_sheet_sheet_pool = self.env['hr_timesheet_sheet.sheet']
         hr_timesheet_ids = hr_timesheet_sheet_sheet_pool.search(
@@ -280,7 +273,7 @@ class HrEmployee(models.Model):
             return True
         return attendance
 
-    @api.model_cr_context
+    @api.model
     def _init_column(self, column_name):
         """ Initialize the value of the given column for existing rows.
             Overridden here because we need to have different default values
@@ -303,7 +296,6 @@ class HrEmployee(models.Model):
                     self._table, column_name, employee_id[0])
                 self.env.cr.execute(query, (default_value,))
 
-    @api.multi
     def read(self, fields=None, load='_classic_read'):
         result = super(HrEmployee, self).read(fields=fields, load=load)
         new_result = []

@@ -53,7 +53,7 @@ class HrTimesheetSheetSheetAccount(models.Model):
         'hr_timesheet_sheet.sheet': ['date_from', 'date_to', 'user_id'],
     }
 
-    @api.model_cr
+    @api.model
     def init(self):
         drop_view_if_exists(self._cr, 'hr_timesheet_sheet_sheet_account')
         self._cr.execute("""create view hr_timesheet_sheet_sheet_account as (

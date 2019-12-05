@@ -33,11 +33,11 @@
         'resource',
         'mail',
         'analytic',
+        'hr_holidays',
         'hr_timesheet',
         'hr_attendance',
         'hr',
         'hr_contract',
-        'hr_holidays_public'
     ],
 
     'images': ['images/overundertime.png'],
@@ -48,7 +48,7 @@
 
         'views/hr_timesheet_sheet_views.xml',
         'views/hr_attendance_subtypes.xml',
-        'views/hr_holidays_views.xml',
+        # 'views/hr_holidays_views.xml',
         'views/hr_department_views.xml',
 
         # Report

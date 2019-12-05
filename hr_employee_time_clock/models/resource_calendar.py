@@ -31,7 +31,6 @@ import pytz
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
 
-    @api.multi
     def get_working_intervals_of_day(self, start_dt=None,
                                      end_dt=None, leaves=None,
                                      compute_leaves=False, resource_id=None,
@@ -119,7 +118,6 @@ class ResourceCalendar(models.Model):
         #     intervals += work_intervals
         return intervals
 
-    @api.multi
     def get_working_hours_of_date(self, start_dt=None,
                                   end_dt=None, leaves=None,
                                   compute_leaves=None, resource_id=None,
@@ -136,7 +134,6 @@ class ResourceCalendar(models.Model):
             res += interval[1] - interval[0]
         return seconds(res) / 3600.0
 
-    @api.multi
     def get_bonus_hours_of_date(self, start_dt=None,
                                 end_dt=None, leaves=None,
                                 compute_leaves=False, resource_id=None,
@@ -153,7 +150,6 @@ class ResourceCalendar(models.Model):
             res += interval[1] - interval[0]
         return seconds(res) / 3600.0
 
-    @api.multi
     def get_attendances_for_weekdays(self, weekdays, start_dt, end_dt):
         """ Given a list of weekdays, return matching
         resource.calendar.attendance"""
@@ -202,7 +198,6 @@ class ResourceCalendar(models.Model):
                                           "overtime from when two days "
                                           "shift is not using.")
 
-    @api.multi
     def _get_leave_intervals(self, resource_id=None,
                              start_datetime=None, end_datetime=None):
         self.ensure_one()
@@ -246,7 +241,6 @@ class ResourceCalendar(models.Model):
             to_tz(fields.Datetime.from_string(leave.date_to), leave.tz),
             {'leaves': leave}) for leave in filtered_leaves]
 
-    @api.multi
     def initial_overtime(self):
         contracts = self.env['hr.contract'].search(
             [('resource_calendar_id', '=', self.id)])
@@ -304,7 +298,6 @@ def to_tz(datetime, tz_name):
 class ResourceCalendarAttendance(models.Model):
     _inherit = "resource.calendar.attendance"
 
-    @api.multi
     def write(self, values):
         if 'date_from' in values.keys() or 'date_to' in values.keys():
             old_date_from = self.date_from
@@ -346,7 +339,6 @@ class ResourceCalendarAttendance(models.Model):
         res.change_working_time(date_start, date_end)
         return res
 
-    @api.multi
     def unlink(self):
         date_start = self.date_from or (
             datetime.now().date().replace(month=1, day=1)).strftime("%Y-%m-%d")
@@ -358,7 +350,6 @@ class ResourceCalendarAttendance(models.Model):
         self.change_working_time(date_start, date_end, resource_calendar_id)
         return res
 
-    @api.multi
     def change_working_time(self, date_start, date_end,
                             resource_calendar_id=False):
         _logger.info(date_start)

@@ -108,7 +108,6 @@ class HrAttendance(models.Model):
                            readonly=True,
                            default=0.0)
 
-    @api.multi
     def _get_attendance_employee_tz(self, employee_id, date):
         """ Simulate timesheet in employee timezone
 
@@ -131,7 +130,6 @@ class HrAttendance(models.Model):
                                             DEFAULT_SERVER_DATE_FORMAT)
         return att_tz_date_str
 
-    @api.multi
     def _get_current_sheet(self, employee_id, date=False):
         """
         Returns current timesheet (depends on date)
@@ -152,7 +150,6 @@ class HrAttendance(models.Model):
             limit=1)
         return sheet_ids and sheet_ids[0] or False
 
-    @api.multi
     def _get_hr_timesheet_sheet(self):
         attendance_ids = []
         for ts in self:
@@ -176,7 +173,6 @@ class HrAttendance(models.Model):
             attendance_ids.extend([row[0] for row in self.env.cr.fetchall()])
         return attendance_ids
 
-    @api.multi
     @api.depends('employee_id', 'check_in', 'check_out')
     def _sheet(self):
         res = {}.fromkeys(self, False)
@@ -201,7 +197,6 @@ class HrAttendance(models.Model):
         float_time = '%02d:%02d' % (hours, mins)
         return float_time
 
-    @api.multi
     def get_employee_sheets(self, employee, check_in):
         sheet_ids = []
         year = int(str(check_in).split('-')[0])
@@ -212,7 +207,6 @@ class HrAttendance(models.Model):
                 sheet_ids.append(sheet.id)
         return sheet_ids
 
-    @api.multi
     def _calculate_overtime(self, check_in, check_out, this_year_sheets):
         """
         Checks if employee has overtime in current attendance.
@@ -265,7 +259,6 @@ class HrAttendance(models.Model):
                 calculate_overtime = False
         return calculate_overtime
 
-    @api.multi
     def get_contract(self, time_info=None):
         """
         Returns current employee's contract
@@ -289,7 +282,6 @@ class HrAttendance(models.Model):
             contract = contract[-1]
         return contract
 
-    @api.multi
     def check_overtime(self, values):
         """
         Calculates bonus hours, night worked shift hours for current attendance on
@@ -480,7 +472,6 @@ class HrAttendance(models.Model):
         return values
         # return res
 
-    @api.multi
     def write(self, values):
         if not self.env.context.get('check_overtime'):
             values = self.check_overtime(values)
@@ -539,7 +530,6 @@ class HrAttendance(models.Model):
                 attendance, values)
         return attendance
 
-    @api.multi
     def unlink(self):
         for attendance in self:
             name = str(attendance.check_in).split(' ')[0]

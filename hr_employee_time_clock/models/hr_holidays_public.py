@@ -23,11 +23,6 @@
 from datetime import date
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
-
-
-class HrHolidaysPublic(models.Model):
-    _inherit = 'hr.holidays.public'
 
 
 class HrHolidaysPublicLine(models.Model):
@@ -41,7 +36,6 @@ class HrHolidaysPublicLine(models.Model):
             line_date=line_date)
         return line
 
-    @api.multi
     def write(self, values):
         old_date = self.date
         new_date = values.get('date')
@@ -55,7 +49,6 @@ class HrHolidaysPublicLine(models.Model):
 
         return res
 
-    @api.multi
     def unlink(self):
         old_date = self.date
         res = super(HrHolidaysPublicLine, self).unlink()

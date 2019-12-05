@@ -32,7 +32,6 @@
     <record id="action_hr_attendance_analysis_report" model="ir.actions.act_window">
         <field name="name">Analysis by attendance sheet</field>
         <field name="res_model">hr.attendance.analysis.report</field>
-        <field name="view_type">form</field>
         <field name="view_mode">graph</field>
         <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
     </record>

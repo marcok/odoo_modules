@@ -38,7 +38,6 @@ class HolidaysType(models.Model):
 class HrHolidays(models.Model):
     _inherit = "hr.leave"
 
-    @api.multi
     def write(self, values):
         state = self.state
         res = super(HrHolidays, self).write(values)

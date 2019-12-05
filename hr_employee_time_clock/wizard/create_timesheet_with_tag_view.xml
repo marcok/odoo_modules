@@ -38,8 +38,7 @@
                 model="ir.actions.act_window">
             <field name="name">My Timesheet</field>
             <field name="res_model">hr.timesheet.current.open</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree</field>
             <field name="view_id" ref="view_hr_timesheet_current_open"/>
             <field name="target">new</field>
             <field name="help">My Timesheet opens your timesheet so that you can

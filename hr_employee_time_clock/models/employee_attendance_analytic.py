@@ -70,7 +70,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                              readonly=True,
                              )
 
-    @api.multi
     def recalculate_line(self, line_date, employee_id=None):
         if employee_id:
             lines = self.search([('name', '=', line_date),
@@ -104,12 +103,10 @@ class EmployeeAttendanceAnalytic(models.Model):
                     values.update(leave_description=l.name)
                 line.write(values)
 
-    @api.multi
     def _get_difference(self):
         for line in self:
             line.difference = line.worked_hours - line.duty_hours
 
-    @api.multi
     def unlink_attendance(self, attend=False):
         worked_hours = 0
         bonus_worked_hours = 0
@@ -133,7 +130,6 @@ class EmployeeAttendanceAnalytic(models.Model):
             'night_shift_worked_hours': night_shift_worked_hours,
         })
 
-    @api.multi
     def recalculate_line_worktime(self, new_attendance, values):
         if values.get('check_in') or values.get('check_out'):
             line_new = False
@@ -227,7 +223,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                     'night_shift_worked_hours': night_shift_worked_hours,
                 })
 
-    @api.multi
     def create_line(self, sheet, date_from, date_to):
         dates = list(rrule.rrule(rrule.DAILY,
                                  dtstart=parser.parse(str(date_from)),
@@ -263,7 +258,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                     values.update(leave_description=l.name)
                 self.create(values)
 
-    @api.multi
     def calculate_duty_hours(self, sheet, date_from):
         contract_obj = self.env['hr.contract']
         duty_hours = 0.0

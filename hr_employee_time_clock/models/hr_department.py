@@ -30,7 +30,6 @@ class HrDepartment(models.Model):
     timesheet_to_approve_count = fields.Integer(
         compute='_compute_timesheet_to_approve', string='Timesheet to Approve')
 
-    @api.multi
     def _compute_timesheet_to_approve(self):
         timesheet_data = self.env['hr_timesheet_sheet.sheet'].read_group(
             [('department_id', 'in', self.ids),

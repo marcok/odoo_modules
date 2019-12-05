@@ -48,7 +48,6 @@ class ImportLeaveRequests(models.TransientModel):
             DEFAULT_SERVER_DATETIME_FORMAT)
         return converted_date
 
-    @api.multi
     def import_leave_data(self):
         holiday_obj = self.env['hr.leave']
         employee_obj = self.env['hr.employee']

@@ -36,7 +36,6 @@ class HrContract(models.Model):
 
     rate_per_hour = fields.Boolean(string="Use hour rate")
 
-    @api.multi
     def write(self, values):
         for contract in self:
             old_date_start = contract.date_start
@@ -119,7 +118,6 @@ class HrContract(models.Model):
                         employee_id=contract.employee_id)
             return res
 
-    @api.multi
     def attach_attendance(self):
         date_start = self.date_start
         date_end = self.date_end
@@ -151,7 +149,6 @@ class HrContract(models.Model):
                         line_date=line.name,
                         employee_id=self.employee_id)
 
-    @api.multi
     def remove_from_attendance(self, lines, employee):
         analytic_pool = self.env['employee.attendance.analytic']
         for line in lines:
@@ -164,7 +161,6 @@ class HrContract(models.Model):
                 analytic_pool.recalculate_line(
                     line_date=str(date_line), employee_id=employee)
 
-    @api.multi
     def unlink(self):
         analytic_pool = self.env['employee.attendance.analytic']
         lines = analytic_pool.search(

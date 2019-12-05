@@ -50,7 +50,7 @@ class TimesheetsByPeriod(models.Model):
         'hr_timesheet_sheet.sheet': ['attendances_ids', 'timesheet_ids'],
     }
 
-    @api.model_cr
+    @api.model
     def init(self):
         self._cr.execute("""create or replace view %s as
             SELECT
