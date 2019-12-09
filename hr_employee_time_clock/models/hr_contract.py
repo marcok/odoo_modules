@@ -111,7 +111,6 @@ class HrContract(models.Model):
                             line_date=str(date_line),
                             employee_id=contract.employee_id)
             if values.get('date_start'):
-
                 dates = calculate_days(old_date_start, values.get('date_start'))
                 for date_line in dates:
                     analytic_pool.recalculate_line(

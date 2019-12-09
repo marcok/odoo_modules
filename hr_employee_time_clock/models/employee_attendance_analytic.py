@@ -284,11 +284,14 @@ class EmployeeAttendanceAnalytic(models.Model):
         # dh = contract.resource_calendar_id.get_working_hours_of_date(
         #     start_dt=fields.Datetime.from_string(str(date_from)),
         #     resource_id=sheet.employee_id.id)
+        dh = 0.00
         if contract:
             dh = contract.resource_calendar_id.get_working_hours_of_date(
                 start_dt=fields.Datetime.from_string(str(date_from)),
                 resource_id=sheet.employee_id.id)
-        else:
+        contracts = self.env['hr.contract'].search([('employee_id', '=',
+                                                     sheet.employee_id.id)])
+        if not contracts:
             dh = sheet.employee_id.resource_calendar_id.get_working_hours_of_date(
                 start_dt=fields.Datetime.from_string(str(date_from)),
                 resource_id=sheet.employee_id.id)
