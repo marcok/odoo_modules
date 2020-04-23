@@ -167,8 +167,8 @@ class HrTimesheetDh(models.Model):
                     output.append('<th colspan="2">' + prev_ts + ' </th>')
                     output.append('<td colspan="3">' + t + '</td>')
                     output.append('</tr>')
-            keys = ('Date', 'Duty Hours', 'Worked Hours',
-                    'Difference', 'Running')
+            keys = (_('Date'), _('Duty Hours'), _('Worked Hours'),
+                    _('Difference'), _('Running'))
             a = ('previous_month_diff', 'hours', 'total')
             for k in a:
                 v = data.get(k)
