@@ -367,9 +367,9 @@ class HrTimesheetSheet(models.Model):
         if self:
             record = self[0]
             if 'state' in init_values and record.state == 'confirm':
-                return 'hr_employee_time_clock.mt_timesheet_confirmed'
+                return self.env.ref('hr_employee_time_clock.mt_timesheet_confirmed')
             elif 'state' in init_values and record.state == 'done':
-                return 'hr_employee_time_clock.mt_timesheet_approved'
+                return self.env.ref('hr_employee_time_clock.mt_timesheet_approved')
         return super(HrTimesheetSheet, self)._track_subtype(init_values)
 
     @api.model
