@@ -30,6 +30,14 @@ from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
+class HrEmployeeBase(models.AbstractModel):
+    _inherit = "hr.employee.base"
+
+    start_time_different = fields.Float(string='Start Time Different',
+                                        default=0.00)
+    start_overtime_different = fields.Integer(string='Start Overtime Count',
+                                              default=0.00)
+
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
@@ -82,15 +90,15 @@ class HrEmployee(models.Model):
         help='The employee will have access to the "My Attendances" '
              'menu to check in and out from his session')
 
-    start_time_different = fields.Float(string='Start Time Different',
-                                        default=0.00)
+    # start_time_different = fields.Float(string='Start Time Different',
+    #                                    default=0.00)
 
     _sql_constraints = [('barcode_uniq', 'unique (barcode)',
                          "The Badge ID must be unique, this one is "
                          "already assigned to another employee.")]
 
-    start_overtime_different = fields.Integer(string='Start Overtime Count',
-                                              default=0.00)
+    # start_overtime_different = fields.Integer(string='Start Overtime Count',
+    #                                          default=0.00)
 
     def _compute_manual_attendance(self):
         for employee in self:
@@ -199,7 +207,7 @@ class HrEmployee(models.Model):
         action_message['next_action'] = next_action
 
         if self.user_id:
-            modified_attendance = self.sudo(
+            modified_attendance = self.with_user(
                 self.user_id.id).attendance_action_change()
         else:
             modified_attendance = self.sudo().attendance_action_change()
