@@ -97,7 +97,7 @@ class HrEmployee(models.Model):
                          "The Badge ID must be unique, this one is "
                          "already assigned to another employee.")]
 
-    # start_overtime_different = fields.Integer(string='Start Overtime Count',
+    #start_overtime_different = fields.Integer(string='Start Overtime Count',
     #                                          default=0.00)
 
     def _compute_manual_attendance(self):

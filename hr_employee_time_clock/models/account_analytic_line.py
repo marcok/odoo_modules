@@ -66,6 +66,10 @@ class AccountAnalyticLine(models.Model):
     department_id = fields.Many2one('hr.department', "Department",
                                     related='employee_id.department_id',
                                     store=True, readonly=True)
+    account_id = fields.Many2one('account.analytic.account', 'Analytic Account',
+                                 required=False, ondelete='restrict', index=True,
+                                 domain="['|', ('company_id', '=', False), "
+                                        "('company_id', '=', company_id)]")
 
     def _search_sheet(self, operator, value):
         assert operator == 'in'
