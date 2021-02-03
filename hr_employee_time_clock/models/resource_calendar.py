@@ -26,6 +26,9 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 import pytz
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ResourceCalendar(models.Model):
