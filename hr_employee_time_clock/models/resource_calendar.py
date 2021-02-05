@@ -343,14 +343,15 @@ class ResourceCalendarAttendance(models.Model):
         return res
 
     def unlink(self):
-        date_start = self.date_from or (
-            datetime.now().date().replace(month=1, day=1)).strftime("%Y-%m-%d")
-        date_end = self.date_to or (
-            datetime.now().date().replace(month=12, day=31)).strftime(
-            "%Y-%m-%d")
-        resource_calendar_id = self.calendar_id.id
+        for day in self:
+            date_start = day.date_from or (
+                datetime.now().date().replace(month=1, day=1)).strftime("%Y-%m-%d")
+            date_end = day.date_to or (
+                datetime.now().date().replace(month=12, day=31)).strftime(
+                "%Y-%m-%d")
+            resource_calendar_id = day.calendar_id.id
+            day.change_working_time(date_start, date_end, resource_calendar_id)
         res = super(ResourceCalendarAttendance, self).unlink()
-        self.change_working_time(date_start, date_end, resource_calendar_id)
         return res
 
     def change_working_time(self, date_start, date_end,
