@@ -24,6 +24,13 @@
                         string="Initial Employee Overtime"
                         class="btn-primary"/>
             </xpath>
+            <xpath expr="//group[@name='active_group']" position="after">
+                <group string='Attendance' groups="hr_attendance.group_hr_attendance_user">
+                    <field name="barcode"/>
+                    <field name="pin" groups="hr_attendance.group_hr_attendance_use_pin"/>
+                    <field name="manual_attendance" attrs="{'invisible': [('user_id', '=', False)]}"/>
+                </group>
+            </xpath>
         </field>
     </record>
 
