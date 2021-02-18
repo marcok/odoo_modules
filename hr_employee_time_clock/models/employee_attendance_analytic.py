@@ -191,7 +191,8 @@ class EmployeeAttendanceAnalytic(models.Model):
                 new_attendance.line_analytic_id = line.id
             else:
                 if not new_attendance.line_analytic_id:
-                    new_attendance.line_analytic_id = line.id
+                    for rec in line:
+                        new_attendance.line_analytic_id = rec.id
             if check_out:
                 worked_hours = 0
                 bonus_worked_hours = 0
