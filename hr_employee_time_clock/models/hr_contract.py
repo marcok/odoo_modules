@@ -103,8 +103,8 @@ class HrContract(models.Model):
                 if lines:
                     dates = list(rrule.rrule(
                         rrule.DAILY,
-                        dtstart=parser.parse(old_date_end.strftime('%Y-%m-%d')),
-                        until=parser.parse((lines[-1].name).strftime('%Y-%m-%d'))))
+                        dtstart=parser.parse(old_date_end),
+                        until=parser.parse(lines[-1].name)))
                     for date_line in dates:
                         analytic_pool.recalculate_line(
                             line_date=str(date_line),
