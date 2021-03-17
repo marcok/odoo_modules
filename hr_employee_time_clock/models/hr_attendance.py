@@ -230,7 +230,7 @@ class HrAttendance(models.Model):
                     and str(cl_attendance.check_out) < str(attendance.check_out) < str(check_in):
                 cl_attendance = attendance
         if cl_attendance != self:
-            self_date = fields.Datetime.to_string(check_out).split(' ')[0].split('-')
+            self_date = check_out.split(' ')[0].split('-')
             self_day_of_week = calendar.weekday(int(self_date[0]),
                                                 int(self_date[1]),
                                                 int(self_date[2]))

@@ -75,7 +75,7 @@
                 <filter string="Current Month" name="current_month" domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]" />
             </xpath>
             <!--<xpath expr="//filter[4]" position="replace">-->
-                <!--<filter string="My Attendances" name="my_attendances" domain="[('employee_id.user_id.id', '=', uid)]" />-->
+            <!--<filter string="My Attendances" name="my_attendances" domain="[('employee_id.user_id.id', '=', uid)]" />-->
             <!--</xpath>-->
         </field>
     </record>
@@ -376,9 +376,9 @@
             <xpath expr="//button[@id='hr_presence_button']" position="before">
                 <field name="attendance_state" invisible="1"/>
                 <button name="%(hr_attendance.hr_attendance_action_employee)d"
-                    class="oe_stat_button"
-                    id="hr_attendance_button"
-                    type="action" attrs="{'invisible': [('attendance_state', '=', False)]}">
+                        class="oe_stat_button"
+                        id="hr_attendance_button"
+                        type="action" attrs="{'invisible': [('attendance_state', '=', False)]}">
                     <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_green" attrs="{'invisible': [('attendance_state', '=', 'checked_out')]}" aria-label="Users" title="Users"/>
                     <div id="oe_hr_attendance_status" class="fa fa-fw fa-user o_button_icon oe_hr_attendance_status_red" attrs="{'invisible': [('attendance_state', '=', 'checked_in')]}" aria-label="Users" title="Users"/>
                     <div class="o_stat_info">
@@ -386,13 +386,13 @@
                     </div>
                 </button>
             </xpath>
-<!--            <xpath expr="//group[@name='active_group']" position="after">-->
-<!--                <group string='Attendance' groups="hr_attendance.group_hr_attendance_user">-->
-<!--                    <field name="barcode"/>-->
-<!--                    <field name="pin" groups="hr_attendance.group_hr_attendance_use_pin"/>-->
-<!--                    <field name="manual_attendance" attrs="{'invisible': [('user_id', '=', False)]}"/>-->
-<!--                </group>-->
-<!--            </xpath>-->
+            <!--            <xpath expr="//group[@name='active_group']" position="after">-->
+            <!--                <group string='Attendance' groups="hr_attendance.group_hr_attendance_user">-->
+            <!--                    <field name="barcode"/>-->
+            <!--                    <field name="pin" groups="hr_attendance.group_hr_attendance_use_pin"/>-->
+            <!--                    <field name="manual_attendance" attrs="{'invisible': [('user_id', '=', False)]}"/>-->
+            <!--                </group>-->
+            <!--            </xpath>-->
         </field>
     </record>
 
