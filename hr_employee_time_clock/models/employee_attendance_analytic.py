@@ -42,8 +42,8 @@ class EmployeeAttendanceAnalytic(models.Model):
                                string='Sheet',
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
-                                     'line_analytic_id',
-                                     string='Attendance IDS')
+                                      'line_analytic_id',
+                                      string='Attendance IDS')
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
@@ -78,8 +78,8 @@ class EmployeeAttendanceAnalytic(models.Model):
         else:
             lines = self.search([('name', '=', line_date)])
             date_line = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(line_date),
-                                         until=parser.parse(line_date)))[0]
+                                         dtstart=parser.parse(str(line_date)),
+                                         until=parser.parse(str(line_date))))[0]
         for line in lines:
             if line.sheet_id:
                 duty_hours, contract, leave, public_holiday = \
@@ -193,18 +193,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if not new_attendance.line_analytic_id:
                     new_attendance.line_analytic_id = line.id
             if check_out:
-                old_line_to_update = new_attendance.line_analytic_id.id
-                self.env['hr.attendance'].search([('id', '=', new_attendance.id)]).write({
-                    'line_analytic_id': line.id
-                })
-                worked_hours_to_update = self.env['hr.attendance'].search(
-                    [('line_analytic_id', '=', old_line_to_update)])
-                hours = 0
-                for i in worked_hours_to_update:
-                    hours += i.worked_hours
-                self.search([('id', '=', old_line_to_update)]).write({
-                    'worked_hours': hours
-                })
                 worked_hours = 0
                 bonus_worked_hours = 0
                 night_shift_worked_hours = 0
