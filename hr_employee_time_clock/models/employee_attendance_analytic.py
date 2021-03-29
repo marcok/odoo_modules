@@ -100,7 +100,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                         l = leaves[0]
                     else:
                         l = leave[0]
-                    values.update(leave_description=l.name)
+                    values.update(leave_description=l.holiday_status_id.name)
                 line.write(values)
 
     def _get_difference(self):
@@ -267,7 +267,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=l.name)
+                    values.update(leave_description=l.holiday_status_id.name)
                 self.create(values)
 
     def calculate_duty_hours(self, sheet, date_from):
@@ -318,6 +318,4 @@ class EmployeeAttendanceAnalytic(models.Model):
         else:
             dh = 0.00
             duty_hours += dh
-        if not contract.date_start:
-            duty_hours = 0.00
         return duty_hours, contract, leave, public_holiday
