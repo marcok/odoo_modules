@@ -789,6 +789,13 @@ class HrTimesheetSheet(models.Model):
         return duty_hours
 
     def get_previous_month_diff(self, employee_id, prev_timesheet_date_from):
+        contract_obj = self.env['hr.contract']
+        contract_ids = contract_obj.search(
+            [('employee_id', '=', self.employee_id.id),
+             ('state', 'not in', ('draft', 'cancel'))])
+        for contract in contract_ids:
+            if contract.rate_per_hour:
+                return 0.0
         total_diff = self.env['hr.employee'].browse(
             employee_id).start_time_different
         prev_timesheet_ids = self.search(
