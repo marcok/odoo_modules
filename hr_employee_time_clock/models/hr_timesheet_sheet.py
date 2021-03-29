@@ -470,6 +470,7 @@ class HrTimesheetSheet(models.Model):
             for holiday_id in holiday_ids:
                 date_from = fields.Datetime.from_string(holiday_id.date_from)
                 date_to = fields.Datetime.from_string(holiday_id.date_to)
+                manual_number_of_days = holiday_id.number_of_days
                 contracts = self.env['hr.contract'].search([
                     ('employee_id', '=', employee_id),
                     ('date_start', '<=', holiday_id.date_from),
@@ -519,11 +520,20 @@ class HrTimesheetSheet(models.Model):
 
                             if date_to_calc < date_from_calc:
                                 date_from_calc = date_to_calc
+
                             real_duty_hours += \
                                 (date_to_calc - date_from_calc) \
                                 / timedelta(days=temp_duty_hours / 24) \
                                 * temp_duty_hours
-                        number_of_days += real_duty_hours / default_duty_hours
+
+                        # Calculate leave days modification value, based on leave days number, which was defined by user
+                        # manually. These manually defined days are split evenly between number of calendar days in
+                        # leave request.
+                        leave_time_delta = holiday_id.request_date_to - holiday_id.request_date_from
+                        leave_days = leave_time_delta.days + 1
+                        manual_leave_days_mod = holiday_id.number_of_days / leave_days
+
+                        number_of_days += real_duty_hours / default_duty_hours * manual_leave_days_mod
 
         return [holiday_ids, number_of_days]
 
@@ -789,13 +799,6 @@ class HrTimesheetSheet(models.Model):
         return duty_hours
 
     def get_previous_month_diff(self, employee_id, prev_timesheet_date_from):
-        contract_obj = self.env['hr.contract']
-        contract_ids = contract_obj.search(
-            [('employee_id', '=', self.employee_id.id),
-             ('state', 'not in', ('draft', 'cancel'))])
-        for contract in contract_ids:
-            if contract.rate_per_hour:
-                return 0.0
         total_diff = self.env['hr.employee'].browse(
             employee_id).start_time_different
         prev_timesheet_ids = self.search(
