@@ -42,8 +42,8 @@ class EmployeeAttendanceAnalytic(models.Model):
                                string='Sheet',
                                index=True)
     attendance_ids = fields.One2many('hr.attendance',
-                                     'line_analytic_id',
-                                     string='Attendance IDS')
+                                      'line_analytic_id',
+                                      string='Attendance IDS')
     contract_id = fields.Many2one('hr.contract',
                                   string='Contract')
     duty_hours = fields.Float(string='Duty Hours',
@@ -100,7 +100,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                         l = leaves[0]
                     else:
                         l = leave[0]
-                    values.update(leave_description=l.holiday_status_id.name)
+                    values.update(leave_description=l.name)
                 line.write(values)
 
     def _get_difference(self):
@@ -193,18 +193,6 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if not new_attendance.line_analytic_id:
                     new_attendance.line_analytic_id = line.id
             if check_out:
-                old_line_to_update = new_attendance.line_analytic_id.id
-                self.env['hr.attendance'].search([('id', '=', new_attendance.id)]).write({
-                    'line_analytic_id': line.id
-                })
-                worked_hours_to_update = self.env['hr.attendance'].search(
-                    [('line_analytic_id', '=', old_line_to_update)])
-                hours = 0
-                for i in worked_hours_to_update:
-                    hours += i.worked_hours
-                self.search([('id', '=', old_line_to_update)]).write({
-                    'worked_hours': hours
-                })
                 worked_hours = 0
                 bonus_worked_hours = 0
                 night_shift_worked_hours = 0
@@ -267,7 +255,7 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if public_holiday:
                     values.update(leave_description=public_holiday.name)
                 if leave and leave[0]:
-                    values.update(leave_description=l.holiday_status_id.name)
+                    values.update(leave_description=l.name)
                 self.create(values)
 
     def calculate_duty_hours(self, sheet, date_from):
@@ -318,4 +306,6 @@ class EmployeeAttendanceAnalytic(models.Model):
         else:
             dh = 0.00
             duty_hours += dh
+        if not contract.date_start:
+            duty_hours = 0.00
         return duty_hours, contract, leave, public_holiday
