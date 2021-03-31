@@ -148,6 +148,7 @@
                                    string="Remaining this attendance sheet"/>
                             <field name="calculate_diff_hours"
                                    widget="float_time" string="Total balance"/>
+                            <field name="contract_id"/>
                         </group>
                     </group>
                     <notebook>

@@ -42,6 +42,8 @@ class HrTimesheetSheet(models.Model):
     _order = "id desc"
     _description = "Timesheet"
 
+    contract_id = fields.Many2one('hr.contract', string="Employee's contract", invisible=True)
+
     def _default_date_from(self):
         user = self.env['res.users'].browse(self.env.uid)
         r = user.company_id and user.company_id.timesheet_range or 'month'
@@ -248,6 +250,8 @@ class HrTimesheetSheet(models.Model):
             hr_timesheet_sheet, hr_timesheet_sheet.date_from,
             hr_timesheet_sheet.date_to)
         hr_timesheet_sheet.write({'state': 'draft'})
+        hr_timesheet_sheet.contract_id = hr_timesheet_sheet.employee_id.contract_id and (
+                                         hr_timesheet_sheet.employee_id.contract_id.id)
         return hr_timesheet_sheet
 
     @api.constrains('date_to', 'date_from', 'employee_id')
@@ -799,13 +803,8 @@ class HrTimesheetSheet(models.Model):
         return duty_hours
 
     def get_previous_month_diff(self, employee_id, prev_timesheet_date_from):
-        contract_obj = self.env['hr.contract']
-        contract_ids = contract_obj.search(
-            [('employee_id', '=', self.employee_id.id),
-             ('state', 'not in', ('draft', 'cancel'))])
-        for contract in contract_ids:
-            if contract.rate_per_hour:
-                return 0.0
+        if self.contract_id and self.contract_id.rate_per_hour:
+            return 0.0
         total_diff = self.env['hr.employee'].browse(
             employee_id).start_time_different
         prev_timesheet_ids = self.search(
