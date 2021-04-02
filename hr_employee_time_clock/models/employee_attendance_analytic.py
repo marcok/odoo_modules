@@ -193,6 +193,18 @@ class EmployeeAttendanceAnalytic(models.Model):
                 if not new_attendance.line_analytic_id:
                     new_attendance.line_analytic_id = line.id
             if check_out:
+                old_line_to_update = new_attendance.line_analytic_id.id
+                self.env['hr.attendance'].search([('id', '=', new_attendance.id)]).write({
+                    'line_analytic_id': line.id
+                })
+                worked_hours_to_update = self.env['hr.attendance'].search(
+                    [('line_analytic_id', '=', old_line_to_update)])
+                hours = 0
+                for i in worked_hours_to_update:
+                    hours += i.worked_hours
+                self.search([('id', '=', old_line_to_update)]).write({
+                    'worked_hours': hours
+                })
                 worked_hours = 0
                 bonus_worked_hours = 0
                 night_shift_worked_hours = 0
