@@ -530,15 +530,17 @@ class HrTimesheetSheet(models.Model):
                                 / timedelta(days=temp_duty_hours / 24) \
                                 * temp_duty_hours
 
-                        # Calculate leave days modification value, based on leave days number, which was defined by user
-                        # manually. These manually defined days are split evenly between number of calendar days in
-                        # leave request.
-                        calendar_working_days = holiday_id._get_number_of_days(date_from, date_to, None)['days']
-                        manual_leave_days_mod = holiday_id.number_of_days / calendar_working_days
-
                         calc_leave_days_mod = real_duty_hours / default_duty_hours
-                        number_of_days += calc_leave_days_mod if calc_leave_days_mod != 1 \
-                            else manual_leave_days_mod
+
+                        if (calc_leave_days_mod == 1) and (holiday_id.holiday_status_id.request_unit == "day"):
+                            # Calculate leave days modification value, based on leave days number, which was defined by
+                            # user manually. These manually defined days are split evenly between number of calendar
+                            # days in leave request.
+                            calendar_working_days = round(holiday_id._get_number_of_days(date_from, date_to, None)['days'])
+                            manual_leave_days_mod = holiday_id.number_of_days / calendar_working_days
+                            number_of_days += manual_leave_days_mod
+                        else:
+                            number_of_days += calc_leave_days_mod
 
         return [holiday_ids, number_of_days]
 
