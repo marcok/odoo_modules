@@ -474,7 +474,6 @@ class HrTimesheetSheet(models.Model):
             for holiday_id in holiday_ids:
                 date_from = fields.Datetime.from_string(holiday_id.date_from)
                 date_to = fields.Datetime.from_string(holiday_id.date_to)
-                manual_number_of_days = holiday_id.number_of_days
                 contracts = self.env['hr.contract'].search([
                     ('employee_id', '=', employee_id),
                     ('date_start', '<=', holiday_id.date_from),
@@ -529,18 +528,7 @@ class HrTimesheetSheet(models.Model):
                                 (date_to_calc - date_from_calc) \
                                 / timedelta(days=temp_duty_hours / 24) \
                                 * temp_duty_hours
-
-                        calc_leave_days_mod = real_duty_hours / default_duty_hours
-
-                        if (calc_leave_days_mod == 1) and (holiday_id.holiday_status_id.request_unit == "day"):
-                            # Calculate leave days modification value, based on leave days number, which was defined by
-                            # user manually. These manually defined days are split evenly between number of calendar
-                            # days in leave request.
-                            calendar_working_days = round(holiday_id._get_number_of_days(date_from, date_to, employee_id)['days'])
-                            manual_leave_days_mod = holiday_id.number_of_days / calendar_working_days
-                            number_of_days += manual_leave_days_mod
-                        else:
-                            number_of_days += calc_leave_days_mod
+                        number_of_days += real_duty_hours / default_duty_hours
 
         return [holiday_ids, number_of_days]
 
