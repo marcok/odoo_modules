@@ -78,8 +78,8 @@ class EmployeeAttendanceAnalytic(models.Model):
         else:
             lines = self.search([('name', '=', line_date)])
             date_line = list(rrule.rrule(rrule.DAILY,
-                                         dtstart=parser.parse(line_date),
-                                         until=parser.parse(line_date)))[0]
+                                         dtstart=parser.parse(str(line_date)),
+                                         until=parser.parse(str(line_date))))[0]
         for line in lines:
             if line.sheet_id:
                 duty_hours, contract, leave, public_holiday = \
