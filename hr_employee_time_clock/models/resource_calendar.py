@@ -66,11 +66,11 @@ class ResourceCalendar(models.Model):
                     start_dt.replace(hour=default_interval[1],
                                      minute=0, second=0))
             # intervals = self._interval_remove_leaves(working_interval, work_limits)
-            date_from = start_dt.replace(hour=default_interval[0],
-                                     minute=0, second=0).replace(tzinfo=pytz.UTC)
-            date_to = start_dt.replace(hour=default_interval[1],
-                                     minute=0, second=0).replace(tzinfo=pytz.UTC)
-            intervals += self._leave_intervals(date_from, date_to)
+                date_from = start_dt.replace(hour=default_interval[0],
+                                         minute=0, second=0).replace(tzinfo=pytz.UTC)
+                date_to = start_dt.replace(hour=default_interval[1],
+                                         minute=0, second=0).replace(tzinfo=pytz.UTC)
+                intervals += self._leave_intervals(date_from, date_to)
             return intervals
 
         #working_intervals = []
